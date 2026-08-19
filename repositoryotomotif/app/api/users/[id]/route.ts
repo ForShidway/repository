@@ -124,3 +124,55 @@ export async function PUT(
         )
     }
 }
+
+export async function DELETE(
+    request : Request,
+    context : RouteContext
+) {
+    try {
+        const{id} = await context.params;
+        const userId = Number(id);
+        if (Number.isNaN(userId)) {
+            return NextResponse.json(
+                {
+                    message: "ID user tidak valid",
+                },
+                { status: 400,}
+            )
+        }
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        });
+
+        if (!existingUser) {
+            return NextResponse.json(
+                {
+                    message: "User tidak ditemukan"
+                }, 
+                { status: 404,}
+            )
+        }
+
+        await prisma.user.delete({
+            where: {
+                id: userId,
+            }
+        });
+
+        return NextResponse.json({
+            message: "user berhasil dihapus"
+        });
+    } catch (error) {
+        console.error("DELETE USER ERROR:", error);
+        return NextResponse.json(
+            {
+                message: "Gagal menghapus user"
+            },
+            {
+                status: 500,
+            }
+        )
+    }
+}
