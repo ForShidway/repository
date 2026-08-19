@@ -37,10 +37,54 @@ export default function EditUserPage() {
     }
 
     useEffect(() => {
-        if (id) {
-            loadUser();
+    let cancelled = false;
+
+    async function fetchUser() {
+        if (!id) {
+            return;
         }
-    }, [id]);
+
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await fetch(`/api/users/${id}`);
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Gagal mengambil data user"
+                );
+            }
+
+            if (!cancelled) {
+                setName(data.name);
+                setEmail(data.email);
+            }
+        } catch (error) {
+            console.error(error);
+
+            if (!cancelled) {
+                setError(
+                    error instanceof Error
+                        ? error.message
+                        : "Terjadi kesalahan"
+                );
+            }
+        } finally {
+            if (!cancelled) {
+                setLoading(false);
+            }
+        }
+    }
+
+    fetchUser();
+
+    return () => {
+        cancelled = true;
+    };
+}, [id]);
 
     // update user
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
