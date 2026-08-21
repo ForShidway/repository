@@ -13,7 +13,7 @@ export async function GET() {
         });
         return NextResponse.json(users);
     } catch (error) {
-        console.error("GET USERS ERRER:", error);
+        console.error("GET USERS ERROR:", error);
         return NextResponse.json(
             {message : "Gagal mengambil data user"},
             {status : 500}
