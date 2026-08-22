@@ -26,3 +26,15 @@ model Dosen {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model ProgramStudy {
+  id Int @id @default(autoincrement())
+  name String 
+  degree String
+  description String? @db.Text
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, degree])
+}

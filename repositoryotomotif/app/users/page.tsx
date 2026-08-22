@@ -115,9 +115,9 @@ export default function UsersPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
+                            {users.map((user, index) => (
                                 <tr key={user.id}>
-                                    <td><span className="id-badge">#{user.id}</span></td>
+                                    <td><span className="id-badge">#{index + 1}</span></td>
                                     <td><strong className="user-name">{user.name}</strong></td>
                                     <td className="user-email">{user.email}</td>
                                     <td className="user-date">

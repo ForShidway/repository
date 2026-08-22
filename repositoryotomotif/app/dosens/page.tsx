@@ -100,10 +100,10 @@ export default function DosensPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dosens.map((dosen) => (
+                                    {dosens.map((dosen, index) => (
                                         <tr key={dosen.id}>
                                             <td>
-                                                <span>#{dosen.id}</span>
+                                                <span>{index + 1}</span>
                                             </td>
                                             <td>
                                                 <strong>{dosen.name}</strong>
