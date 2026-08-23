@@ -25,6 +25,9 @@ model Dosen {
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  pembimbingTa TugasAkhir[] @relation ("PembimbingTA")
+  dosenPa TugasAkhir[] @relation("DosenPA")
 }
 
 model ProgramStudy {
@@ -42,6 +45,28 @@ model ProgramStudy {
 model Ruangan{
   id Int @id @default(autoincrement())
   name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tugasAkhir TugasAkhir[]
+}
+
+model TugasAkhir {
+  id Int @id @default(autoincrement())
+  name String
+  tahunMasuk Int
+  nim String @unique
+  judul String @db.Text
+  mataKuliahRelevan String
+
+  ruanganId Int
+  pembimbingId Int
+  dosenPaId Int
+
+  ruangan Ruangan @relation(fields: [ruanganId], references: [id])
+  pembimbing Dosen @relation("PembimbingTA", fields: [pembimbingId], references: [id])
+  dosenPa Dosen @relation("DosenPA", fields: [dosenPaId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
