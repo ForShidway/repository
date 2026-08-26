@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const links = [
 	["Beranda", "/"],
-	["Repository", "/users"],
+	["Repository", "/admin/users"],
 	["Dosen", "/lecturers"],
 	["Statistik", "/statistics"],
 ] as const;
@@ -18,7 +18,7 @@ export function Navbar() {
 				<nav className="main-nav" aria-label="Navigasi utama">
 					{links.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
 				</nav>
-				<Link href="/users/create" className="login-button">Tambah User</Link>
+				<Link href="/admin/users/create" className="login-button">Tambah User</Link>
 			</div>
 		</header>
 	);

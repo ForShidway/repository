@@ -24,12 +24,12 @@ const menuGroups = [
         items: [
             {
                 label: "Pengguna",
-                href: "/users",
+                href: "/admin/users",
                 icon: "⌂"
             },
             {
                 label: "Dosen",
-                href:"/dosens"
+                href:"/admin/dosens"
             },
             {
                 label:"Ruangan Ujian ",
@@ -41,10 +41,10 @@ const menuGroups = [
         items: [
             {
                 label:"Tugas Akhir",
-                href:"/tugas-akhirs"
+                href:"/admin/tugas-akhirs"
             }, {
                 label: "SDGS",
-                href: "/sdgs"
+                href: "/admin/sdgs"
             }
         ]
     }, 
