@@ -63,9 +63,16 @@ model TugasAkhir {
   pembimbingId Int
   dosenPaId Int
 
+  fileName String?
+  filePath String?
+  fileSize Int?
+  fileType String?
+
   ruangan Ruangan @relation(fields: [ruanganId], references: [id])
   pembimbing Dosen @relation("PembimbingTA", fields: [pembimbingId], references: [id])
   dosenPa Dosen @relation("DosenPA", fields: [dosenPaId], references: [id])
+
+  sdgs SDGs[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,5 +86,7 @@ model SDGs  {
   isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  tugasAkhirs TugasAkhir[]
 }
 

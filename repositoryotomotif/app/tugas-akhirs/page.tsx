@@ -85,7 +85,7 @@ export default function TugasAkhirPage() {
                         Kelola data tugas Akhir mahasiswa
                     </p>
                 </div>
-                <button onClick={() => router.push("/tugas-akhir/create")} className="primay-button">
+                <button onClick={() => router.push("/tugas-akhirs/create")} className="primay-button">
                     <span>Tambahkan Tugas Akhir</span>
                 </button>
             </section>

@@ -20,7 +20,7 @@ export default function CreateRuanganPage() {
 
         try{
             setLoading(true);
-            const response = await fetch("/api/ruagans", {
+            const response = await fetch("/api/ruangans", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
