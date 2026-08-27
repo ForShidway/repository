@@ -149,6 +149,21 @@ export async function DELETE(
         });
     } catch (error) {
         console.error("DELETE DOSEN ERROR:", error);
+
+        if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            error.code === "P2003"
+        ) {
+            return NextResponse.json(
+                {
+                    message: "Dosen tidak dapat dihapus karena masih digunakan pada data tugas akhir",
+                },
+                { status: 409 }
+            );
+        }
+
         return NextResponse.json(
             {
                 message: "Gagal menghapus dosen"

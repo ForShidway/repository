@@ -31,6 +31,10 @@ body {
 .site-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.94); backdrop-filter: blur(12px); }
 .site-header-inner, .site-footer-inner { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
 .site-header-inner { display: flex; min-height: 76px; align-items: center; gap: 28px; }
+body:has(.admin-layout) .site-header,
+body:has(.admin-layout) .site-footer { margin-left: 18rem; }
+body:has(.admin-layout) .site-header-inner,
+body:has(.admin-layout) .site-footer-inner { width: min(1160px, calc(100% - 40px)); }
 .brand { display: flex; align-items: center; gap: 11px; color: var(--navy); text-decoration: none; }
 .brand-mark { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 11px; background: var(--navy); color: #fff; font-size: 20px; font-weight: 800; box-shadow: 0 8px 18px rgba(18,63,120,.18); }
 .brand strong, .brand small { display: block; }

@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Manufacturing_Consent } from "next/font/google";
-import { Main } from "next/document";
 
 type Dosen = {
     id: number;
@@ -75,11 +73,17 @@ export default function DosensPage() {
     return (
         <main className="page-shell">
             <section className="page-heading">
-                <div>  
-                    <h1>Dosen Dosen Jurusan</h1>
+                <div>
+                    <p className="eyebrow">Pusat administrasi</p>
+                    <h1>Data Dosen</h1>
+                    <p className="page-description">
+                        Kelola data dosen Jurusan Teknik Otomotif yang terdaftar di repository.
+                    </p>
                 </div>
+
                 <button onClick={() => router.push("/admin/dosens/create")} className="primary-button">
-                    <span aria-hidden="true"> Tambah Dosen</span>
+                    <span aria-hidden="true">+</span>
+                    Tambah Dosen
                 </button>
             </section>
             { error && (
@@ -87,8 +91,17 @@ export default function DosensPage() {
             )}
 
             <section className="content-panel">
-                <h1>Daftar Dosen Terdaftar</h1>
-                {dosens.length === 0 ? (<p className="empty-state">belum ada user terdaftar </p>) : (
+                <div className="panel-heading">
+                    <div>
+                        <p className="eyebrow">Daftar dosen</p>
+                        <h2>Dosen Jurusan Teknik Otomotif</h2>
+                    </div>
+                    <span className="count-pill">
+                        {dosens.length} dosen
+                    </span>
+                </div>
+                
+                {dosens.length === 0 ? (<p className="empty-state">Belum ada data dosen.</p>) : (
                         <div className="table-wrapper">
                             <table className="users-table">
                                 <thead>

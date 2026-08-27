@@ -16,7 +16,7 @@ const menuGroups = [
             {
                 label:"Dahboard",
                 href: "/dashoard",
-                icon: "⌂"
+                icon: ""
             }
         ]
     }, {
@@ -25,7 +25,7 @@ const menuGroups = [
             {
                 label: "Pengguna",
                 href: "/admin/users",
-                icon: "⌂"
+                icon: ""
             },
             {
                 label: "Dosen",
@@ -60,7 +60,7 @@ export default function Sidebar() {
             {/* Logo */}
             <div className="flex h-20 items-center border-b border-slate-100 px-6">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl text-white shadow-sm">
-                    🚗
+                    
                 </div>
                 <div className="ml-3">
                     <h1 className="text-sm font-bold tracking-tight text-slate-900">
