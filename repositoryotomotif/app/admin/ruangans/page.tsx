@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Manufacturing_Consent } from "next/font/google";
-import { Main } from "next/document";
 
 type Ruangan = {
     id: number;
@@ -75,11 +73,16 @@ export default function RuangansPage() {
     return (
         <main className="page-shell">
             <section className="page-heading">
-                <div>  
-                    <h1>Ruangan</h1>
+                <div>
+                    <p className="eyebrow">Pusat administrasi</p>
+                    <h1>Data Ruangan</h1>
+                    <p className="page-description">
+                        Kelola data ruangan yang digunakan untuk pelaksanaan ujian.
+                    </p>
                 </div>
-                <button onClick={() => router.push("/ruangans/create")} className="primary-button">
-                    <span aria-hidden="true"> Tambah Ruangan</span>
+                <button onClick={() => router.push("/admin/ruangans/create")} className="primary-button">
+                    <span aria-hidden="true">+</span>
+                    Tambah Ruangan
                 </button>
             </section>
             { error && (
@@ -87,13 +90,19 @@ export default function RuangansPage() {
             )}
 
             <section className="content-panel">
-                <h1>Daftar Ruangan</h1>
-                {ruangans.length === 0 ? (<p className="empty-state">belum ada ruangan terdaftar </p>) : (
+                <div className="panel-heading">
+                    <div>
+                        <p className="eyebrow">Daftar ruangan</p>
+                        <h2>Ruangan ujian</h2>
+                    </div>
+                    <span className="count-pill">{ruangans.length} ruangan</span>
+                </div>
+                {ruangans.length === 0 ? (<p className="empty-state">Belum ada ruangan terdaftar.</p>) : (
                         <div className="table-wrapper">
                             <table className="users-table">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
+                                        <th>ID</th>
                                         <th>Nama</th>
                                         <th>Dibuat</th>
                                         <th>Aksi</th>
@@ -103,18 +112,18 @@ export default function RuangansPage() {
                                     {ruangans.map((ruangan, index) => (
                                         <tr key={ruangan.id}>
                                             <td>
-                                                <span>{index + 1}</span>
+                                                <span className="id-badge">#{index + 1}</span>
                                             </td>
                                             <td>
-                                                <strong>{ruangan.name}</strong>
+                                                <strong className="user-name">{ruangan.name}</strong>
                                             </td>
                                             <td className="user-date">
                                                 {new Date(ruangan.createdAt).toLocaleDateString(
                                                     "id-ID"
                                                 )}
                                             </td>
-                                            <td>
-                                                <button onClick={() => router.push(`/ruangans/${ruangan.id}/edit`)} className="edit-button">Edit</button>
+                                            <td className="action-cell">
+                                                <button onClick={() => router.push(`/admin/ruangans/${ruangan.id}/edit`)} className="edit-button">Edit</button>
                                                 <button onClick={() => handleDelete(ruangan.id)} className="delete-button">Hapus</button>
                                             </td>
                                         </tr>

@@ -29,7 +29,8 @@ export async function GET(
             }, include : {
                 ruangan: true,
                 pembimbing: true,
-                dosenPa: true
+                dosenPa: true,
+                sdgs: true,
             }
         });
 

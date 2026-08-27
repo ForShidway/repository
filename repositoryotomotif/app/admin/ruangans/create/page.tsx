@@ -37,7 +37,7 @@ export default function CreateRuanganPage() {
                     
                 )
             }
-            router.push("/ruangans");
+            router.push("/admin/ruangans");
             router.refresh();
         } catch (error) {
             console.error(error);
@@ -72,7 +72,7 @@ export default function CreateRuanganPage() {
                         )}
 
                         <div className="flex gap-3">
-                            <button type="button" onClick={() => router.push("/ruangans")}>
+                            <button type="button" onClick={() => router.push("/admin/ruangans")}>
                                 Batal
                             </button>
                             <button type="submit" disabled={loading} className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">

@@ -33,7 +33,7 @@ const menuGroups = [
             },
             {
                 label:"Ruangan Ujian ",
-                href: "ruangans"
+                href: "/admin/ruangans"
             },
         ]
     }, {
