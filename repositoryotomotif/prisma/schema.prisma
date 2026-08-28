@@ -39,7 +39,7 @@ model ProgramStudy {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  
+  tugasAkhirs TugasAkhir[]
   @@unique([name, degree])
 }
 
@@ -63,6 +63,7 @@ model TugasAkhir {
   ruanganId Int
   pembimbingId Int
   dosenPaId Int
+  ProgramStudyId Int?
 
   fileName String?
   filePath String?
@@ -72,6 +73,7 @@ model TugasAkhir {
   ruangan Ruangan @relation(fields: [ruanganId], references: [id])
   pembimbing Dosen @relation("PembimbingTA", fields: [pembimbingId], references: [id])
   dosenPa Dosen @relation("DosenPA", fields: [dosenPaId], references: [id])
+  programStudy ProgramStudy? @relation(fields: [ProgramStudyId], references: [id])
 
   sdgs SDGs[]
 

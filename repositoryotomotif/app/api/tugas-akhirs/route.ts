@@ -37,6 +37,7 @@ export async function POST(request: Request) {
         const ruanganId = Number(formData.get("ruanganId"));
         const pembimbingId = Number(formData.get("pembimbingId"));
         const dosenPaId = Number(formData.get("dosenPaId"));
+        const programStudyId = Number(formData.get("programStudyId"))
 
         const sdgsRaw = formData.get("sdgsId");
         let sdgsId: number[] = [];
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
         }
 
         if(
-            !name || !tahunMasuk || !nim || !judul || ! mataKuliahRelevan || !ruanganId || !pembimbingId || !dosenPaId
+            !name || !tahunMasuk || !nim || !judul || ! mataKuliahRelevan || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId
         ) {
             return NextResponse.json(
                 { message : "semua data harus diisi"},
@@ -165,6 +166,24 @@ export async function POST(request: Request) {
             )
         }
 
+        const programStudy = await prisma.programStudy.findUnique({
+            where : {
+                id: programStudyId,
+            }
+        })
+        if(!programStudy) {
+            return NextResponse.json(
+                { message: "Program studi tidak ditemukan"},
+                { status: 404}
+            )
+        }
+        if (!programStudy.isActive) {
+            return NextResponse.json(
+                { message: "Program studi tidak aktif"},
+                { status: 400}
+            )
+        }
+
         const sdgs =
             await prisma.sDGs.findMany({
                 where: {
@@ -230,7 +249,7 @@ export async function POST(request: Request) {
 
         const tugasAkhir = await prisma.tugasAkhir.create ({
             data: {
-                name, tahunMasuk, nim, judul, mataKuliahRelevan, ruanganId, pembimbingId, dosenPaId, 
+                name, tahunMasuk, nim, judul, mataKuliahRelevan, ruanganId, pembimbingId, dosenPaId, ProgramStudyId : programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,
