@@ -418,9 +418,9 @@ export default function KatalogTugasAkhirPage() {
 
                       {ta.sdgs && ta.sdgs.length > 0 && (
                         <div className="mb-4 flex flex-wrap gap-1.5">
-                          {ta.sdgs.map(sdg => (
-                            <span key={sdg.id} className="rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">
-                              SDG {sdg.code}
+                          {ta.sdgs.map(sdgs => (
+                            <span key={sdgs.id} className="rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">
+                              {sdgs.code}
                             </span>
                           ))}
                         </div>
