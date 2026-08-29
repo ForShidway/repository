@@ -36,7 +36,7 @@ export default function MahasiswaPage() {
     }, []);
 
     function handleSelectProgramStudy(programStudyId: number){
-        router.push(`/mahasiswa/tugas-akhir/create/${programStudyId}`);
+        router.push(`/mahasiswa/${programStudyId}`);
     }
     if (loading) {
         return (

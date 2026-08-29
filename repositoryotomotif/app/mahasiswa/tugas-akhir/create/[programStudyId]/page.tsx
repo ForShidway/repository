@@ -2,7 +2,7 @@
 "use client";
 
 import { FormEvent, useState, useEffect, use } from "react";
-import {useRouter} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 type Dosen = {
@@ -33,7 +33,9 @@ export default function CreateTugasAkhirPage({
     params: Promise<{ programStudyId: string }>;
 }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { programStudyId } = use(params);
+    const selectedCategory = searchParams.get("category") || "Tugas Akhir";
     const [name, setName] = useState("");
     const [tahunMasuk, setTahunMasuk] = useState("");
     const [nim, setNim] =  useState("");
@@ -181,8 +183,8 @@ export default function CreateTugasAkhirPage({
         <main className="min-h-screen bg-gray-50 p-8" >
             <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold txt-gray-900"> Tambah Tugas Akhir</h1>
-                    <p className="mt-2 text-gray-600"> Tambahkan data Tugas Akhir mahasiswa</p>
+                    <h1 className="text-3xl font-bold txt-gray-900">Tambah {selectedCategory}</h1>
+                    <p className="mt-2 text-gray-600">Tambah data {selectedCategory.toLowerCase()} mahasiswa untuk program studi ini.</p>
                 </div>
                 <div className="rounded-xl border bg-whte p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -343,7 +345,7 @@ export default function CreateTugasAkhirPage({
                         )}
 
                         <div className="flex gap-3">
-                            <button type="button" onClick={() => router.push("/tugas-akhirs")}>
+                            <button type="button" onClick={() => router.push(`/mahasiswa/${programStudyId}`)}>
                                 Batal
                             </button>
                             <button type="submit" disabled={loading} className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
