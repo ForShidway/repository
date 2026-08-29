@@ -14,6 +14,7 @@ export async function GET(){
                 pembimbing:  true,
                 dosenPa: true,
                 sdgs: true,
+                programStudy: true,
             }
         })
         return NextResponse.json(tugasAkhir);
