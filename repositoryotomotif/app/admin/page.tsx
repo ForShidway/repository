@@ -24,9 +24,15 @@ type ProgramStudyStat = {
     jumlah: number;
 };
 
-type TugasAkhirTerbaru = {
+type Mahasiswa = {
     id: number;
     name: string;
+    nim: string;
+    urutan: number;
+};
+
+type TugasAkhirTerbaru = {
+    id: number;
     judul: string;
     tahunMasuk: number;
     programStudy: {
@@ -36,6 +42,7 @@ type TugasAkhirTerbaru = {
     pembimbing: {
         name: string;
     } | null;
+    mahasiswa: Mahasiswa[];
 };
 
 type Aktivitas = {
@@ -157,6 +164,11 @@ export default function AdminDashboard() {
             </main>
         );
     }
+
+    const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
+        if (!mahasiswa.length) return "-";
+        return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
+    };
 
     return (
         <main className="min-h-screen bg-slate-50">
@@ -333,7 +345,7 @@ export default function AdminDashboard() {
                                                 </p>
                                             </td>
                                             <td className="px-4 py-4 text-sm text-slate-600">
-                                                {ta.name}
+                                                {formatMahasiswa(ta.mahasiswa)}
                                             </td>
                                             <td className="px-4 py-4 text-sm text-slate-600">
                                                 {ta.tahunMasuk}

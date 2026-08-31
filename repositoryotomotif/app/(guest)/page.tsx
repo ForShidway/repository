@@ -16,16 +16,22 @@ type Ruangan = {
     id: number;
     name: string;
 };
-type TugasAkhir = {
+type Mahasiswa = {
     id: number;
     name: string;
-    tahunMasuk: number;
     nim: string;
+    urutan: number;
+};
+
+type TugasAkhir = {
+    id: number;
+    tahunMasuk: number;
     judul: string;
     mataKuliahRelevan: string;
     ruangan: Ruangan;
     pembimbing: Dosen;
     dosenPa: Dosen;
+    mahasiswa: Mahasiswa[];
     sdgs: SDGs[];
 };
 type HomeData = {
@@ -139,8 +145,11 @@ export default function GuestHomePage() {
         );
     }
 
-    // TODO: ganti dengan logika periode/tahun kamu sendiri
     const periodeTersedia = "2021 - 2026";
+    const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
+        if (!mahasiswa.length) return "-";
+        return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
+    };
 
     const stats = [
         {
@@ -394,13 +403,13 @@ export default function GuestHomePage() {
                                 <div className="flex gap-2">
                                     <span className="w-24 text-slate-400">Mahasiswa</span>
                                     <span className="font-medium text-slate-700">
-                                        {tugasAkhir.name}
+                                        {formatMahasiswa(tugasAkhir.mahasiswa)}
                                     </span>
                                 </div>
                                 <div className="flex gap-2">
                                     <span className="w-24 text-slate-400">NIM</span>
                                     <span className="font-medium text-slate-700">
-                                        {tugasAkhir.nim}
+                                        {tugasAkhir.mahasiswa?.[0]?.nim ?? "-"}
                                     </span>
                                 </div>
                                 <div className="flex gap-2">

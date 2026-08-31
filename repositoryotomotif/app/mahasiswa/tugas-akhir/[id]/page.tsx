@@ -20,16 +20,22 @@ type SDG = {
   title: string;
 };
 
-type TugasAkhir = {
+type Mahasiswa = {
   id: number;
   name: string;
   nim: string;
+  urutan: number;
+};
+
+type TugasAkhir = {
+  id: number;
   tahunMasuk: number;
   judul: string;
   mataKuliahRelevan: string;
   pembimbing: Dosen;
   dosenPa: Dosen;
   programStudy: ProgramStudy;
+  mahasiswa: Mahasiswa[];
   sdgs: SDG[];
   createdAt: string;
 };
@@ -107,6 +113,8 @@ export default function DetailTugasAkhirPage() {
   }
 
   const tahun = new Date(tugasAkhir.createdAt).getFullYear();
+  const mahasiswaText = tugasAkhir.mahasiswa?.map((m) => `${m.name} (${m.nim})`).join(", ") || "-";
+  const nimText = tugasAkhir.mahasiswa?.map((m) => m.nim).join(", ") || "-";
 
   return (
     <main className="min-h-screen bg-gray-50 px-8 py-10">
@@ -156,11 +164,11 @@ export default function DetailTugasAkhirPage() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Nama Mahasiswa</p>
-                    <p className="mt-1 text-lg font-semibold text-slate-900">{tugasAkhir.name}</p>
+                    <p className="mt-1 text-lg font-semibold text-slate-900">{mahasiswaText}</p>
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">NIM</p>
-                    <p className="mt-1 font-mono text-slate-700">{tugasAkhir.nim}</p>
+                    <p className="mt-1 font-mono text-slate-700">{nimText}</p>
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Tahun Masuk</p>

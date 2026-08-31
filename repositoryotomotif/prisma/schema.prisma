@@ -54,9 +54,7 @@ model Ruangan{
 
 model TugasAkhir {
   id Int @id @default(autoincrement())
-  name String
   tahunMasuk Int
-  nim String @unique
   judul String @db.Text
   mataKuliahRelevan String
 
@@ -75,6 +73,7 @@ model TugasAkhir {
   dosenPa Dosen @relation("DosenPA", fields: [dosenPaId], references: [id])
   programStudy ProgramStudy? @relation(fields: [ProgramStudyId], references: [id])
 
+  mahasiswa Mahasiswa[]
   sdgs SDGs[]
 
   createdAt DateTime @default(now())
@@ -93,3 +92,18 @@ model SDGs  {
   tugasAkhirs TugasAkhir[]
 }
 
+model Mahasiswa {
+  id Int @id @default(autoincrement())
+  name String
+  nim String
+  urutan Int @default(1)
+
+  tugasAkhirId Int
+  tugasAkhir TugasAkhir @relation(fields: [tugasAkhirId], references:[id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tugasAkhirId, nim])
+
+}

@@ -4,7 +4,10 @@
 import { FormEvent, useState, useEffect, useMemo, use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-
+type MahasiswaInput = { 
+    name: string; 
+    nim : string
+};
 
 type Dosen = {
     id: number;
@@ -37,9 +40,11 @@ export default function CreateTugasAkhirPage({
     const searchParams = useSearchParams();
     const { programStudyId } = use(params);
     const selectedCategory = searchParams.get("category") || "Tugas Akhir";
-    const [name, setName] = useState("");
+
+    const [mahasiswas, setMahasiswas] = useState<MahasiswaInput[]>([
+        { name: "", nim: ""}
+    ]);
     const [tahunMasuk, setTahunMasuk] = useState("");
-    const [nim, setNim] =  useState("");
     const [judul, setJudul] = useState("");
     const [mataKuliahRelevan, setMataKuliahRelevan] = useState("");
 
@@ -129,7 +134,8 @@ export default function CreateTugasAkhirPage({
         event.preventDefault();
         setError("");
 
-        if (!name.trim() || !tahunMasuk || !nim.trim() || !judul.trim() || !mataKuliahRelevan.trim() || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId ||selectedSDGs.length === 0)    {
+        const mahasiswaValid = mahasiswas.every((m) => m.name.trim() && m.nim.trim());
+        if (!mahasiswaValid || !tahunMasuk || !judul.trim() || !mataKuliahRelevan.trim() || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId ||selectedSDGs.length === 0)    {
             setError("Semua data Tugas Akhir harus di isi, minimal satu SDGS harus dipilih");
             return;
         }
@@ -138,9 +144,11 @@ export default function CreateTugasAkhirPage({
             setLoading(true);
 
             const formData = new FormData();
-            formData.append("name", name.trim());
+            formData.append("mahasiswas", JSON.stringify(
+                mahasiswas.map((m) => ({ name: m.name.trim(), nim: m.nim.trim() }))
+            ));
+
             formData.append("tahunMasuk", tahunMasuk);
-            formData.append("nim", nim.trim());
             formData.append("judul", judul.trim());
             formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
             formData.append("ruanganId", ruanganId);
@@ -187,6 +195,20 @@ export default function CreateTugasAkhirPage({
         });
     }
 
+    function updateMahasiswa(index:number, field:"name"|"nim", value:string) {
+        setMahasiswas((current) => current.map((m, i) => (i === index ? {...m, [field]: value }: m)))
+    }
+
+    function addMahasiswa() {
+        setMahasiswas((current) => {
+            if (current.length >= 3) return current;
+            return [...current, { name: "", nim: ""}]
+        })
+    }
+
+    function removeMahasiswa(index:number) {
+        setMahasiswas((current) => current.filter((_,i) => i !== index));
+    }
 
     return (
         <main className="min-h-screen bg-gray-50 p-8" >
@@ -197,18 +219,55 @@ export default function CreateTugasAkhirPage({
                 </div>
                 <div className="rounded-xl border bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label  htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700"> 
-                                    Nama Mahasiswa</label>
-                                <input type="text" id="name" value={name} onChange={(event) => setName(event.target.value)} className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10" />
-                            </div>
-                            <div>
-                                <label htmlFor="nim" className="mb-2 block text-sm font-medium">
-                                    NIM
-                                </label>
-                                <input id="nim" type="text" value={nim} onChange={(e) => setNim(e.target.value) } className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10" placeholder="Contoh: 23123456" />
-                            </div>
+                        <div className="space-y-4">
+                            {mahasiswas.map((m, index) => (
+                                <div key={index} className="rounded-lg border border-slate-200 p-4">
+                                    <div className="mb-3 flex items-center justify-between">
+                                        <p className="text-sm font-semibold text-slate-700">Mahasiswa {index + 1}</p>
+                                        {index > 0 && (
+                                            <button type="button" onClick={() => removeMahasiswa(index)} className="text-xs font-semibold text-red-500 hover:text-red-700">Hapus</button>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor={`name-${index}`} className="mb-2 block text-sm font-medium text-gray-700">Nama Mahasiswa</label>
+                                            <input
+                                                type="text"
+                                                id={`name-${index}`}
+                                                value={m.name}
+                                                onChange={(e) => updateMahasiswa(index, "name", e.target.value)}
+                                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                                placeholder="Contoh: Budi Santoso"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor={`nim-${index}`} className="mb-2 block text-sm font-medium">NIM</label>
+                                            <input
+                                                id={`nim-${index}`}
+                                                type="text"
+                                                value={m.nim}
+                                                onChange={(e) => updateMahasiswa(index, "nim", e.target.value)}
+                                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                                placeholder="Contoh: 23123456"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {index === mahasiswas.length - 1 && mahasiswas.length < 3 && (
+                                        <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+                                            <input
+                                                type="checkbox"
+                                                checked={false}
+                                                onChange={addMahasiswa}
+                                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            Ada mahasiswa lain yang terlibat
+                                        </label>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                             
                        
@@ -220,14 +279,14 @@ export default function CreateTugasAkhirPage({
                         </div>
 
                         <div>
-                            <label htmlFor="judul"  className="mb-2 block text-sm font-medium" >
+                            <label htmlFor="judul" className="mb-2 block text-sm font-medium">
                                 Judul Tugas Akhir
                             </label>
                             <textarea id="judul" value={judul} onChange={(e) => setJudul(e.target.value)  }  rows={5} className="w-full rounded-lg border px-4 py-3" placeholder="Masukkan judul tugas akhir"/>
                         </div>
                         
                         <div>
-                            <label htmlFor="ruangan" className="mb-2 block text-sm font-medium" >
+                            <label htmlFor="ruangan" className="mb-2 block text-sm font-medium">
                                 Tempat Pelaksanaan TA
                             </label>
                             <select id="ruangan" value={ruanganId}  onChange={(e) => setRuanganId( e.target.value ) } className="w-full rounded-lg border px-4 py-3" >
@@ -245,7 +304,7 @@ export default function CreateTugasAkhirPage({
                         </div>
 
                         <div>
-                            <label  htmlFor="mataKuliahRelevan" className="mb-2 block text-sm font-medium" >
+                            <label htmlFor="mataKuliahRelevan" className="mb-2 block text-sm font-medium">
                                 Mata Kuliah yang Relevan
                             </label>
                             <input  id="mataKuliahRelevan" type="text" value={ mataKuliahRelevan }
@@ -257,7 +316,7 @@ export default function CreateTugasAkhirPage({
 
 
                         <div>
-                            <label  htmlFor="pembimbing"  className="mb-2 block text-sm font-medium" >
+                            <label htmlFor="pembimbing" className="mb-2 block text-sm font-medium">
                                 Dosen Pembimbing
                             </label>
 
@@ -275,7 +334,7 @@ export default function CreateTugasAkhirPage({
                             </select>
                         </div>
                         <div>
-                            <label  htmlFor="dosenPa" className="mb-2 block text-sm font-medium" >
+                            <label htmlFor="dosenPa" className="mb-2 block text-sm font-medium">
                                 Dosen PA
                             </label>
                             <select id="dosenPa" value={dosenPaId} onChange={(e) => setDosenPaId(  e.target.value ) } className="w-full rounded-lg border px-4 py-3" >

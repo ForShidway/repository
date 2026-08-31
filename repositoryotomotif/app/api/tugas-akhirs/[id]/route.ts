@@ -31,6 +31,9 @@ export async function GET(
                 pembimbing: true,
                 dosenPa: true,
                 sdgs: true,
+                mahasiswa: {
+                    orderBy: { urutan: "asc" }
+                },
             }
         });
 

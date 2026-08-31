@@ -15,6 +15,7 @@ export async function GET(){
                 dosenPa: true,
                 sdgs: true,
                 programStudy: true,
+                mahasiswa : { orderBy: { urutan : "asc"}}
             }
         })
         return NextResponse.json(tugasAkhir);
@@ -30,9 +31,49 @@ export async function GET(){
 export async function POST(request: Request) {
     try{
         const formData= await request.formData();
-        const name = formData.get("name")?.toString().trim();
+
+        const mahasiswasRaw = formData.get("mahasiswas");
+        let mahasiswas: { name:string; nim:string}[] = [];
+        if (mahasiswasRaw) {
+            try {
+                const parsed = JSON.parse(mahasiswasRaw.toString());
+                    if (Array.isArray(parsed)) {mahasiswas = parsed.map((m) => ({
+                        name: String(m.name ?? "").trim(),
+                        nim: String(m.nim ?? "").trim(),
+                    })) .filter((m) => m.name && m.nim);
+                }
+            } catch (error) {
+                console.error("Mahasiswa error", error);
+                return NextResponse.json (
+                    { messagae: "Format data mahasiswa tidak valid"},
+                    { status : 400}
+
+                )
+            }
+        }
+        if (mahasiswas.length === 0) {
+            return NextResponse.json (
+                { message: "minimal harus ada satu mahasiswa"},
+                { status : 404}
+            )
+        }
+        if (mahasiswas.length > 3) {
+            return NextResponse.json (
+                {  messagae : " jumlah maksimal jumlah mahasiswa untuk satu judu TA adalah 3" },
+                { status: 404}
+
+            )
+        }
+        const nimList = mahasiswas.map((m) => m.nim);
+        const nimDuplikat = nimList.filter((nim, idx) => nimList.indexOf(nim) !==idx);
+        if (nimDuplikat.length > 0) {
+            return NextResponse.json (
+                { message : `Nim ${nimDuplikat[0]} telah terdaftar, tidak boleh diinputkan 2 kali`},
+                { status: 400}
+            )
+        }
+
         const tahunMasuk = Number(formData.get("tahunMasuk"));
-        const nim = formData.get("nim")?.toString().trim();
         const judul = formData.get("judul")?.toString().trim();
         const mataKuliahRelevan = formData.get("mataKuliahRelevan")?.toString().trim();
         const ruanganId = Number(formData.get("ruanganId"));
@@ -93,7 +134,7 @@ export async function POST(request: Request) {
         }
 
         if(
-            !name || !tahunMasuk || !nim || !judul || ! mataKuliahRelevan || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId
+            !tahunMasuk || !judul || ! mataKuliahRelevan || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId
         ) {
             return NextResponse.json(
                 { message : "semua data harus diisi"},
@@ -113,13 +154,14 @@ export async function POST(request: Request) {
             );
         }
 
-        const existingTugasAkhir = await prisma.tugasAkhir.findUnique({
+        const existingMahasiswa = await prisma.mahasiswa.findMany({
             where :   { 
-                nim,
-            }
+                nim : { in: nimList },
+            }, select: { nim:true},
         })
 
-        if (existingTugasAkhir) {
+        if (existingMahasiswa.length > 0 ) {
+            const nimTerdaftar = existingMahasiswa.map((m: { nim: string }) => m.nim).join(",")
             return NextResponse.json(
                 { message : "Nim tersebut telah terdaftar"},
                 { status : 409 }
@@ -247,14 +289,18 @@ export async function POST(request: Request) {
             filePath = `/uploads/tugas-akhir/${uniqueFileName}`;
         }
         
-
         const tugasAkhir = await prisma.tugasAkhir.create ({
             data: {
-                name, tahunMasuk, nim, judul, mataKuliahRelevan, ruanganId, pembimbingId, dosenPaId, ProgramStudyId : programStudyId,
+                tahunMasuk, judul, mataKuliahRelevan, ruanganId, pembimbingId, dosenPaId, ProgramStudyId : programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,
                 fileType: file?.type ?? null,
+                mahasiswa: {
+                    create: mahasiswas.map((m, index) => ({
+                        name: m.name, nim: m.nim, urutan: index + 1
+                    }))
+                },
                 sdgs:{ connect: sdgsId.map((id) => ({
                     id,
                 }))}
@@ -262,7 +308,10 @@ export async function POST(request: Request) {
                 ruangan: true,
                 pembimbing: true,
                 dosenPa: true,
-                sdgs: true
+                sdgs: true,
+                mahasiswa: {
+                    orderBy : {urutan:"asc"},
+                }
             }
         });
         return NextResponse.json(

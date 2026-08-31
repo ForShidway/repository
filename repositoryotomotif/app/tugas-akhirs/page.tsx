@@ -16,16 +16,22 @@ type Ruangan = {
     id:number;
     name:string;
 }
-type TugasAkhir = {
+type Mahasiswa = {
     id: number;
     name: string;
-    tahunMasuk: number;
     nim: string;
+    urutan: number;
+};
+
+type TugasAkhir = {
+    id: number;
+    tahunMasuk: number;
     judul: string;
     mataKuliahRelevan: string;
     ruangan: Ruangan;
     pembimbing: Dosen;
     dosenPa: Dosen;
+    mahasiswa: Mahasiswa[];
     sdgs: SDGs[];
 
     fileName: string | null;
@@ -63,10 +69,16 @@ export default function TugasAkhirGuestPage() {
             }
         } fetchTugasAkhir();
     }, []);
+    const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
+        if (!mahasiswa.length) return "-";
+        return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
+    };
+
     const filteredTugasAkhir = tugasAkhir.filter((ta) => {
         const keyword = search.toLowerCase();
+        const mahasiswaText = formatMahasiswa(ta.mahasiswa).toLowerCase();
         return (
-            ta.judul.toLowerCase().includes(keyword) || ta.name.toLowerCase().includes(keyword) || ta.nim.toLowerCase().includes(keyword)
+            ta.judul.toLowerCase().includes(keyword) || mahasiswaText.includes(keyword)
         );
     });
 
@@ -128,11 +140,11 @@ export default function TugasAkhirGuestPage() {
                             <h3 className="text-xl font-bold leading-relaxed text-slate-900"> {ta.judul} </h3>
                             <div>
                                 <p className="text-slate-400">Mahasiswa</p>
-                                <p className="font-semibold text-slate-700"> {ta.name} </p>
+                                <p className="font-semibold text-slate-700"> {formatMahasiswa(ta.mahasiswa)} </p>
                             </div>
                             <div>
                                 <p className="text-slate-400">Nim</p>
-                                <p className="font-semibold text-slate-700"> {ta.nim} </p>
+                                <p className="font-semibold text-slate-700"> {ta.mahasiswa?.map((m) => m.nim).join(", ") || "-"} </p>
                             </div>
                             <div>
                                 <p className="text-slate-400">Tahun Masuk</p>

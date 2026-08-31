@@ -22,15 +22,21 @@ type SDGs = {
   title: string;
 };
 
-type TugasAkhir = {
+type Mahasiswa = {
   id: number;
   name: string;
   nim: string;
+  urutan: number;
+};
+
+type TugasAkhir = {
+  id: number;
   tahunMasuk: number;
   judul: string;
   mataKuliahRelevan: string;
   pembimbing: Dosen;
   programStudy: ProgramStudy;
+  mahasiswa: Mahasiswa[];
   sdgs: SDGs[];
   createdAt: string;
   fileName ?: string | null;
@@ -118,11 +124,18 @@ export default function KatalogTugasAkhirPage() {
     });
   }, [sdgs]);
 
+  const getMahasiswaText = (mahasiswa: Mahasiswa[] = []) => {
+    if (!mahasiswa.length) return "";
+    return mahasiswa.map((m) => `${m.name} ${m.nim}`).join(" ");
+  };
+
   const filtered = useMemo(() => { let result = [...tugasAkhirs];
     if (kataKunci) {
       const lq = kataKunci.toLowerCase();
-      result = result.filter(t => t.judul.toLowerCase().includes(lq) || t.name.toLowerCase().includes(lq) || t.nim.toLowerCase().includes(lq) || (t.mataKuliahRelevan && t.mataKuliahRelevan.toLowerCase().includes(lq))
-      );
+      result = result.filter(t => {
+        const mahasiswaText = getMahasiswaText(t.mahasiswa).toLowerCase();
+        return t.judul.toLowerCase().includes(lq) || mahasiswaText.includes(lq) || (t.mataKuliahRelevan && t.mataKuliahRelevan.toLowerCase().includes(lq));
+      });
     }
     if (prodi) {
       result = result.filter(
@@ -394,7 +407,7 @@ export default function KatalogTugasAkhirPage() {
                           {ta.judul}
                         </h2>
                         <div className="mb-4 space-y-1 text-sm text-slate-500">
-                          <p className="font-medium text-slate-700">{ta.name} ({ta.nim})</p>
+                          <p className="font-medium text-slate-700">{getMahasiswaText(ta.mahasiswa) || '-'}</p>
                           <p className="line-clamp-1">Pembimbing: {ta.pembimbing?.name || '-'}</p>
                         </div>
                         {ta.sdgs && ta.sdgs.length > 0 && (

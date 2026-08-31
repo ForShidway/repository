@@ -3,16 +3,22 @@
 import { useEffect, useState} from "react";
 import { useRouter } from "next/navigation";
 
+type Mahasiswa = {
+    id: number;
+    name: string;
+    nim: string;
+    urutan: number;
+};
+
 type TugasAkhir = {
     id : number,
-    name: string,
     tahunMasuk: number,
-    nim : string,
     judul: string,
     mataKuliahRelevan:string,
     ruangan: {id: number, name:string}
     pembimbing: {id: number, name: string}
     dosenPa: {id: number, name:string}
+    mahasiswa: Mahasiswa[];
 };
 
 export default function TugasAkhirPage() {
@@ -67,6 +73,11 @@ export default function TugasAkhirPage() {
             );
         }
     }
+
+    const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
+        if (!mahasiswa.length) return "-";
+        return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
+    };
 
     if (loading) {
         return <p>Loading...</p>
@@ -125,8 +136,8 @@ export default function TugasAkhirPage() {
                                 {data.map((item, index) => (
                                     <tr key={(item.id)}>
                                         <td>{index + 1}</td>
-                                        <td> <strong>{item.name}</strong> </td>
-                                        <td>{item.nim}</td>
+                                        <td> <strong>{formatMahasiswa(item.mahasiswa)}</strong> </td>
+                                        <td>{item.mahasiswa?.map((m) => m.nim).join(", ") || "-"}</td>
                                         <td>{item.judul}</td>
                                         <td> {item.tahunMasuk} </td>
                                         <td> {item.ruangan.name} </td>

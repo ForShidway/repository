@@ -19,7 +19,10 @@ export async function GET() {
                     ruangan: true,
                     pembimbing: true,
                     dosenPa: true,
-                    sdgs : true
+                    sdgs : true,
+                    mahasiswa: {
+                        orderBy: { urutan: "asc" }
+                    }
                 }
             })    
         ]);
