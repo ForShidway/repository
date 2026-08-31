@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { NestedMiddlewareError } from "next/dist/build/utils";
 
 type RouteContex = {
     params: Promise<{
@@ -29,30 +28,34 @@ export async function GET(
             }, include : {
                 ruangan: true,
                 pembimbing: true,
+                pembimbing2: true,
                 dosenPa: true,
                 sdgs: true,
+                programStudy: true,
                 mahasiswa: {
                     orderBy: { urutan: "asc" }
                 },
+                keywords: true,
             }
         });
 
         if (!tugasAkhir) {
             return NextResponse.json(
                 {
-                    messaage: "Tugas akhir tidak ditemukan "
+                    message: "Tugas akhir tidak ditemukan "
                 }, { status : 404}
             )
         }
         return NextResponse.json(tugasAkhir)
      } catch (error) {
-        console.error("Get Tugas Akhir Erro", error);
+        console.error("Get Tugas Akhir Error", error);
         return NextResponse.json (
-            { message : "Gagal mengambil data user"},
+            { message : "Gagal mengambil data tugas akhir"},
             { status: 500 }
         )
      }
 }
+
 
 export async function DELETE(
     request: Request,
@@ -79,7 +82,7 @@ export async function DELETE(
                 { status: 404}
             )
         }
-        
+
         await prisma.tugasAkhir.delete({
             where: {
                 id: tugasAkhirId
@@ -89,7 +92,7 @@ export async function DELETE(
             message: " Data tugass akhir berhasil dihapus"
         })
     }  catch (error) {
-        console.error ("Delete TA Error");
+        console.error ("Delete TA Error", error);
         return NextResponse.json (
             {
                 message: "Gagal menghapus data tugas akhir"

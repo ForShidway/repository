@@ -223,7 +223,7 @@ export default function GuestHomePage() {
                     <div>
                         <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700">
                             <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                            Selamat Datang di Repository Otomotif
+                            Selamat Datang di Repository Jurusan Teknik Otomotif
                         </span>
 
                         <h1 className="text-4xl font-bold leading-tight tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
@@ -241,7 +241,7 @@ export default function GuestHomePage() {
 
                         <div className="mt-8 flex flex-wrap gap-3">
                             <Link
-                                href="/repository"
+                                href="/jelajahirepository"
                                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
                             >
                                 📖 Jelajahi Repository
@@ -323,12 +323,12 @@ export default function GuestHomePage() {
             </section>
 
             {/* Spacer to compensate for the overlapping stats card */}
-            <div className="h-20 sm:h-16" />
+            <div className="h-20 sm:h-16 bg-sky-100" />
 
             {/* =========================================
                 FITUR REPOSITORY
             ========================================= */}
-            <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+            <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8  bg-sky-100" >
                 <div className="mx-auto mb-12 max-w-2xl text-center">
                     <h2 className="text-3xl font-bold text-slate-900">
                         Fitur Repository
@@ -404,12 +404,6 @@ export default function GuestHomePage() {
                                     <span className="w-24 text-slate-400">Mahasiswa</span>
                                     <span className="font-medium text-slate-700">
                                         {formatMahasiswa(tugasAkhir.mahasiswa)}
-                                    </span>
-                                </div>
-                                <div className="flex gap-2">
-                                    <span className="w-24 text-slate-400">NIM</span>
-                                    <span className="font-medium text-slate-700">
-                                        {tugasAkhir.mahasiswa?.[0]?.nim ?? "-"}
                                     </span>
                                 </div>
                                 <div className="flex gap-2">

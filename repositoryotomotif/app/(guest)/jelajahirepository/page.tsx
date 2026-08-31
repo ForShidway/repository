@@ -84,15 +84,15 @@ export default function KatalogTugasAkhirPage() {
             )
         }
 
-        if(!dosenResponse) {
+        if(!dosenResponse.ok) {
             throw new Error (
-                dosenData.messagae || "Gagal mengambil data dosen"
+            dosenData.message || "Gagal mengambil data dosen"
             )
         }
 
-        if (!sdgsResponse) {
+        if (!sdgsResponse.ok) {
             throw new Error (
-                sdgsData.message || "Gagam mengambil data SDGS"
+            sdgsData.message || "Gagal mengambil data SDGS"
             )
         }
 
@@ -194,7 +194,7 @@ export default function KatalogTugasAkhirPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-sky-90 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         
         <section className="mb-10">

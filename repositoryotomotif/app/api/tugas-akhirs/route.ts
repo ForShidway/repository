@@ -12,10 +12,12 @@ export async function GET(){
             }, include : {
                 ruangan: true,
                 pembimbing:  true,
+                pembimbing2:  true,
                 dosenPa: true,
                 sdgs: true,
                 programStudy: true,
-                mahasiswa : { orderBy: { urutan : "asc"}}
+                mahasiswa : { orderBy: { urutan : "asc"}},
+                keywords: true,
             }
         })
         return NextResponse.json(tugasAkhir);
@@ -73,11 +75,37 @@ export async function POST(request: Request) {
             )
         }
 
+        const keywordsRaw = formData.get("keywords")
+        let keywords: string[] =[];
+        if (keywordsRaw) {
+            try {
+                const parsed = JSON.parse(keywordsRaw.toString());
+                if (Array.isArray(parsed)) {
+                    keywords = parsed .map((k) => String(k).trimStart()) .filter ((k) => k.length > 0);
+                }
+            } catch (error) {
+                console.error("Parsing Keyword tidak valid,", error);
+                return NextResponse.json(
+                    { message : "format kata kunci tidak valid"},
+                    { status : 400 }
+                )
+            }
+        }
+        if (keywords.length > 5) {
+            return NextResponse.json (
+                { message : "maksimal kata kunci yang dimaukkna adalah 5"},
+                { status : 404}
+            )
+        }
+        const keywordsUnik = Array.from(new Set(keywords));
+
         const tahunMasuk = Number(formData.get("tahunMasuk"));
         const judul = formData.get("judul")?.toString().trim();
         const mataKuliahRelevan = formData.get("mataKuliahRelevan")?.toString().trim();
         const ruanganId = Number(formData.get("ruanganId"));
         const pembimbingId = Number(formData.get("pembimbingId"));
+        const pembimbingId2 = formData.get("pembimbing2Id");
+        const pembimbing2Id = pembimbingId2 ? Number(pembimbingId2) : null ;
         const dosenPaId = Number(formData.get("dosenPaId"));
         const programStudyId = Number(formData.get("programStudyId"))
 
@@ -142,6 +170,13 @@ export async function POST(request: Request) {
             );
         }
 
+        if ( pembimbing2Id && pembimbing2Id === pembimbingId) {
+            return NextResponse.json(
+                { message: "Pembimbing 1 dan Pembimbing 2 tidak boleh orang yang sama"},
+                { status : 400}
+            )
+        }
+
         if (sdgsId.length === 0) {
             return NextResponse.json(
                 {
@@ -195,6 +230,22 @@ export async function POST(request: Request) {
                 { status: 404}
             )
         }
+
+        if (pembimbing2Id) {
+            const pembimbing2 = await prisma.dosen.findUnique({
+                where: {
+                    id: pembimbing2Id
+                }
+            })
+
+            if (!pembimbing) {
+                return NextResponse.json(
+                    { message : "Data Pembimbing 2 tidak ditemukan"},
+                    { status: 404}
+                )
+            }
+        }
+        
 
         const dosenPa = await prisma.dosen.findUnique ({
             where: {
@@ -301,12 +352,16 @@ export async function POST(request: Request) {
                         name: m.name, nim: m.nim, urutan: index + 1
                     }))
                 },
+                keywords : {
+                    create: keywordsUnik.map((kata) => ({kata}))
+                },
                 sdgs:{ connect: sdgsId.map((id) => ({
                     id,
                 }))}
             }, include : {
                 ruangan: true,
                 pembimbing: true,
+                pembimbing2: true,
                 dosenPa: true,
                 sdgs: true,
                 mahasiswa: {

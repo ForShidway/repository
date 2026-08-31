@@ -74,11 +74,6 @@ export default function TugasAkhirPage() {
         }
     }
 
-    const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
-        if (!mahasiswa.length) return "-";
-        return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
-    };
-
     if (loading) {
         return <p>Loading...</p>
     }
@@ -96,9 +91,6 @@ export default function TugasAkhirPage() {
                         Kelola data tugas Akhir mahasiswa
                     </p>
                 </div>
-                <button onClick={() => router.push("/admin/tugas-akhirs/create")} className="primay-button">
-                    <span>Tambahkan Tugas Akhir</span>
-                </button>
             </section>
             {error && (
                 <div className="error-banner">
@@ -126,9 +118,6 @@ export default function TugasAkhirPage() {
                                     <th>NIM</th>
                                     <th>Judul</th>
                                     <th>Tahun Masuk</th>
-                                    <th>Ruangan</th>
-                                    <th>Pembimbing</th>
-                                    <th>Dosen PA</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -136,14 +125,14 @@ export default function TugasAkhirPage() {
                                 {data.map((item, index) => (
                                     <tr key={(item.id)}>
                                         <td>{index + 1}</td>
-                                        <td> <strong>{formatMahasiswa(item.mahasiswa)}</strong> </td>
+                                        <td> <strong> {item.mahasiswa?.map((m) => m.name).join(", ") || "-"} </strong> </td>
                                         <td>{item.mahasiswa?.map((m) => m.nim).join(", ") || "-"}</td>
                                         <td>{item.judul}</td>
                                         <td> {item.tahunMasuk} </td>
-                                        <td> {item.ruangan.name} </td>
-                                        <td> {item.pembimbing.name} </td>
-                                        <td> {item.dosenPa.name} </td>
                                         <td className="action-cell">
+                                            <button onClick={() => router.push(`/admin/tugas-akhirs/${item.id}`) }  className="detail-button"  >
+                                                Lihat Detail
+                                            </button>
                                             <button onClick={() => handleDelete(item.id)} className="delete-button">
                                                 Delete
                                             </button>

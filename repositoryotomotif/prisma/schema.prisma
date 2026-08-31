@@ -27,6 +27,7 @@ model Dosen {
   updatedAt DateTime @updatedAt
 
   pembimbingTa TugasAkhir[] @relation ("PembimbingTA")
+  pembimbing2Ta TugasAkhir[] @relation ("Pembimbing2TA")
   dosenPa TugasAkhir[] @relation("DosenPA")
 }
 
@@ -60,6 +61,7 @@ model TugasAkhir {
 
   ruanganId Int
   pembimbingId Int
+  pembimbing2Id Int?
   dosenPaId Int
   ProgramStudyId Int?
 
@@ -70,11 +72,13 @@ model TugasAkhir {
 
   ruangan Ruangan @relation(fields: [ruanganId], references: [id])
   pembimbing Dosen @relation("PembimbingTA", fields: [pembimbingId], references: [id])
+  pembimbing2 Dosen? @relation("Pembimbing2TA", fields: [pembimbing2Id], references: [id])
   dosenPa Dosen @relation("DosenPA", fields: [dosenPaId], references: [id])
   programStudy ProgramStudy? @relation(fields: [ProgramStudyId], references: [id])
 
   mahasiswa Mahasiswa[]
   sdgs SDGs[]
+  keywords Keyword[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -97,13 +101,20 @@ model Mahasiswa {
   name String
   nim String
   urutan Int @default(1)
-
   tugasAkhirId Int
   tugasAkhir TugasAkhir @relation(fields: [tugasAkhirId], references:[id], onDelete: Cascade)
-  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@unique([tugasAkhirId, nim])
 
+}
+
+model Keyword {
+  id Int @id @default(autoincrement())
+  kata String
+
+  tugasAkhirId Int
+  tugasAkhir TugasAkhir @relation(fields: [tugasAkhirId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+   @@unique([tugasAkhirId, kata])
 }

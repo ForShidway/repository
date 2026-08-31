@@ -50,8 +50,12 @@ export default function CreateTugasAkhirPage({
 
     const [ruanganId, setRuanganId] = useState("");
     const [pembimbingId, setPembimbingId] = useState("");
+    const [pembimbing2Id, setPembimbing2Id] = useState("")
     const [dosenPaId, setDosenPaId] = useState("")
     const [file, setFile] = useState<File | null>(null);
+
+    const [keywordInput, setKeywordInput] = useState("");
+    const [keywords, setKeywords] = useState<string[]>([]);
 
     const [ruangans, setRuangans] = useState<Ruangan[]>([]);
     const [dosens, setDosens] = useState<Dosen[]>([]);
@@ -153,9 +157,14 @@ export default function CreateTugasAkhirPage({
             formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
             formData.append("ruanganId", ruanganId);
             formData.append("pembimbingId", pembimbingId);
+            if(pembimbing2Id) {
+                formData.append("pembimbing2Id", pembimbing2Id)
+            }
+            
             formData.append("dosenPaId", dosenPaId);
             formData.append("programStudyId", programStudyId);
             formData.append("sdgsId", JSON.stringify(selectedSDGs));
+            formData.append("keywords", JSON.stringify(keywords));
             if (file) {
                 formData.append("file", file);
             }
@@ -194,6 +203,30 @@ export default function CreateTugasAkhirPage({
             return [...current, sdgId];
         });
     }
+
+   function addKeyword() {
+        const parts = keywordInput
+            .split(",")
+            .map((k) => k.trim())
+            .filter((k) => k.length > 0);
+        if (parts.length === 0) return;
+        setKeywords((current) => {
+            const gabungan = [...current];
+            for (const kata of parts) {
+                if (gabungan.length >= 5) break;
+                if (!gabungan.includes(kata)) {
+                    gabungan.push(kata);
+                }
+            }
+            return gabungan;
+        });
+        setKeywordInput("");
+    }
+
+    function removeKeyword(kata: string) {
+        setKeywords((current) => current.filter((k) => k !==kata));
+    }
+
 
     function updateMahasiswa(index:number, field:"name"|"nim", value:string) {
         setMahasiswas((current) => current.map((m, i) => (i === index ? {...m, [field]: value }: m)))
@@ -273,7 +306,7 @@ export default function CreateTugasAkhirPage({
                        
                         <div>
                             <label htmlFor="tahunMasuk" className="mb-2 block text-sm font-medium">
-                                Tahun Masuk
+                                Tahun
                             </label>
                             <input id="tahunMasuk" type="number" value={tahunMasuk} onChange={(e) => setTahunMasuk( e.target.value)} className="w-full rounded-lg border px-4 py-3" placeholder="2020"/>
                         </div>
@@ -314,10 +347,59 @@ export default function CreateTugasAkhirPage({
                             />
                         </div>
 
+                        <div>
+                            <label htmlFor="keywordInput" className="mb-2 block text-sm font-medium text-gray-700">
+                                Kata Kunci <span className="font-normal text-slate-400">(maksimal 5)</span>
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    id="keywordInput"
+                                    type="text"
+                                    value={keywordInput}
+                                    onChange={(e) => setKeywordInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            addKeyword();
+                                        }
+                                    }}
+                                    disabled={keywords.length >= 5}
+                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:text-slate-400"
+                                    placeholder={keywords.length >= 5 ? "Batas maksimal tercapai" : "Contoh: Machine Learning"}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={addKeyword}
+                                    disabled={keywords.length >= 5}
+                                    className="shrink-0 rounded-lg bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    + Tambah
+                                </button>
+                            </div>
+                        </div>
+                        {keywords.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {keywords.map((kata) => (
+                                    <span
+                                        key={kata}
+                                        className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
+                                    >
+                                        {kata}
+                                        <button
+                                            type="button"
+                                            onClick={() => removeKeyword(kata)}
+                                            className="text-blue-400 hover:text-blue-700"
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
 
                         <div>
                             <label htmlFor="pembimbing" className="mb-2 block text-sm font-medium">
-                                Dosen Pembimbing
+                                Dosen Pembimbing I
                             </label>
 
                             <select id="pembimbing" value={pembimbingId} onChange={(e) =>  setPembimbingId( e.target.value ) } className="w-full rounded-lg border px-4 py-3" >
@@ -326,6 +408,24 @@ export default function CreateTugasAkhirPage({
                                 </option>
                                 {dosens.map(
                                     (dosen) => (
+                                        <option key={dosen.id}  value={dosen.id} >
+                                            {dosen.name}
+                                        </option>
+                                    )
+                                )}
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="pembimbing" className="mb-2 block text-sm font-medium">
+                                Dosen Pembimbing II
+                            </label>
+
+                            <select id="pembimbing" value={pembimbing2Id} onChange={(e) =>  setPembimbing2Id( e.target.value ) } className="w-full rounded-lg border px-4 py-3" >
+                                <option value="">
+                                    -- Pilih Dosen Pembimbing --
+                                </option>
+                                {dosens .filter((dosen) => String(dosen.id) !== pembimbingId)
+                                    .map((dosen) => (
                                         <option key={dosen.id}  value={dosen.id} >
                                             {dosen.name}
                                         </option>
