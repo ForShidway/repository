@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState , useMemo} from "react";
 import { useRouter } from "next/navigation";
 
 type SDGs={
@@ -19,6 +19,12 @@ export default function SDGsPage() {
     const [sdgs, setSDGs] = useState<SDGs[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const sortedSdgs = useMemo(() => {
+        return [...sdgs].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+    }, [sdgs]);
 
     useEffect(() => {
         async function fetchSDGs() {
@@ -139,7 +145,7 @@ export default function SDGsPage() {
                             </thead>
 
                             <tbody>
-                                {sdgs.map((sdgs, index) => (
+                                {sortedSdgs.map((sdgs, index) => (
                                     <tr key={sdgs.id}>
                                         <td>
                                             {index + 1}

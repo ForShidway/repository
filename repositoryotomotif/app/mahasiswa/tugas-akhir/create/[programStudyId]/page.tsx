@@ -1,8 +1,9 @@
 //app/mahasiswa/tugas-akhir/create/[programStudyId]/page.tsx
 "use client";
 
-import { FormEvent, useState, useEffect, use } from "react";
+import { FormEvent, useState, useEffect, useMemo, use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
 
 
 type Dosen = {
@@ -52,6 +53,14 @@ export default function CreateTugasAkhirPage({
     const [programStudy, setProgramStudy] = useState<ProgramStudy | null> (null);
     const [sdgs, setSdgs] = useState<SDGs[]>([]);
     const [selectedSDGs, setSelectedSDGs] = useState<number[]>([]);
+
+    const sortedSdgs = useMemo(() => {
+        return [...sdgs].sort((a, b) => {
+            const numA = parseInt(a.code.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.code.replace(/\D/g, '')) || 0;
+            return numA - numB;
+    });
+    }, [sdgs])
 
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
@@ -183,28 +192,31 @@ export default function CreateTugasAkhirPage({
         <main className="min-h-screen bg-gray-50 p-8" >
             <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold txt-gray-900">Tambah {selectedCategory}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Tambah {selectedCategory}</h1>
                     <p className="mt-2 text-gray-600">Tambah data {selectedCategory.toLowerCase()} mahasiswa untuk program studi ini.</p>
                 </div>
-                <div className="rounded-xl border bg-whte p-6 shadow-sm">
+                <div className="rounded-xl border bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label  htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700"> 
-                                Nama Mahasiswa</label>
-                            <input type="text" id="name" value={name} onChange={(event) => setName(event.target.value)} />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label  htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700"> 
+                                    Nama Mahasiswa</label>
+                                <input type="text" id="name" value={name} onChange={(event) => setName(event.target.value)} className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10" />
+                            </div>
+                            <div>
+                                <label htmlFor="nim" className="mb-2 block text-sm font-medium">
+                                    NIM
+                                </label>
+                                <input id="nim" type="text" value={nim} onChange={(e) => setNim(e.target.value) } className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10" placeholder="Contoh: 23123456" />
+                            </div>
                         </div>
+                            
+                       
                         <div>
                             <label htmlFor="tahunMasuk" className="mb-2 block text-sm font-medium">
                                 Tahun Masuk
                             </label>
-                            <input id="tahunMasuk" type="number" value={tahunMasuk} onChange={(e) => setTahunMasuk( e.target.value)} className="w-full rounded-lg border px-4 py-3" placeholder="2024"/>
-                        </div>
-
-                        <div>
-                            <label htmlFor="nim" className="mb-2 block text-sm font-medium">
-                                NIM
-                            </label>
-                            <input id="nim" type="text" value={nim} onChange={(e) => setNim(e.target.value) } className="w-full rounded-lg border px-4 py-3" placeholder="Contoh: 23123456" />
+                            <input id="tahunMasuk" type="number" value={tahunMasuk} onChange={(e) => setTahunMasuk( e.target.value)} className="w-full rounded-lg border px-4 py-3" placeholder="2020"/>
                         </div>
 
                         <div>
@@ -281,7 +293,7 @@ export default function CreateTugasAkhirPage({
                         </div>
                         <div>
                             <label htmlFor="" className="mb-2 block text-sm font-medium text-gray-700">Program Studi</label>
-                            <div className="w-full rounded-lg border border-blue-200 bg-blue50 px-4 py-3">
+                            <div className="w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
                                 {programStudy ? (
                                     <div>
                                         <p className="font-semibold text-blue-800"> {programStudy.degree} {programStudy.name}</p>
@@ -295,21 +307,42 @@ export default function CreateTugasAkhirPage({
                         <div>
                             <label className="mb-3 block text-sm font-medium text-gray-700">SDGs yang Relevan</label>
                         </div>
-                        <div className="space-y-3 rounded-lg border border-gray-300 p-4">
-                            {sdgs.length === 0 ?(
-                                <p className="text-sm text-gray-500">Belum ada data SDGs</p>
-                            ): (
-                                sdgs.map((sdgs) => (
-                                    <label key={sdgs.id} className="flex cursor-pointer items-start gap-3 rounded-lg p-2 transition hover:bg-gray-50" >
-                                        <input type="checkbox" checked={selectedSDGs.includes(sdgs.id)} onChange={() => handleSDGsChange(sdgs.id)} className="mt-1 h-4 w-4" />
-                                        <div> 
-                                            <p className="font-medium text-gray-800"> {sdgs.code}-{sdgs.title}</p>
-                                        </div>
-                                    </label>
-                                ))
+                        <div className="rounded-lg border border-slate-200 p-4">
+                            {sortedSdgs.length === 0 ? (
+                                <p className="text-sm text-slate-500">Belum ada data SDGs</p>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                    {sortedSdgs.map((sdgs) => {
+                                        const isSelected = selectedSDGs.includes(sdgs.id);
+                                        return (
+                                            <label
+                                                key={sdgs.id}
+                                                className={`flex cursor-pointer items-start gap-2 rounded-lg border p-3 text-sm transition ${
+                                                    isSelected
+                                                        ? "border-blue-300 bg-blue-50"
+                                                        : "border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/40"
+                                                }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleSDGsChange(sdgs.id)}
+                                                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                <div className="min-w-0">
+                                                    <p className="font-semibold text-slate-800">{sdgs.code}</p>
+                                                    <p className="line-clamp-2 text-xs text-slate-500">{sdgs.title}</p>
+                                                </div>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
                             )}
+
                             {selectedSDGs.length > 0 && (
-                                <p>{selectedSDGs.length}SDG diplih </p>
+                                <p className="mt-3 text-sm font-medium text-blue-600">
+                                    {selectedSDGs.length} SDGs dipilih
+                                </p>
                             )}
                         </div>
                         <div>
@@ -330,8 +363,8 @@ export default function CreateTugasAkhirPage({
                             }
                             setError("");
                             setFile(selectedFile);
-                        }} className="w-full rounde-lg border px-4"/>
-                        <p>Format : PDF, DOC, DOCX. Maksimal 200 Mb</p>
+                        }} className="w-full rounded-lg border px-4"/>
+                        <p>Format : PDF Maksimal 200 Mb</p>
                         {file && (
                             <p className="mt-2 text-sm text-gray-600"> 
                                 File dipilih: <strong>{file.name}</strong>

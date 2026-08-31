@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -6,47 +6,103 @@ import Link from "next/link";
 type Dosen = {
     id: number;
     name: string;
-}
+};
 type SDGs = {
     id: number;
     code: string;
-    title: string
-}
+    title: string;
+};
 type Ruangan = {
-    id: number,
-    name: string
-}
+    id: number;
+    name: string;
+};
 type TugasAkhir = {
     id: number;
     name: string;
     tahunMasuk: number;
-    nim : string;
-    judul: string,
+    nim: string;
+    judul: string;
     mataKuliahRelevan: string;
     ruangan: Ruangan;
     pembimbing: Dosen;
     dosenPa: Dosen;
     sdgs: SDGs[];
-}
+};
 type HomeData = {
-    statistics: { totalTugasAkhir:number; totalDosen:number; totalRuangan:number; totalSDGs:number;}
-    tugasAkhirTerbaru:TugasAkhir[]
-}
+    statistics: {
+        totalTugasAkhir: number;
+        totalDosen: number;
+        totalRuangan: number;
+        totalSDGs: number;
+    };
+    tugasAkhirTerbaru: TugasAkhir[];
+};
+
+const features = [
+    {
+        iconBg: "bg-blue-50",
+        iconColor: "text-blue-600",
+        title: "Pencarian Cerdas",
+        desc: "Cari Tugas Akhir berdasarkan judul, nama mahasiswa, NIM, atau bidang teknologi.",
+        icon: (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+            </svg>
+        ),
+    },
+    {
+        iconBg: "bg-emerald-50",
+        iconColor: "text-emerald-600",
+        title: "Filter Lengkap",
+        desc: "Filter berdasarkan program studi, tahun, SDGs, dosen pembimbing, dan ruangan.",
+        icon: (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+            </svg>
+        ),
+    },
+    {
+        iconBg: "bg-violet-50",
+        iconColor: "text-violet-600",
+        title: "Statistik Informatif",
+        desc: "Lihat statistik dan analisis data Tugas Akhir berdasarkan berbagai kriteria.",
+        icon: (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="20" x2="12" y2="10" />
+                <line x1="18" y1="20" x2="18" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="16" />
+            </svg>
+        ),
+    },
+    {
+        iconBg: "bg-orange-50",
+        iconColor: "text-orange-600",
+        title: "Akses Mudah",
+        desc: "Unduh file Tugas Akhir dengan mudah dan akses informasi lengkap.",
+        icon: (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+        ),
+    },
+];
 
 export default function GuestHomePage() {
     const [data, setData] = useState<HomeData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
     useEffect(() => {
-        async function fecthHomeData() {
-            try{
+        async function fetchHomeData() {
+            try {
                 setLoading(true);
                 const response = await fetch("/api/guest/home");
                 const result = await response.json();
                 if (!response.ok) {
-                    throw new Error(
-                        result.message || "Gagal mengambil data"
-                    );
+                    throw new Error(result.message || "Gagal mengambil data");
                 }
                 setData(result);
             } catch (error) {
@@ -58,7 +114,7 @@ export default function GuestHomePage() {
                 setLoading(false);
             }
         }
-        fecthHomeData();
+        fetchHomeData();
     }, []);
 
     if (loading) {
@@ -66,90 +122,236 @@ export default function GuestHomePage() {
             <main className="flex min-h-[calc(100vh-72px)] items-center justify-center">
                 <div className="text-center">
                     <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
-                        <p className="text-sm text-slate-500"> Memuat Repository...</p>
-                    
+                    <p className="text-sm text-slate-500">Memuat Repository...</p>
                 </div>
             </main>
-        )
+        );
     }
 
     if (error) {
         return (
             <main className="flex min-h-[calc(100vh-72px)] items-center justify-center px-6">
                 <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-5 text-center">
-                    <p className="font-semibold text-red-700"> Gagal memuat data</p>
-                    <p className="mt-1 text-sm texxt-red-600"> {error} </p>
+                    <p className="font-semibold text-red-700">Gagal memuat data</p>
+                    <p className="mt-1 text-sm text-red-600">{error}</p>
                 </div>
             </main>
-        )
+        );
     }
 
+    // TODO: ganti dengan logika periode/tahun kamu sendiri
+    const periodeTersedia = "2021 - 2026";
+
+    const stats = [
+        {
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-600",
+            value: data?.statistics.totalTugasAkhir ?? 0,
+            label: "Tugas Akhir",
+            sub: "Tersedia",
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+            ),
+        },
+        {
+            iconBg: "bg-emerald-50",
+            iconColor: "text-emerald-600",
+            value: data?.statistics.totalDosen ?? 0,
+            label: "Dosen Pembimbing",
+            sub: "Aktif",
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+            ),
+        },
+        {
+            iconBg: "bg-violet-50",
+            iconColor: "text-violet-600",
+            value: data?.statistics.totalSDGs ?? 0,
+            label: "SDGs",
+            sub: "Tersedia",
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+            ),
+        },
+        {
+            iconBg: "bg-orange-50",
+            iconColor: "text-orange-600",
+            value: periodeTersedia,
+            label: "Periode",
+            sub: "Tersedia",
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+            ),
+        },
+    ];
+
     return (
-        <main>  
-            <section className="Relative overflow-hidden bg-white">
-                <div className="mx-auto max-w-7x1 px-6 py-20 lg:px-8 lg:py-28">
-                    <div className="max-w-4xl"> 
-                        <p className="mb-4 text-sm font-bold uppercase tracking-[0.2mem] text-blue-600">Repository Otomotif</p>
-                        <h1 className="text-4xl font-bold tracking-tight text-slate-900 md:text-6xl">  Temukan Tugas Akhir
+        <main>
+            {/* =========================================
+                HERO
+            ========================================= */}
+            <section className="relative bg-white">
+                <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-14 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-32 lg:pt-16">
+                    {/* Left: text */}
+                    <div>
+                        <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700">
+                            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                            Selamat Datang di Repository Otomotif
+                        </span>
+
+                        <h1 className="text-4xl font-bold leading-tight tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
+                            Pusat Pengetahuan
                             <span className="block text-blue-600">
-                                Mahasiswa Otomotif
+                                Teknologi Otomotif
                             </span>
                         </h1>
-                        <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">Jelajahi Koleksi Tugas Akhir Mahasiswa berdasarkan Judul, Nama Mahasiswa, Dosen Pembimbing, Mata Kuliah dan SDGs terkait</p>
-                        <div className="mt-8 max-w-2xl">
-                            <div className="flex items-center rounded-xl border border-slate bg-white p-2 shadow-slate-200/50">
-                                <span className="px-3 text-xl">
-                                    🔍
-                                </span>
-                                <input type="text" placeholder="Cari Judul....." className="flex-1 bg-transparent px-2 py-3 text-sm outline-none" />
-                                <Link href="/repository" className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white trasition hover:bg-blue-700"> Cari </Link>
-                             </div>
+
+                        <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+                            Jelajahi koleksi Tugas Akhir mahasiswa D3 dan D4 Teknologi
+                            Otomotif Politeknik Negeri Malang. Temukan inovasi, penelitian,
+                            dan solusi teknologi untuk masa depan otomotif.
+                        </p>
+
+                        <div className="mt-8 flex flex-wrap gap-3">
+                            <Link
+                                href="/repository"
+                                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                            >
+                                📖 Jelajahi Repository
+                            </Link>
+                            <Link
+                                href="/dosen"
+                                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:border-blue-200"
+                            >
+                                👥 Lihat Dosen
+                            </Link>
                         </div>
-                        <div className="mt-6 flex fles-wrap gap-3">
-                            <Link href="/repository" className="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"> Jelajahi Repositori</Link>
-                            <Link href="/sdgs" className="rounded-lg bg-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"> Lihat SDGs</Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section className="border-y border-slate-200 bg-slate-50">
-                <div className="mx-auto grid max-w-7xl grid-cols-2 px-6 py-8 md:grid-cols-4 lg:px-8">
-                    <div className="border-slate-200 px-6 py-4 text-center md:border-r">
-                        <p className="text-3xl font-bold text-slate-900">
-                            {data?.statistics.totalTugasAkhir}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Tugas Akhir
-                        </p>
-                    </div>
-                    <div className="border-slate-200 px-6 py-4 text-center md:border-r">
-                        <p className="text-3xl font-bold text-slate-900">
-                            {data?.statistics.totalDosen}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Dosen
-                        </p>
-                    </div>
-                    <div className="border-slate-200 px-6 py-4 text-center md:border-r">
-                        <p className="text-3xl font-bold text-slate-900">
-                            {data?.statistics.totalRuangan}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Ruangan
-                        </p>
-                    </div>
-                    <div className="px-6 py-4 text-center">
-                        <p className="text-3xl font-bold text-slate-900">
-                            {data?.statistics.totalSDGs}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-500">
-                            SDGs
-                        </p>
                     </div>
 
+                    {/* Right: illustration placeholder (no photo) */}
+                    <div className="relative">
+                        <div className="absolute -right-6 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-blue-100/70 lg:h-[480px] lg:w-[480px]" />
+
+                        <div className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-[28px] bg-gradient-to-br from-blue-600 to-indigo-700 shadow-xl sm:h-[400px] lg:h-[460px]">
+                            {/* dekorasi titik-titik */}
+                            <div
+                                className="absolute inset-0 opacity-20"
+                                style={{
+                                    backgroundImage:
+                                        "radial-gradient(circle, rgba(255,255,255,0.6) 1.5px, transparent 1.5px)",
+                                    backgroundSize: "22px 22px",
+                                }}
+                            />
+
+                            {/* ikon mobil sebagai placeholder */}
+                            <svg
+                                width="180"
+                                height="180"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="white"
+                                strokeWidth="1.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="relative opacity-90"
+                            >
+                                <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 012 2v4h-2" />
+                                <circle cx="7.5" cy="17.5" r="2.5" />
+                                <circle cx="17.5" cy="17.5" r="2.5" />
+                                <path d="M5 12h13" />
+                            </svg>
+
+                            <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium text-white backdrop-blur">
+                                Repository Otomotif
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Stats card — overlaps bottom edge of hero */}
+                <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2 px-6 lg:px-8">
+                    <div className="mx-auto max-w-6xl rounded-2xl border border-slate-100 bg-white px-6 py-7 shadow-xl shadow-slate-200/60 sm:px-10">
+                        <div className="grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:gap-6">
+                            {stats.map((s) => (
+                                <div key={s.label} className="flex items-center gap-3">
+                                    <div
+                                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${s.iconBg} ${s.iconColor}`}
+                                    >
+                                        {s.icon}
+                                    </div>
+                                    <div>
+                                        <p className="text-2xl font-bold leading-tight text-slate-900">
+                                            {s.value}
+                                        </p>
+                                        <p className="text-sm font-medium leading-tight text-slate-700">
+                                            {s.label}
+                                        </p>
+                                        <p className="text-xs text-slate-400">{s.sub}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
-                        
+
+            {/* Spacer to compensate for the overlapping stats card */}
+            <div className="h-20 sm:h-16" />
+
+            {/* =========================================
+                FITUR REPOSITORY
+            ========================================= */}
+            <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+                <div className="mx-auto mb-12 max-w-2xl text-center">
+                    <h2 className="text-3xl font-bold text-slate-900">
+                        Fitur Repository
+                    </h2>
+                    <div className="mx-auto mt-3 h-1 w-14 rounded-full bg-blue-600" />
+                    <p className="mt-4 text-slate-500">
+                        Temukan berbagai fitur yang membantu Anda menjelajahi dan
+                        memahami koleksi Tugas Akhir
+                    </p>
+                </div>
+
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {features.map((f) => (
+                        <div
+                            key={f.title}
+                            className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                        >
+                            <div
+                                className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${f.iconBg} ${f.iconColor}`}
+                            >
+                                {f.icon}
+                            </div>
+                            <h3 className="mb-2 font-bold text-slate-900">{f.title}</h3>
+                            <p className="text-sm leading-6 text-slate-500">{f.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* =========================================
+                TUGAS AKHIR TERBARU
+            ========================================= */}
             <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
                 <div className="mb-8 flex items-end justify-between">
                     <div>
@@ -163,68 +365,75 @@ export default function GuestHomePage() {
                             Koleksi tugas akhir yang baru ditambahkan.
                         </p>
                     </div>
-                    <Link href="/repository" className="hidden text-sm font-semibold text-blue-600 hover:text-blue-700 md:block" >
+                    <Link
+                        href="/repository"
+                        className="hidden text-sm font-semibold text-blue-600 hover:text-blue-700 md:block"
+                    >
                         Lihat semua →
                     </Link>
                 </div>
 
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                    {data?.tugasAkhirTerbaru.map((TugasAkhir) => (
-                        <article  key={TugasAkhir.id}  className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg" >
+                    {data?.tugasAkhirTerbaru.map((tugasAkhir) => (
+                        <article
+                            key={tugasAkhir.id}
+                            className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"
+                        >
                             <div className="mb-4 flex items-center justify-between">
                                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                                    {TugasAkhir.tahunMasuk}
+                                    {tugasAkhir.tahunMasuk}
                                 </span>
                                 <span className="text-xs text-slate-400">
-                                    #{TugasAkhir.id}
+                                    #{tugasAkhir.id}
                                 </span>
                             </div>
                             <h3 className="line-clamp-3 text-lg font-bold leading-7 text-slate-900 group-hover:text-blue-700">
-                                {TugasAkhir.judul}
+                                {tugasAkhir.judul}
                             </h3>
                             <div className="mt-5 space-y-2 text-sm">
                                 <div className="flex gap-2">
-                                    <span className="w-24 text-slate-400">
-                                        Mahasiswa
-                                    </span>
+                                    <span className="w-24 text-slate-400">Mahasiswa</span>
                                     <span className="font-medium text-slate-700">
-                                        {TugasAkhir.name}
+                                        {tugasAkhir.name}
                                     </span>
                                 </div>
                                 <div className="flex gap-2">
-                                    <span className="w-24 text-slate-400">
-                                        NIM
-                                    </span>
+                                    <span className="w-24 text-slate-400">NIM</span>
                                     <span className="font-medium text-slate-700">
-                                        {TugasAkhir.nim}
+                                        {tugasAkhir.nim}
                                     </span>
                                 </div>
                                 <div className="flex gap-2">
-                                    <span className="w-24 text-slate-400">
-                                        Pembimbing
-                                    </span>
+                                    <span className="w-24 text-slate-400">Pembimbing</span>
                                     <span className="font-medium text-slate-700">
-                                        {TugasAkhir.pembimbing.name}
+                                        {tugasAkhir.pembimbing.name}
                                     </span>
                                 </div>
                             </div>
-                            {TugasAkhir.sdgs.length > 0 && (
+                            {tugasAkhir.sdgs.length > 0 && (
                                 <div className="mt-5 flex flex-wrap gap-1.5">
-                                    {TugasAkhir.sdgs.slice(0, 3).map((sdg) => (
-                                        <span key={sdg.id} className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600" >
+                                    {tugasAkhir.sdgs.slice(0, 3).map((sdg) => (
+                                        <span
+                                            key={sdg.id}
+                                            className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+                                        >
                                             {sdg.code}
                                         </span>
                                     ))}
                                 </div>
                             )}
                             <div className="mt-6 border-t border-slate-100 pt-4">
-                                <Link href={`/tugas-akhir/${TugasAkhir.id}`} className="text-sm font-semibold text-blue-600 hover:text-blue-700" >
+                                <Link
+                                    href={`/tugas-akhir/${tugasAkhir.id}`}
+                                    className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+                                >
                                     Lihat Detail →
                                 </Link>
                             </div>
                         </article>
                     ))}
                 </div>
+
                 {data?.tugasAkhirTerbaru.length === 0 && (
                     <div className="rounded-xl border border-dashed border-slate-300 py-16 text-center">
                         <p className="font-medium text-slate-600">
@@ -234,5 +443,5 @@ export default function GuestHomePage() {
                 )}
             </section>
         </main>
-    )
+    );
 }

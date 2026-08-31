@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Span } from 'next/dist/trace';
 
 // --- TYPE DEFINITIONS ---
 type Dosen = {
@@ -32,6 +33,10 @@ type TugasAkhir = {
   programStudy: ProgramStudy;
   sdgs: SDGs[];
   createdAt: string;
+  fileName ?: string | null;
+  filePath ?: string | null;
+  fileSize ?: string | null;
+  fileType ?: string | null;
 };
 
 export default function KatalogTugasAkhirPage() {
@@ -50,7 +55,8 @@ export default function KatalogTugasAkhirPage() {
    const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState('terbaru');
   const [page, setPage] = useState(1);
-  const PER_PAGE = 6;
+  const [previewFile, setPreviewFile] = useState<string | null | undefined>(null);
+  const PER_PAGE = 10;
 
   useEffect(() => {
     async function fetchData() {
@@ -175,8 +181,8 @@ export default function KatalogTugasAkhirPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-8 py-10">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
         
         <section className="mb-10">
           <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-blue-600">Repositori Otomotif</p>
@@ -191,14 +197,11 @@ export default function KatalogTugasAkhirPage() {
         )}
 
 
-         <div className="sticky top-0 z-30 mb-6 rounded-2xl border border-[#E8E4DC] bg-[#FAF8F4]/95 p-3 backdrop-blur">
-
+         <div className="sticky top-0 z-30 mb-6 rounded-2xl border border-slate-200 bg-white/95 p-3 backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row">
-
                 <div className="relative flex-1">
-
                     <svg
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9AA0A6]"
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                         width="17"
                         height="17"
                         viewBox="0 0 24 24"
@@ -224,7 +227,7 @@ export default function KatalogTugasAkhirPage() {
                             setPage(1);
                         }}
                         placeholder="Cari judul, mahasiswa, NIM, mata kuliah..."
-                        className="w-full rounded-xl border border-[#E8E4DC] bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#1E4FBA] focus:ring-2 focus:ring-[#1E4FBA]/10"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-ring-blue-500/10"
                     />
 
                 </div>
@@ -267,8 +270,8 @@ export default function KatalogTugasAkhirPage() {
                         }
                         className={`px-4 transition ${
                             view === "grid"
-                                ? "bg-[#1E4FBA] text-white"
-                                : "text-[#9AA0A6]"
+                                ? "bg-blue-600 text-white"
+                                : "text-slate-400"
                         }`}
                     >
                         ▦
@@ -281,8 +284,8 @@ export default function KatalogTugasAkhirPage() {
                         }
                         className={`px-4 transition ${
                             view === "list"
-                                ? "bg-[#1E4FBA] text-white"
-                                : "text-[#9AA0A6]"
+                                ? "bg-blue-600 text-white"
+                                : "text-slate-400"
                         }`}
                     >
                         ☰
@@ -302,26 +305,6 @@ export default function KatalogTugasAkhirPage() {
           <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-8">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               
-              {/* Kolom Pencarian */}
-              <div className="mb-6 border-b border-slate-100 pb-6">
-                <label className="mb-3 block text-xs font-semibold uppercase tracking-wider text-slate-500">Pencarian</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={kataKunci}
-                    onChange={e => { setKataKunci(e.target.value); setPage(1); }}
-                    placeholder="Cari judul, nama, NIM..."
-                    className="w-full rounded-lg border border-slate-200 bg-gray-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"
-                  />
-                  {kataKunci && (
-                    <button onClick={() => setKataKunci('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                      ✕
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Header Filter */}
               <div className="mb-5 flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Filter Data</span>
                 {(prodi || tahun || dosen || sdgsFilter.length > 0) && (
@@ -361,8 +344,7 @@ export default function KatalogTugasAkhirPage() {
                     <button
                       key={s.id}
                       onClick={() => toggleSdg(s.id)}
-                      className={`h-8 w-8 rounded-lg text-xs font-bold transition-all ${sdgsFilter.includes(s.id) ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                    >
+                      className={`rounded-lg px-2.5 py-1.5 text-[11px] font-bold whitespace-nowrap transition-all ${sdgsFilter.includes(s.id) ? 'bg-blue-600 text-white' :  'border border-slate-200 bg-white text-slate-500 hover:bg-blue-50 hover:bg-slate-200 hover:text-blue-600'}`}  >
                       {s.code}
                     </button>
                   ))}
@@ -381,56 +363,113 @@ export default function KatalogTugasAkhirPage() {
                 <p className="text-slate-600">Tidak ada Tugas Akhir yang sesuai dengan pencarian atau filter Anda.</p>
               </div>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className= { view === "grid" ? "grid gap-6 md:grid-cols-2" : "flex flex-col gap-3"}>
+     
+     
+     
+     
+     
                 {paged.map(ta => (
-                  <button 
+                  <div 
                     key={ta.id} 
                     onClick={() => router.push(`/mahasiswa/tugas-akhir/${ta.id}`)} 
                     className="group text-left"
                   >
-                    <div className="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg flex flex-col">
-                      
-                      <div className="mb-4 flex items-start justify-between gap-2">
-                        <div className="flex flex-wrap gap-2">
-                          <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
-                            {ta.programStudy?.degree || 'Program'}
+                    {view === "grid" ? (
+                      <div className="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg flex flex-col">
+                        <div className="mb-4 flex items-start justify-between gap-2">
+                          <div className="flex flex-wrap gap-2">
+                            <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
+                              {ta.programStudy? `${ta.programStudy.degree}${ta.programStudy.name}` : 'Jurusan Teknik Otomotif'}
+                            </span>
+                              <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                                {new Date(ta.createdAt).getFullYear()}
+                              </span>
+                          </div>
+                          <span className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600 shrink-0">
+                            →
                           </span>
-                          {ta.mataKuliahRelevan && (
-                            <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
-                              {ta.mataKuliahRelevan}
-                            </span>
-                          )}
                         </div>
-                        <span className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600 shrink-0">
-                          →
-                        </span>
-                      </div>
-                      
-                      <h2 className="mb-3 text-lg font-bold leading-tight text-slate-900 line-clamp-3">
-                        {ta.judul}
-                      </h2>
-                      
-                      <div className="mb-4 space-y-1 text-sm text-slate-500">
-                        <p className="font-medium text-slate-700">{ta.name}</p>
-                        <p>NIM: {ta.nim} · Tahun: {new Date(ta.createdAt).getFullYear()}</p>
-                        <p className="line-clamp-1">Pembimbing: {ta.pembimbing?.name || '-'}</p>
-                      </div>
-
-                      {ta.sdgs && ta.sdgs.length > 0 && (
-                        <div className="mb-4 flex flex-wrap gap-1.5">
-                          {ta.sdgs.map(sdgs => (
-                            <span key={sdgs.id} className="rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">
-                              {sdgs.code}
-                            </span>
-                          ))}
+                        <h2 className="mb-3 text-lg font-bold leading-tight text-slate-900 line-clamp-3">
+                          {ta.judul}
+                        </h2>
+                        <div className="mb-4 space-y-1 text-sm text-slate-500">
+                          <p className="font-medium text-slate-700">{ta.name} ({ta.nim})</p>
+                          <p className="line-clamp-1">Pembimbing: {ta.pembimbing?.name || '-'}</p>
                         </div>
-                      )}
+                        {ta.sdgs && ta.sdgs.length > 0 && (
+                          <div className="mb-4 flex flex-wrap gap-1.5">
+                            {ta.sdgs.map(sdgs => (
+                              <span key={sdgs.id} className="rounded-md bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">
+                                {sdgs.code}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="mt-auto border-t border-slate-100 pt-5 flex items-center gap-4"> 
+                          {ta.filePath ? ( <>
+                              <button onClick={(e) => {
+                                e.stopPropagation(); setPreviewFile(ta.filePath);
+                              }}>
+                                View
+                              </button>
+                              <a href={ta.filePath}
+                                download={ta.fileName ?? true}
+                                onClick={(e) => e.stopPropagation()} className="text-sm font-semibold text-slate-500 hover:text-slate-700">
+                                  Unduh
+                              </a>
+                            </>  
+                          ) : (
+                            <span className='text-sm font-semibold text-slate-300'> Belum Ada File</span>
+                          ) }
+                        </div>
 
-                      <div className="mt-auto border-t border-slate-100 pt-5">
-                        <span className="text-sm font-semibold text-blue-600">Lihat Detail TA</span>
+
                       </div>
-                    </div>
-                  </button>
+                    ) : (
+                      <div className='flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition-all hover:border-blue-200 hover:shadow-md'>
+                        <div className='flex items-center justify-between gap-2'>
+                          <div className='flex items-center gap-2'>
+                            <span className='whitespace-nowrap rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700'>
+                              {ta.programStudy ? `${ta.programStudy.degree} ${ta.programStudy.name}` : "Jurusan Teknik Otomotif"}
+                            </span>
+                            <span className='whitespace-nowrap rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600'>
+                              {new Date(ta.createdAt).getFullYear()}
+                            </span>
+                          </div>
+
+                          {ta.filePath ? (
+                            <div className='flex items-center gap-3 shrink-0'>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setPreviewFile(ta.filePath);  }}
+                                title="Lihat" className='text-slate-400 transition hover:text-blue-600'
+                              >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                  <circle cx="12" cy="12" r="3" />
+                                </svg>
+                              </button>
+                              <a href={ta.filePath}
+                                  download={ta.fileName ?? true}
+                                  onClick={(e) => e.stopPropagation()} title="unduh"
+                                  className="text-slate-400 transition hover:text-slate-600">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                      <polyline points="7 10 12 15 17 10" />
+                                      <line x1="12" y1="15" x2="12" y2="3" />
+                                    </svg>
+                              </a>
+                            </div>
+                        ) : (
+                          <span className="shrink-0 text-xs font-medium text-slate-300">Belum ada file</span>
+                        )}
+                      </div>
+                        <h2 className='line-clamp-1 text-sm font-bold text-slate-900'>
+                          {ta.judul}
+                        </h2>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -458,6 +497,17 @@ export default function KatalogTugasAkhirPage() {
 
           </div>
         </div>
+
+        {previewFile && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4' onClick={() => setPreviewFile(null)}>
+            <div className='relative h-[90vh] w-full max-w-4xl overflow-hidden rounded-xl bg-white shadow-2xl' onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => setPreviewFile(null)} className='absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-600 shadow hover:bg-slate-100'>
+                X
+              </button>
+              <iframe src={previewFile} className='h-full w-full' title="Preview Dokumen"></iframe>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
