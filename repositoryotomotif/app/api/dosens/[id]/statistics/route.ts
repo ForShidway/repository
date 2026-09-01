@@ -52,7 +52,14 @@ export async function GET(
             }, orderBy: [
                 { tahunMasuk : "desc"}, { createdAt: "desc" }
             ], include: {
-                programStudy: true, ruangan: true, sdgs:true
+                programStudy: true,
+                ruangan: true,
+                sdgs: true,
+                mahasiswa: {
+                    orderBy: {
+                        urutan: "asc",
+                    },
+                },
             }
         });
         const statistikProgramStudy = await prisma.tugasAkhir.groupBy({

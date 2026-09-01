@@ -47,10 +47,10 @@ type TugasAkhirDetail = {
     filePath: string | null;
     fileSize: number | null;
     fileType: string | null;
-    ruangan: Ruangan;
+    ruangan: Ruangan | null;
     pembimbing: Dosen;
     pembimbing2: Dosen | null;
-    dosenPa: Dosen;
+    dosenPa: Dosen | null;
     programStudy: ProgramStudy | null;
     sdgs: SDGs[];
     mahasiswa: Mahasiswa[];
@@ -130,7 +130,7 @@ export default function DetailTugasAkhirPage({
                         <p className="text-sm text-red-600">{error || "Data tidak ditemukan"}</p>
                     </div>
                     <button
-                        onClick={() => router.push("/tugas-akhirs")}
+                        onClick={() => router.push("/admin/tugas-akhirs")}
                         className="mt-4 rounded-lg border px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
                     >
                         Kembali
@@ -152,7 +152,7 @@ export default function DetailTugasAkhirPage({
                         Beranda
                     </button>
                     <span>{'>'}</span>
-                    <button onClick={() => router.push("/tugas-akhirs")} className="hover:text-blue-600">
+                    <button onClick={() => router.push("/admin/tugas-akhirs")} className="hover:text-blue-600">
                         Tugas Akhir
                     </button>
                     <span>{'>'}</span>
@@ -166,13 +166,13 @@ export default function DetailTugasAkhirPage({
                     </div>
                     <div className="flex gap-3">
                         <button
-                            onClick={() => router.push("/tugas-akhirs")}
+                            onClick={() => router.push("/admin/tugas-akhirs")}
                             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
                         >
                             &larr; Kembali
                         </button>
                         <button
-                            onClick={() => router.push(`/tugas-akhirs/${data.id}/edit`)}
+                            onClick={() => router.push(`/admin/tugas-akhirs/${data.id}/edit`)}
                             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
                         >
                             Edit Data
@@ -214,7 +214,7 @@ export default function DetailTugasAkhirPage({
                                 </svg>
                                 Ruangan
                             </p>
-                            <p className="text-slate-800">{data.ruangan.name}</p>
+                            <p className="text-slate-800">{data.ruangan?.name || "Tidak ada ruangan terkait"}</p>
                         </div>
 
                         {data.fileName && (
@@ -291,7 +291,7 @@ export default function DetailTugasAkhirPage({
                             ))}
                             <div>
                                 <p className="text-sm text-slate-500">Dosen PA</p>
-                                <p className="font-medium text-slate-800">{data.dosenPa.name}</p>
+                                <p className="font-medium text-slate-800">{data.dosenPa?.name}</p>
                             </div>
                         </div>
                     </div>

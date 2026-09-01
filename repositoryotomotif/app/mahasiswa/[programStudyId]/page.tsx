@@ -89,8 +89,8 @@ export default function MahasiswaProgramStudyFolderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-8 py-10">
-      <div className="mx-auto max-w-5xl">
+    <main className="min-h-screen bg-gray-50 px-8 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
         <button
           type="button"
           onClick={() => router.push("/mahasiswa")}

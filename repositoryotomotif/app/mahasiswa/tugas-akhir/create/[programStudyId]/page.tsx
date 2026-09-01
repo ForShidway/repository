@@ -139,7 +139,7 @@ export default function CreateTugasAkhirPage({
         setError("");
 
         const mahasiswaValid = mahasiswas.every((m) => m.name.trim() && m.nim.trim());
-        if (!mahasiswaValid || !tahunMasuk || !judul.trim() || !mataKuliahRelevan.trim() || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId ||selectedSDGs.length === 0)    {
+        if (!mahasiswaValid || !tahunMasuk || !judul.trim() || !pembimbingId || !programStudyId ||selectedSDGs.length === 0)    {
             setError("Semua data Tugas Akhir harus di isi, minimal satu SDGS harus dipilih");
             return;
         }
@@ -154,14 +154,19 @@ export default function CreateTugasAkhirPage({
 
             formData.append("tahunMasuk", tahunMasuk);
             formData.append("judul", judul.trim());
-            formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
-            formData.append("ruanganId", ruanganId);
+            if (mataKuliahRelevan.trim()) {
+                formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
+            }
+            if (ruanganId) {
+                formData.append("ruanganId", ruanganId);
+            }
             formData.append("pembimbingId", pembimbingId);
             if(pembimbing2Id) {
                 formData.append("pembimbing2Id", pembimbing2Id)
             }
-            
-            formData.append("dosenPaId", dosenPaId);
+            if(dosenPaId) {
+                formData.append("dosenPaId", dosenPaId)
+            }
             formData.append("programStudyId", programStudyId);
             formData.append("sdgsId", JSON.stringify(selectedSDGs));
             formData.append("keywords", JSON.stringify(keywords));
@@ -181,7 +186,9 @@ export default function CreateTugasAkhirPage({
                     
                 )
             }
-            router.push("/tugas-akhirs");
+
+            alert("Tugas Akhir berhasil ditambahkan!");
+            router.push(`/mahasiswa/${programStudyId}`);
             router.refresh();
         } catch (error) {
             console.error(error);
@@ -250,6 +257,7 @@ export default function CreateTugasAkhirPage({
                     <h1 className="text-3xl font-bold text-gray-900">Tambah {selectedCategory}</h1>
                     <p className="mt-2 text-gray-600">Tambah data {selectedCategory.toLowerCase()} mahasiswa untuk program studi ini.</p>
                 </div>
+                
                 <div className="rounded-xl border bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-4">

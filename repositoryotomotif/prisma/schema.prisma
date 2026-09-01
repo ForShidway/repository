@@ -57,12 +57,12 @@ model TugasAkhir {
   id Int @id @default(autoincrement())
   tahunMasuk Int
   judul String @db.Text
-  mataKuliahRelevan String
+  mataKuliahRelevan String?
 
-  ruanganId Int
+  ruanganId Int?
   pembimbingId Int
   pembimbing2Id Int?
-  dosenPaId Int
+  dosenPaId Int?
   ProgramStudyId Int?
 
   fileName String?
@@ -70,10 +70,10 @@ model TugasAkhir {
   fileSize Int?
   fileType String?
 
-  ruangan Ruangan @relation(fields: [ruanganId], references: [id])
+  ruangan Ruangan? @relation(fields: [ruanganId], references: [id])
   pembimbing Dosen @relation("PembimbingTA", fields: [pembimbingId], references: [id])
   pembimbing2 Dosen? @relation("Pembimbing2TA", fields: [pembimbing2Id], references: [id])
-  dosenPa Dosen @relation("DosenPA", fields: [dosenPaId], references: [id])
+  dosenPa Dosen? @relation("DosenPA", fields: [dosenPaId], references: [id])
   programStudy ProgramStudy? @relation(fields: [ProgramStudyId], references: [id])
 
   mahasiswa Mahasiswa[]

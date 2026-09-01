@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer} from "recharts";
 
 type ProgramStudy = {
     id: number;
@@ -15,13 +16,18 @@ type SDGs = {
     title: string;
 };
 
-type TugasAkhir = {
+type Mahasiswa = {
     id: number;
     name: string;
     nim: string;
+    urutan: number;
+}
+
+type TugasAkhir = {
+    id: number;
     judul: string;
     tahunMasuk: number;
-
+    mahasiswa: Mahasiswa[];
     programStudy: ProgramStudy | null;
 
     ruangan?: {
@@ -77,6 +83,38 @@ export default function StatistikDosenPage() {
     const [page, setPage] = useState(1);
 
     const ITEMS_PER_PAGE = 6;
+
+    const PROGRAM_COLORS = [ "#3b82f6",  "#10b981",  "#8b5cf6",  "#f97316", "#ef4444", 
+        "#14b8a6", ]
+
+    function ProgramStudyTooltip({
+        active,
+        payload,
+        total,
+    }: {
+        active?: boolean;
+        payload?: any[];
+        total: number;
+    }) {
+        if (!active || !payload || !payload.length) return null;
+
+        const data = payload[0].payload as StatistikProgramStudy;
+        const percentage =
+            total > 0 ? Math.round((data.jumlah / total) * 100) : 0;
+
+        return (
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-lg">
+                <p className="font-semibold text-slate-800">{data.name}</p>
+                <p className="text-slate-400">{data.degree}</p>
+                <p className="mt-1 text-sm font-bold text-blue-600">
+                    {data.jumlah} TA{" "}
+                    <span className="font-medium text-slate-500">
+                        ({percentage}%)
+                    </span>
+                </p>
+            </div>
+        );
+    }
 
     // ==========================================
     // FETCH DATA
@@ -140,12 +178,16 @@ export default function StatistikDosenPage() {
                 ta.judul
                     .toLowerCase()
                     .includes(keyword) ||
-                ta.name
-                    .toLowerCase()
-                    .includes(keyword) ||
-                ta.nim
-                    .toLowerCase()
-                    .includes(keyword) ||
+                ta.mahasiswa?.some((m) =>
+                    m.name
+                        .toLowerCase()
+                        .includes(keyword)
+                ) ||
+                ta.mahasiswa?.some((m) =>
+                    m.nim
+                        .toLowerCase()
+                        .includes(keyword)
+                ) ||
                 ta.programStudy?.name
                     .toLowerCase()
                     .includes(keyword) ||
@@ -393,46 +435,60 @@ export default function StatistikDosenPage() {
                                 </p>
                             </div>
                         ) : (
-                            <div className="flex h-64 items-end gap-4 overflow-x-auto px-2 pb-8">
-                                {statistik.statistikPerTahun.map(
-                                    (item) => {
-                                        const height =
-                                            Math.max(
-                                                (item.jumlah /
-                                                    maxJumlah) *
-                                                    180,
-                                                12
-                                            );
+                            <div className="flex h-64 items-end gap-4 overflow-x-auto px-2 pb-8 pt-16">
+                                {statistik.statistikPerTahun.map((item) => {
+                                    const totalTahun = statistik.statistikPerTahun.reduce(
+                                        (sum, i) => sum + i.jumlah,
+                                        0
+                                    );
 
-                                        return (
-                                            <div
-                                                key={
-                                                    item.tahun
-                                                }
-                                                className="flex min-w-[55px] flex-1 flex-col items-center justify-end"
-                                            >
-                                                <span className="mb-2 text-xs font-bold text-slate-600">
-                                                    {
-                                                        item.jumlah
-                                                    }
-                                                </span>
+                                    const percentage =
+                                        totalTahun > 0
+                                            ? Math.round((item.jumlah / totalTahun) * 100)
+                                            : 0;
 
-                                                <div
-                                                    className="w-10 rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
-                                                    style={{
-                                                        height: `${height}px`,
-                                                    }}
-                                                />
+                                    const height = Math.max(
+                                        (item.jumlah / maxJumlah) * 160,
+                                        12
+                                    );
 
-                                                <span className="mt-3 text-xs font-medium text-slate-500">
-                                                    {
-                                                        item.tahun
-                                                    }
-                                                </span>
+                                    return (
+                                        <div
+                                            key={item.tahun}
+                                            className="group relative flex min-w-[55px] flex-1 flex-col items-center justify-end"
+                                        >
+                                            {/* TOOLTIP */}
+                                            <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs opacity-0 shadow-lg transition group-hover:opacity-100">
+                                                <p className="font-semibold text-slate-800">
+                                                    Tahun {item.tahun}
+                                                </p>
+                                                <p className="mt-0.5 font-bold text-blue-600">
+                                                    {item.jumlah} TA{" "}
+                                                    <span className="font-medium text-slate-500">
+                                                        ({percentage}%)
+                                                    </span>
+                                                </p>
+                                                {/* panah kecil di bawah tooltip */}
+                                                <div className="absolute left-1/2 top-full h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-white" />
                                             </div>
-                                        );
-                                    }
-                                )}
+
+                                            <span className="mb-2 text-xs font-bold text-slate-600">
+                                                {item.jumlah}
+                                            </span>
+
+                                            <div
+                                                className="w-10 cursor-pointer rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
+                                                style={{
+                                                    height: `${height}px`,
+                                                }}
+                                            />
+
+                                            <span className="mt-3 text-xs font-medium text-slate-500">
+                                                {item.tahun}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -463,65 +519,95 @@ export default function StatistikDosenPage() {
                         ) : (
                             <div className="space-y-5">
 
-                                {statistik.statistikPerProgramStudy.map(
-                                    (program) => {
-                                        const percentage =
-                                            statistik.totalBimbingan >
-                                            0
-                                                ? Math.round(
-                                                      (program.jumlah /
-                                                          statistik.totalBimbingan) *
-                                                          100
-                                                  )
-                                                : 0;
-
-                                        return (
-                                            <div
-                                                key={
-                                                    program.id
-                                                }
-                                            >
-                                                <div className="mb-2 flex items-center justify-between">
-                                                    <div>
-                                                        <p className="text-sm font-semibold text-slate-800">
-                                                            {
-                                                                program.name
-                                                            }
-                                                        </p>
-
-                                                        <p className="text-xs text-slate-400">
-                                                            {
-                                                                program.degree
-                                                            }
-                                                        </p>
-                                                    </div>
-
-                                                    <span className="text-sm font-bold text-blue-600">
-                                                        {
-                                                            program.jumlah
-                                                        }{" "}
-                                                        TA
-                                                    </span>
-                                                </div>
-
-                                                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                                                    <div
-                                                        className="h-full rounded-full bg-blue-500"
-                                                        style={{
-                                                            width: `${percentage}%`,
-                                                        }}
+                                {statistik.statistikPerProgramStudy.length === 0 ? (
+                                    <div className="flex h-64 items-center justify-center">
+                                        <p className="text-sm text-slate-400">Belum ada data.</p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center gap-6 sm:flex-row">
+                                        {/* DONUT CHART */}
+                                        <div className="h-56 w-full sm:w-1/2">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={statistik.statistikPerProgramStudy}
+                                                        dataKey="jumlah"
+                                                        nameKey="name"
+                                                        innerRadius={55}
+                                                        outerRadius={85}
+                                                        paddingAngle={3}
+                                                    >
+                                                        {statistik.statistikPerProgramStudy.map(
+                                                            (_, index) => (
+                                                                <Cell
+                                                                    key={index}
+                                                                    fill={
+                                                                        PROGRAM_COLORS[
+                                                                            index % PROGRAM_COLORS.length
+                                                                        ]
+                                                                    }
+                                                                    stroke="#fff"
+                                                                    strokeWidth={2}
+                                                                />
+                                                            )
+                                                        )}
+                                                    </Pie>
+                                                    <Tooltip
+                                                        content={
+                                                            <ProgramStudyTooltip
+                                                                total={statistik.totalBimbingan}
+                                                            />
+                                                        }
                                                     />
-                                                </div>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </div>
 
-                                                <p className="mt-1 text-right text-xs text-slate-400">
-                                                    {
-                                                        percentage
-                                                    }
-                                                    %
-                                                </p>
-                                            </div>
-                                        );
-                                    }
+                                        {/* LEGEND */}
+                                        <div className="w-full space-y-3 sm:w-1/2">
+                                            {statistik.statistikPerProgramStudy.map((program, index) => {
+                                                const percentage =
+                                                    statistik.totalBimbingan > 0
+                                                        ? Math.round(
+                                                            (program.jumlah /
+                                                                statistik.totalBimbingan) *
+                                                                100
+                                                        )
+                                                        : 0;
+
+                                                return (
+                                                    <div
+                                                        key={program.id}
+                                                        className="flex items-center justify-between gap-3 text-sm"
+                                                    >
+                                                        <div className="flex min-w-0 items-center gap-2">
+                                                            <span
+                                                                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        PROGRAM_COLORS[
+                                                                            index % PROGRAM_COLORS.length
+                                                                        ],
+                                                                }}
+                                                            />
+                                                            <div className="min-w-0">
+                                                                <p className="truncate font-medium text-slate-700">
+                                                                    {program.name}
+                                                                </p>
+                                                                <p className="text-xs text-slate-400">
+                                                                    {program.degree}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <span className="shrink-0 font-semibold text-slate-600">
+                                                            {program.jumlah} · {percentage}%
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 )}
 
                             </div>
@@ -633,11 +719,13 @@ export default function StatistikDosenPage() {
                                             </td>
 
                                             <td className="px-6 py-4 text-sm font-medium text-slate-700">
-                                                {ta.name}
+                                                <strong>
+                                                    {ta.mahasiswa?.map((m) => m.name).join(", ") || "-"}
+                                                </strong>
                                             </td>
 
                                             <td className="px-6 py-4 text-sm text-slate-500">
-                                                {ta.nim}
+                                                {ta.mahasiswa?.map((m) => m.nim).join(", ") || "-"}
                                             </td>
 
                                             <td className="px-6 py-4 text-sm text-slate-500">

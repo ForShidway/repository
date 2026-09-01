@@ -101,12 +101,16 @@ export async function POST(request: Request) {
 
         const tahunMasuk = Number(formData.get("tahunMasuk"));
         const judul = formData.get("judul")?.toString().trim();
-        const mataKuliahRelevan = formData.get("mataKuliahRelevan")?.toString().trim();
-        const ruanganId = Number(formData.get("ruanganId"));
+
+        const mataKuliahRelevanRaw = formData.get("mataKuliahRelevan")?.toString().trim();
+        const mataKuliahRelevan = mataKuliahRelevanRaw ? mataKuliahRelevanRaw : null;
+        const ruanganIdRaw = formData.get("ruanganId");
+        const ruanganId = ruanganIdRaw ? Number(ruanganIdRaw) : null;
         const pembimbingId = Number(formData.get("pembimbingId"));
         const pembimbingId2 = formData.get("pembimbing2Id");
         const pembimbing2Id = pembimbingId2 ? Number(pembimbingId2) : null ;
-        const dosenPaId = Number(formData.get("dosenPaId"));
+        const dosenPaRaw = formData.get("dosenPaId");
+        const dosenPaId = dosenPaRaw ? Number(dosenPaRaw) : null ;
         const programStudyId = Number(formData.get("programStudyId"))
 
         const sdgsRaw = formData.get("sdgsId");
@@ -162,7 +166,7 @@ export async function POST(request: Request) {
         }
 
         if(
-            !tahunMasuk || !judul || ! mataKuliahRelevan || !ruanganId || !pembimbingId || !dosenPaId || !programStudyId
+            !tahunMasuk || !judul || !pembimbingId  || !programStudyId
         ) {
             return NextResponse.json(
                 { message : "semua data harus diisi"},
@@ -203,19 +207,17 @@ export async function POST(request: Request) {
             )
         }
 
-        const ruangan = await prisma.ruangan.findUnique({
-            where: {
-                id: ruanganId,
-            }
-        })
+        if (ruanganId) {
+            const ruangan = await prisma.ruangan.findUnique({
+                where: { id: ruanganId }
+            })
 
-        if (!ruangan) {
-            return NextResponse.json (
-                {
-                    message : "Ruangan tidak ditemukan"
-                },
-                { status: 404}
-            )
+            if (!ruangan) {
+                return NextResponse.json(
+                    { message: "Ruangan tidak ditemukan" },
+                    { status: 404 }
+                )
+            }
         }
 
         const pembimbing = await prisma.dosen.findUnique({
@@ -246,18 +248,19 @@ export async function POST(request: Request) {
             }
         }
         
+        if (dosenPaId) {
+            const dosenPa = await prisma.dosen.findUnique({
+                where: {
+                    id: dosenPaId
+                }
+            })
 
-        const dosenPa = await prisma.dosen.findUnique ({
-            where: {
-                id: dosenPaId,
+            if (!dosenPa) {
+                return NextResponse.json(
+                    { message : "Data Dosen PA tidak ditemukan"},
+                    { status: 404}
+                )
             }
-        })
-
-        if (!dosenPa) {
-            return NextResponse.json(
-                { message : "Dosen Pa tidak ditemukan" },
-                { status : 404}
-            )
         }
 
         const programStudy = await prisma.programStudy.findUnique({
@@ -342,7 +345,7 @@ export async function POST(request: Request) {
         
         const tugasAkhir = await prisma.tugasAkhir.create ({
             data: {
-                tahunMasuk, judul, mataKuliahRelevan, ruanganId, pembimbingId, dosenPaId, ProgramStudyId : programStudyId,
+                tahunMasuk, judul, mataKuliahRelevan, ruanganId, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,

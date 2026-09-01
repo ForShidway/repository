@@ -328,122 +328,36 @@ export default function GuestHomePage() {
             {/* =========================================
                 FITUR REPOSITORY
             ========================================= */}
-            <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8  bg-sky-100" >
-                <div className="mx-auto mb-12 max-w-2xl text-center">
-                    <h2 className="text-3xl font-bold text-slate-900">
-                        Fitur Repository
-                    </h2>
-                    <div className="mx-auto mt-3 h-1 w-14 rounded-full bg-blue-600" />
-                    <p className="mt-4 text-slate-500">
-                        Temukan berbagai fitur yang membantu Anda menjelajahi dan
-                        memahami koleksi Tugas Akhir
-                    </p>
-                </div>
-
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    {features.map((f) => (
-                        <div
-                            key={f.title}
-                            className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
-                        >
-                            <div
-                                className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${f.iconBg} ${f.iconColor}`}
-                            >
-                                {f.icon}
-                            </div>
-                            <h3 className="mb-2 font-bold text-slate-900">{f.title}</h3>
-                            <p className="text-sm leading-6 text-slate-500">{f.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* =========================================
-                TUGAS AKHIR TERBARU
-            ========================================= */}
-            <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-                <div className="mb-8 flex items-end justify-between">
-                    <div>
-                        <p className="text-sm font-semibold uppercase tracking-widest text-blue-600">
-                            Repository
-                        </p>
-                        <h2 className="mt-2 text-3xl font-bold text-slate-900">
-                            Tugas Akhir Terbaru
+            <section className=" bg-sky-100" >
+                <div className="mx-auto max-w-7xl   px-6 py-20 lg:px-8">
+                     <div className="mx-auto mb-12 max-w-2xl text-center">
+                        <h2 className="text-3xl font-bold text-slate-900">
+                            Fitur Repository
                         </h2>
-                        <p className="mt-2 text-slate-500">
-                            Koleksi tugas akhir yang baru ditambahkan.
+                        <div className="mx-auto mt-3 h-1 w-14 rounded-full bg-blue-600" />
+                        <p className="mt-4 text-slate-500">
+                            Temukan berbagai fitur yang membantu Anda menjelajahi dan
+                            memahami koleksi Tugas Akhir
                         </p>
                     </div>
-                    <Link
-                        href="/repository"
-                        className="hidden text-sm font-semibold text-blue-600 hover:text-blue-700 md:block"
-                    >
-                        Lihat semua →
-                    </Link>
-                </div>
 
-                <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                    {data?.tugasAkhirTerbaru.map((tugasAkhir) => (
-                        <article
-                            key={tugasAkhir.id}
-                            className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"
-                        >
-                            <div className="mb-4 flex items-center justify-between">
-                                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                                    {tugasAkhir.tahunMasuk}
-                                </span>
-                                <span className="text-xs text-slate-400">
-                                    #{tugasAkhir.id}
-                                </span>
-                            </div>
-                            <h3 className="line-clamp-3 text-lg font-bold leading-7 text-slate-900 group-hover:text-blue-700">
-                                {tugasAkhir.judul}
-                            </h3>
-                            <div className="mt-5 space-y-2 text-sm">
-                                <div className="flex gap-2">
-                                    <span className="w-24 text-slate-400">Mahasiswa</span>
-                                    <span className="font-medium text-slate-700">
-                                        {formatMahasiswa(tugasAkhir.mahasiswa)}
-                                    </span>
-                                </div>
-                                <div className="flex gap-2">
-                                    <span className="w-24 text-slate-400">Pembimbing</span>
-                                    <span className="font-medium text-slate-700">
-                                        {tugasAkhir.pembimbing.name}
-                                    </span>
-                                </div>
-                            </div>
-                            {tugasAkhir.sdgs.length > 0 && (
-                                <div className="mt-5 flex flex-wrap gap-1.5">
-                                    {tugasAkhir.sdgs.slice(0, 3).map((sdg) => (
-                                        <span
-                                            key={sdg.id}
-                                            className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
-                                        >
-                                            {sdg.code}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                            <div className="mt-6 border-t border-slate-100 pt-4">
-                                <Link
-                                    href={`/tugas-akhir/${tugasAkhir.id}`}
-                                    className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 bg-sky-100">
+                        {features.map((f) => (
+                            <div
+                                key={f.title}
+                                className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                            >
+                                <div
+                                    className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${f.iconBg} ${f.iconColor}`}
                                 >
-                                    Lihat Detail →
-                                </Link>
+                                    {f.icon}
+                                </div>
+                                <h3 className="mb-2 font-bold text-slate-900">{f.title}</h3>
+                                <p className="text-sm leading-6 text-slate-500">{f.desc}</p>
                             </div>
-                        </article>
-                    ))}
-                </div>
-
-                {data?.tugasAkhirTerbaru.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-slate-300 py-16 text-center">
-                        <p className="font-medium text-slate-600">
-                            Belum ada tugas akhir.
-                        </p>
+                        ))}
                     </div>
-                )}
+                </div>
             </section>
         </main>
     );

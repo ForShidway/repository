@@ -1,4 +1,4 @@
-import { NavbarMahasiswa } from "@/components/mahasiswa/navbar";
+import NavbarMahasiswa from "@/components/mahasiswa/navbar";
 
 export default function GuestLayout({
     children,
