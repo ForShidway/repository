@@ -58,7 +58,7 @@ export default function DosenPage() {
     const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
     return (
-        <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-[#F4F9F9] px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
 
                 {/* HEADER */}
@@ -131,16 +131,16 @@ export default function DosenPage() {
                 {/* TABLE */}
                 {!loading && paged.length > 0 && (
                     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <table className="w-full text-left">
+                        <table className="w-full text-left user">
                             <thead>
                                 <tr className="border-b border-slate-100 bg-slate-50">
-                                    <th className="w-16 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        #
+                                    <th className="w-16 px-6 py-3 text-16 font-bold uppercase tracking-wider text-black">
+                                        No
                                     </th>
-                                    <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    <th className="px-6 py-3 text-16 font-bold uppercase tracking-wider text-black">
                                         Nama Dosen
                                     </th>
-                                    <th className="w-40 px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    <th className="w-40 px-6 py-3 text-right text-16 font-bold uppercase tracking-wider text-slate-500">
                                         Aksi
                                     </th>
                                 </tr>
@@ -152,14 +152,11 @@ export default function DosenPage() {
                                         onClick={() => router.push(`/dosen/${dosen.id}`)}
                                         className="cursor-pointer border-b border-slate-100 transition last:border-0 hover:bg-blue-50/40"
                                     >
-                                        <td className="px-6 py-4 text-sm text-slate-400">
+                                        <td className="px-6 py-4 text-sm text-black font-bold">
                                             {(page - 1) * PER_PAGE + idx + 1}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                                                    {dosen.name.charAt(0).toUpperCase()}
-                                                </div>
                                                 <span className="font-semibold text-slate-900">
                                                     {dosen.name}
                                                 </span>

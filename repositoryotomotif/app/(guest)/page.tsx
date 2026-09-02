@@ -217,7 +217,7 @@ export default function GuestHomePage() {
             {/* =========================================
                 HERO
             ========================================= */}
-            <section className="relative bg-white">
+            <section className="relative bg-[#E4FBFF]">
                 <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-14 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-32 lg:pt-16">
                     {/* Left: text */}
                     <div>
@@ -235,7 +235,7 @@ export default function GuestHomePage() {
 
                         <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
                             Jelajahi koleksi Tugas Akhir mahasiswa D3 dan D4 Teknologi
-                            Otomotif Politeknik Negeri Malang. Temukan inovasi, penelitian,
+                            Otomotif Universitas  Negeri Padang. Temukan inovasi, penelitian,
                             dan solusi teknologi untuk masa depan otomotif.
                         </p>
 
@@ -323,12 +323,12 @@ export default function GuestHomePage() {
             </section>
 
             {/* Spacer to compensate for the overlapping stats card */}
-            <div className="h-20 sm:h-16 bg-sky-100" />
+            <div className="h-20 sm:h-16 bg-[#F4F9F9]" />
 
             {/* =========================================
                 FITUR REPOSITORY
             ========================================= */}
-            <section className=" bg-sky-100" >
+            <section className=" bg-[#F4F9F9]" >
                 <div className="mx-auto max-w-7xl   px-6 py-20 lg:px-8">
                      <div className="mx-auto mb-12 max-w-2xl text-center">
                         <h2 className="text-3xl font-bold text-slate-900">
@@ -341,7 +341,7 @@ export default function GuestHomePage() {
                         </p>
                     </div>
 
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 bg-sky-100">
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 bg-[#F4F9F9]">
                         {features.map((f) => (
                             <div
                                 key={f.title}

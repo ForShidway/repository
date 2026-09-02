@@ -251,7 +251,7 @@ export default function CreateTugasAkhirPage({
     }
 
     return (
-        <main className="min-h-screen bg-gray-50 p-8" >
+        <main className="min-h-screen bg-[#F4F9F9] p-8" >
             <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Tambah {selectedCategory}</h1>

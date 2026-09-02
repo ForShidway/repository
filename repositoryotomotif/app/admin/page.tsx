@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { FileText, GraduationCap, Users, Building2, Globe2 } from "lucide-react";
 
 type Summary = {
     totalTugasAkhir: number;
@@ -171,7 +172,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <main className="min-h-screen bg-sky-200">
+        <main className="min-h-screen bg-[#F4F9F9] px-4 py-10 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl p-6 lg:p-8">
 
                 <section className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -198,39 +199,41 @@ export default function AdminDashboard() {
                     </div>
                 </section>
 
+                
+
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
                     <StatCard
-                        icon="▣"
+                        icon={<FileText className="h-5 w-5" />}
                         label="Tugas Akhir"
-                        value={ data.summary .totalTugasAkhir }
+                        value={data.summary.totalTugasAkhir}
                         description="Total terdaftar"
                         iconClass="bg-blue-50 text-blue-600"
                     />
                     <StatCard
-                        icon="♙"
+                        icon={<GraduationCap className="h-5 w-5" />}
                         label="Dosen"
-                        value={ data.summary.totalDosen }
+                        value={data.summary.totalDosen}
                         description="Total dosen"
                         iconClass="bg-emerald-50 text-emerald-600"
                     />
                     <StatCard
-                        icon="♟"
+                        icon={<Users className="h-5 w-5" />}
                         label="Mahasiswa"
-                        value={ data.summary .totalMahasiswa }
+                        value={data.summary.totalMahasiswa}
                         description="Memiliki TA"
                         iconClass="bg-violet-50 text-violet-600"
                     />
                     <StatCard
-                        icon="⌂"
+                        icon={<Building2 className="h-5 w-5" />}
                         label="Ruangan"
-                        value={ data.summary .totalRuangan }
+                        value={data.summary.totalRuangan}
                         description="Ruangan terdaftar"
                         iconClass="bg-orange-50 text-orange-600"
                     />
                     <StatCard
-                        icon="◎"
+                        icon={<Globe2 className="h-5 w-5" />}
                         label="SDGs"
-                        value={ data.summary .totalSDGs }
+                        value={data.summary.totalSDGs}
                         description="SDGs aktif"
                         iconClass="bg-cyan-50 text-cyan-600"
                     />
@@ -264,7 +267,7 @@ export default function AdminDashboard() {
                                 Distribusi Berdasarkan Program Studi
                             </h2>
                             <p className="mt-1 text-sm text-slate-500">
-                                Top 5 Program Studi
+                                Top Program Studi
                             </p>
                         </div>
                         {data.distribusiProgramStudy.length === 0 ? (
@@ -432,7 +435,7 @@ function StatCard({
     description,
     iconClass,
 }: {
-    icon: string;
+    icon: ReactNode;
     label: string;
     value: number;
     description: string;
@@ -440,21 +443,21 @@ function StatCard({
 }) {
     return (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-            <div className="flex items-start justify-between">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl text-xl font-bold ${iconClass}`} >
+            <div className="flex items-center gap-4">
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${iconClass}`}>
                     {icon}
                 </div>
-            </div>
-            <div className="mt-5">
-                <p className="text-2xl font-bold text-slate-900">
-                    {value}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-slate-700">
-                    {label}
-                </p>
-                <p className="mt-1 text-xs text-slate-400">
-                    {description}
-                </p>
+
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-slate-900">
+                            {value}
+                        </p>
+                       
+                    </div>
+                     <p className="text-sm font-semibold text-slate-700"> {label}  </p>
+                    {/* <p className="mt-1 text-xs text-slate-400">  {description} </p> */}
+                </div>
             </div>
         </div>
     );
@@ -466,21 +469,28 @@ function YearChart({
     data: TugasPerTahun[];
 }) {
     const max =
-        Math.max( 
-            ...data.map( (item) => item.jumlah ), 1
+        Math.max(
+            ...data.map((item) => item.jumlah), 1
         );
 
     return (
         <div>
-            <div className="flex h-64 items-end gap-3 border-b border-l border-slate-200 px-4 pb-0">
+            <div className="flex h-64 items-end gap-3 overflow-visible border-b border-l border-slate-200 px-4 pb-0">
                 {data.map((item) => {
                     const height =
                         (item.jumlah /
                             max) *
                         100;
                     return (
-                        <div key={  item.tahun } className="group flex h-full flex-1 flex-col items-center justify-end" >
+                        <div key={item.tahun} className="group relative flex h-full flex-1 flex-col items-center justify-end">
                             <div className="relative flex w-full max-w-12 flex-1 items-end justify-center">
+
+                                {/* TOOLTIP */}
+                                <div className="pointer-events-none absolute -top-12 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:-top-10 group-hover:opacity-100">
+                                    Tahun {item.tahun}: {item.jumlah} TA
+                                    <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-slate-900" />
+                                </div>
+
                                 <div
                                     className="w-full rounded-t-lg bg-blue-500 transition-all duration-300 group-hover:bg-blue-600"
                                     style={{
@@ -489,15 +499,11 @@ function YearChart({
                                             3
                                         )}%`,
                                     }}
-                                >
-                                    <span className="absolute -top-6 left-1/2 hidden -translate-x-1/2 text-xs font-semibold text-slate-700 group-hover:block">
-                                        { item.jumlah }
-                                    </span>
-                                </div>
+                                />
                             </div>
 
                             <div className="mt-3 text-xs font-medium text-slate-400">
-                                { item.tahun }
+                                {item.tahun}
                             </div>
                         </div>
                     );
@@ -519,15 +525,17 @@ function DonutChart({
     data,
     total,
 }: {
-    data: { id: number; jumlah: number }[];
+    data: { id: number; name: string; degree: string; jumlah: number }[];
     total: number;
 }) {
     const size = 200;
     const strokeWidth = 28;
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
+    const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     let cumulativePercent = 0;
+    const activeItem = activeIndex !== null ? data[activeIndex] : null;
 
     return (
         <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -538,6 +546,7 @@ function DonutChart({
                     const gap = circumference - dash;
                     const offset = cumulativePercent * circumference;
                     cumulativePercent += percent;
+                    const isActive = activeIndex === index;
 
                     return (
                         <circle
@@ -547,19 +556,37 @@ function DonutChart({
                             r={radius}
                             fill="none"
                             stroke={DONUT_COLORS[index % DONUT_COLORS.length]}
-                            strokeWidth={strokeWidth}
+                            strokeWidth={isActive ? strokeWidth + 6 : strokeWidth}
                             strokeDasharray={`${dash} ${gap}`}
                             strokeDashoffset={-offset}
-                            className="transition-all duration-500"
+                            className="cursor-pointer transition-all duration-300"
+                            onMouseEnter={() => setActiveIndex(index)}
+                            onMouseLeave={() => setActiveIndex(null)}
+                            onFocus={() => setActiveIndex(index)}
+                            onBlur={() => setActiveIndex(null)}
+                            style={{ filter: isActive ? "drop-shadow(0 0 8px rgba(59, 130, 246, 0.35))" : "none" }}
                         />
                     );
                 })}
             </svg>
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-2xl font-bold text-slate-900">{total}</p>
-                <p className="text-xs text-slate-400">Total TA</p>
-            </div>
+            {activeItem ? (
+                <div className="pointer-events-none absolute left-1/2 top-1/2 w-44 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 text-center shadow-lg backdrop-blur-sm">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{activeItem.degree}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-800 line-clamp-2">{activeItem.name}</p>
+                    <p className="mt-1 text-sm font-bold text-blue-600">
+                        {activeItem.jumlah} TA
+                        <span className="ml-1 text-xs font-medium text-slate-500">
+                            ({total > 0 ? Math.round((activeItem.jumlah / total) * 100) : 0}%)
+                        </span>
+                    </p>
+                </div>
+            ) : (
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <p className="text-2xl font-bold text-slate-900">{total}</p>
+                    <p className="text-xs text-slate-400">Total TA</p>
+                </div>
+            )}
         </div>
     );
 }

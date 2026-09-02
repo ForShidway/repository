@@ -96,7 +96,7 @@ export default function DetailTugasAkhirPage() {
 
   if (error || !tugasAkhir) {
     return (
-      <main className="min-h-screen bg-gray-50 p-8">
+      <main className="min-h-screen bg-[#F4F9F9] p-8">
         <div className="mx-auto max-w-4xl">
           <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 mb-6">
             <p className="text-sm text-red-600">{error || "Tugas Akhir tidak ditemukan"}</p>

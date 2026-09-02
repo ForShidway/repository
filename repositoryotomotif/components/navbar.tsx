@@ -29,7 +29,7 @@ export function Navbar() {
                     </div>
                     <div className="leading-tight">
                         <div className="text-sm font-bold text-slate-900">Repository Otomotif</div>
-                        <div className="text-xs text-slate-500">Politeknik Negeri Malang</div>
+                        <div className="text-xs text-slate-500">Universitas  Negeri Padang</div>
                     </div>
                 </Link>
 

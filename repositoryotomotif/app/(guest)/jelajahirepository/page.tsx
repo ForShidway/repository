@@ -126,7 +126,7 @@ export default function KatalogTugasAkhirPage() {
 
   const getMahasiswaText = (mahasiswa: Mahasiswa[] = []) => {
     if (!mahasiswa.length) return "";
-    return mahasiswa.map((m) => `${m.name} ${m.nim}`).join(" ");
+    return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(" ");
   };
 
   const filtered = useMemo(() => { let result = [...tugasAkhirs];
@@ -194,7 +194,7 @@ export default function KatalogTugasAkhirPage() {
   }
 
   return (
-    <main className="min-h-screen bg-sky-90 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#F4F9F9] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         
         <section className="mb-10">
@@ -210,11 +210,11 @@ export default function KatalogTugasAkhirPage() {
         )}
 
 
-         <div className="sticky top-0 z-30 mb-6 rounded-2xl border border-slate-200 bg-white/95 p-3 backdrop-blur">
+         <div className="sticky top-0 z-30 mb-6 rounded-2xl border border-black bg-white/95 p-3 backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row">
                 <div className="relative flex-1">
                     <svg
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black"
                         width="17"
                         height="17"
                         viewBox="0 0 24 24"
@@ -240,7 +240,7 @@ export default function KatalogTugasAkhirPage() {
                             setPage(1);
                         }}
                         placeholder="Cari judul, mahasiswa, NIM, mata kuliah..."
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-ring-blue-500/10"
+                        className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-ring-blue-500/10"
                     />
 
                 </div>
@@ -254,7 +254,7 @@ export default function KatalogTugasAkhirPage() {
                         setSort(e.target.value);
                         setPage(1);
                     }}
-                    className="rounded-xl border border-[#E8E4DC] bg-white px-4 py-3 text-sm text-slate-700 outline-none"
+                    className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none"
                 >
 
                     <option value="terbaru">
@@ -274,7 +274,7 @@ export default function KatalogTugasAkhirPage() {
 
                 {/* VIEW */}
 
-                <div className="flex overflow-hidden rounded-xl border border-[#E8E4DC] bg-white">
+                <div className="flex overflow-hidden rounded-xl border border-slate-300 bg-white">
 
                     <button
                         type="button"
@@ -310,13 +310,9 @@ export default function KatalogTugasAkhirPage() {
 
         </div>
 
-
-
-        
-
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-8 items-start ">
           <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-8">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-black-300 bg-white p-6 shadow-sm">
               
               <div className="mb-5 flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Filter Data</span>
@@ -326,7 +322,7 @@ export default function KatalogTugasAkhirPage() {
               </div>
 
               <div className="mb-5">
-                <select value={prodi} onChange={e => { setProdi(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-200 bg-gray-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white">
+                <select value={prodi} onChange={e => { setProdi(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-300 bg-gray-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white">
                   <option value="">Semua Program Studi</option>
                   <option value="s1">S1 Pend. Teknik Otomotif</option>
                   <option value="d3">D3 Teknik Otomotif</option>
@@ -335,7 +331,7 @@ export default function KatalogTugasAkhirPage() {
 
 
               <div className="mb-5">
-                <select value={tahun} onChange={e => { setTahun(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-200 bg-gray-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white">
+                <select value={tahun} onChange={e => { setTahun(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-300 bg-gray-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white">
                   <option value="">Semua Tahun</option>
                   {TAHUN_OPTIONS.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
@@ -343,7 +339,7 @@ export default function KatalogTugasAkhirPage() {
 
 
               <div className="mb-5">
-                <select value={dosen} onChange={e => { setDosen(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-200 bg-gray-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white">
+                <select value={dosen} onChange={e => { setDosen(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-300 bg-gray-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white">
                   <option value="">Semua Dosen Pembimbing</option>
                   {dosens.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
@@ -352,12 +348,18 @@ export default function KatalogTugasAkhirPage() {
 
               <div>
                 <label className="mb-3 block text-xs font-semibold uppercase tracking-wider text-slate-500">Tag SDGs</label>
-                <div className="flex flex-wrap gap-2">
-                  {sortedSdgs.map(s => (
+                <div className="grid grid-cols-3 gap-2">
+                  {sortedSdgs.map((s) => (
                     <button
                       key={s.id}
+                      type="button"
                       onClick={() => toggleSdg(s.id)}
-                      className={`rounded-lg px-2.5 py-1.5 text-[11px] font-bold whitespace-nowrap transition-all ${sdgsFilter.includes(s.id) ? 'bg-blue-600 text-white' :  'border border-slate-200 bg-white text-slate-500 hover:bg-blue-50 hover:bg-slate-200 hover:text-blue-600'}`}  >
+                      className={`w-full rounded-lg px-2 py-2 text-[11px] font-bold transition-all ${
+                        sdgsFilter.includes(s.id)
+                          ? "bg-blue-600 text-white"
+                          : "border border-slate-300 bg-white text-slate-600 hover:border-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                      }`}
+                    >
                       {s.code}
                     </button>
                   ))}
@@ -389,14 +391,14 @@ export default function KatalogTugasAkhirPage() {
                     className="group text-left"
                   >
                     {view === "grid" ? (
-                      <div className="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg flex flex-col">
+                      <div className="h-full rounded-2xl border border-slate-300 bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-slate-400 hover:shadow-lg flex flex-col">
                         <div className="mb-4 flex items-start justify-between gap-2">
                           <div className="flex flex-wrap gap-2">
                             <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
                               {ta.programStudy? `${ta.programStudy.degree}${ta.programStudy.name}` : 'Jurusan Teknik Otomotif'}
                             </span>
                               <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
-                                {new Date(ta.createdAt).getFullYear()}
+                                {ta.tahunMasuk || new Date(ta.createdAt).getFullYear()}
                               </span>
                           </div>
                           <span className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600 shrink-0">
@@ -440,14 +442,14 @@ export default function KatalogTugasAkhirPage() {
 
                       </div>
                     ) : (
-                      <div className='flex flex-col gap-1.5 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition-all hover:border-blue-200 hover:shadow-md'>
+                      <div className='flex flex-col gap-1.5 rounded-xl border border-slate-300 bg-white px-5 py-4 shadow-sm transition-all hover:border-slate-400 hover:shadow-md'>
                         <div className='flex items-center justify-between gap-2'>
                           <div className='flex items-center gap-2'>
                             <span className='whitespace-nowrap rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700'>
                               {ta.programStudy ? `${ta.programStudy.degree} ${ta.programStudy.name}` : "Jurusan Teknik Otomotif"}
                             </span>
                             <span className='whitespace-nowrap rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600'>
-                              {new Date(ta.createdAt).getFullYear()}
+                              {ta.tahunMasuk || new Date(ta.createdAt).getFullYear()}
                             </span>
                           </div>
 
@@ -477,7 +479,7 @@ export default function KatalogTugasAkhirPage() {
                           <span className="shrink-0 text-xs font-medium text-slate-300">Belum ada file</span>
                         )}
                       </div>
-                        <h2 className='line-clamp-1 text-sm font-bold text-slate-900'>
+                        <h2 className='text-sm font-bold text-slate-900'>
                           {ta.judul}
                         </h2>
                       </div>
@@ -490,19 +492,19 @@ export default function KatalogTugasAkhirPage() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-10 flex items-center justify-center gap-2">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50 disabled:opacity-50">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50 disabled:opacity-50">
                   Kembali
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                   <button 
                     key={p} 
                     onClick={() => setPage(p)} 
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all ${page === p ? 'bg-blue-600 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
+                    className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all ${page === p ? 'bg-blue-600 text-white' : 'border border-slate-300 bg-white text-slate-600 hover:bg-slate-50'}`}
                   >
                     {p}
                   </button>
                 ))}
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50 disabled:opacity-50">
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50 disabled:opacity-50">
                   Lanjut
                 </button>
               </div>

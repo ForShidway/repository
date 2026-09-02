@@ -40,7 +40,7 @@ export default function MahasiswaPage() {
     }
     if (loading) {
         return (
-            <main className="flex min-h-screen  items-center justifiy-center bg-slate-50 p-8">
+            <main className="flex min-h-screen  items-center justifiy-center bg-[#F4F9F9] p-8">
                 <div className="text-center">
                     <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
                         <p>Memuat Program Studi....</p>
@@ -49,11 +49,11 @@ export default function MahasiswaPage() {
         )
     }
     return (
-        <main className="min-h-screen bg-slate-100 py-10 px-6 md:px-8 lg:px-14">
+        <main className="min-h-screen bg-[#F4F9F9] py-10 px-6 md:px-8 lg:px-14">
             <div className="mx-auto max-w-6xl">
                 <section className="mb-10">
                     <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-blue-600">Repositori Otomotif</p>
-                    <h1 className="mt-3 max-w-3xl font-bold text-slate-900">Pilih Program Study</h1>
+                    <h1 className="text-3xl font-bold text-slate-900">Pilih Program Study</h1>
                     <p className="mt-3 max-w-2xl text-slate-600">piilh program studi utnuk melanjutkan pengisian tugas mahasiswa</p>
                 </section>
                 {error && (

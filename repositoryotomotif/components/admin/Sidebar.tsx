@@ -94,7 +94,7 @@ const menuGroups: MenuGroup[] = [
     {
         title: "MAIN",
         items: [
-            { label: "Beranda", href: "/admin/dashboard", icon: icons.dashboard },
+            { label: "Beranda", href: "/admin", icon: icons.dashboard },
         ],
     },
     {
@@ -104,7 +104,6 @@ const menuGroups: MenuGroup[] = [
             { label: "Dosen", href: "/admin/dosens", icon: icons.dosen },
             { label: "Ruangan", href: "/admin/ruangans", icon: icons.ruangan },
             { label: "Program Studi", href: "/admin/program-studies", icon: icons.programStudi },
-            { label: "Mata Kuliah", href: "/admin/mata-kuliahs", icon: icons.mataKuliah },
             { label: "SDGs", href: "/admin/sdgs", icon: icons.sdgs },
         ],
     },
@@ -112,8 +111,7 @@ const menuGroups: MenuGroup[] = [
         title: "SISTEM",
         items: [
             { label: "Pengguna", href: "/admin/users", icon: icons.pengguna },
-            { label: "Pengaturan", href: "/admin/pengaturan", icon: icons.pengaturan },
-            { label: "Log Aktivitas", href: "/admin/log-aktivitas", icon: icons.logAktivitas },
+
         ],
     },
 ];

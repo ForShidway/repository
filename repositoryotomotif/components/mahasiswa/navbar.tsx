@@ -1,25 +1,44 @@
 "use client";
 
+import { User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
-type MahasiswaUser = {
+type User = {
+    id: number;
     name: string;
-    nim?: string;
-};
-
-// Sesuaikan cara ambil data user ini dengan sistem auth kamu
-// (misal dari session/context/props), ini hanya contoh placeholder
-const dummyUser: MahasiswaUser = {
-    name: "Mahasiswa",
-    nim: "-",
+    email: string;
 };
 
 export default function NavbarMahasiswa() {
     const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        async function fetchUser() {
+            try {
+                const response = await fetch("/api/auth/session", {
+                    cache: "no-store",
+                });
+
+                if (!response.ok) {
+                    setUser(null);
+                    return;
+                }
+
+                const data = await response.json();
+                setUser(data.user ?? null);
+            } catch (error) {
+                console.error("Gagal mengambil user session:", error);
+                setUser(null);
+            }
+        }
+
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -38,6 +57,7 @@ export default function NavbarMahasiswa() {
     async function handleLogout() {
         try {
             await fetch("/api/auth/logout", { method: "POST" });
+            setUser(null);
             router.push("/login");
             router.refresh();
         } catch (error) {
@@ -45,11 +65,13 @@ export default function NavbarMahasiswa() {
         }
     }
 
+    const displayName = user?.name || "Mahasiswa";
+    const displayEmail = user?.email || "-";
+    const initialLetter = displayName.charAt(0)?.toUpperCase() || "M";
+
     return (
         <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
             <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-
-                {/* LOGO */}
                 <Link href="/mahasiswa" className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-100">
                         RO
@@ -64,7 +86,6 @@ export default function NavbarMahasiswa() {
                     </div>
                 </Link>
 
-                {/* USER DROPDOWN */}
                 <div className="relative" ref={dropdownRef}>
                     <button
                         type="button"
@@ -72,14 +93,14 @@ export default function NavbarMahasiswa() {
                         className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 transition hover:border-blue-200 hover:bg-blue-50"
                     >
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                            {dummyUser.name.charAt(0).toUpperCase()}
+                            {initialLetter}
                         </div>
                         <div className="hidden text-left sm:block">
                             <p className="text-sm font-semibold leading-tight text-slate-800">
-                                {dummyUser.name}
+                                {displayName}
                             </p>
                             <p className="text-xs leading-tight text-slate-400">
-                                {dummyUser.nim}
+                                {displayEmail}
                             </p>
                         </div>
                         <svg
@@ -103,10 +124,10 @@ export default function NavbarMahasiswa() {
                         <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60">
                             <div className="border-b border-slate-100 px-4 py-3">
                                 <p className="text-sm font-semibold text-slate-800">
-                                    {dummyUser.name}
+                                    {displayName}
                                 </p>
                                 <p className="mt-0.5 text-xs text-slate-400">
-                                    NIM: {dummyUser.nim}
+                                    {displayEmail}
                                 </p>
                             </div>
 
@@ -134,7 +155,6 @@ export default function NavbarMahasiswa() {
                         </div>
                     )}
                 </div>
-
             </div>
         </header>
     );

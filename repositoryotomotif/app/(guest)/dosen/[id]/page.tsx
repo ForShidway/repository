@@ -281,7 +281,7 @@ export default function StatistikDosenPage() {
         );
 
     return (
-        <main className="min-h-screen bg-slate-50 px-6 py-8 md:px-8">
+        <main className="min-h-screen bg-[#F4F9F9] px-6 py-8 md:px-8">
             <div className="mx-auto max-w-7xl">
 
                 {/* ==================================
@@ -349,11 +349,6 @@ export default function StatistikDosenPage() {
                                 <h2 className="text-2xl font-bold text-slate-900">
                                     {dosen.name}
                                 </h2>
-
-                                <span className="mt-2 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                                    Dosen Pembimbing
-                                </span>
-
                                 <p className="mt-3 text-sm text-slate-500">
                                     Pembimbing Tugas Akhir
                                     Repository Otomotif
@@ -435,7 +430,7 @@ export default function StatistikDosenPage() {
                                 </p>
                             </div>
                         ) : (
-                            <div className="flex h-64 items-end gap-4 overflow-x-auto px-2 pb-8 pt-16">
+                            <div className="flex h-64 items-end gap-4 overflow-visible px-2 pb-8 pt-16">
                                 {statistik.statistikPerTahun.map((item) => {
                                     const totalTahun = statistik.statistikPerTahun.reduce(
                                         (sum, i) => sum + i.jumlah,
@@ -455,9 +450,8 @@ export default function StatistikDosenPage() {
                                     return (
                                         <div
                                             key={item.tahun}
-                                            className="group relative flex min-w-[55px] flex-1 flex-col items-center justify-end"
+                                            className="group relative flex min-w-[55px] flex-1 flex-col items-center justify-end overflow-visible"
                                         >
-                                            {/* TOOLTIP */}
                                             <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs opacity-0 shadow-lg transition group-hover:opacity-100">
                                                 <p className="font-semibold text-slate-800">
                                                     Tahun {item.tahun}
@@ -468,7 +462,6 @@ export default function StatistikDosenPage() {
                                                         ({percentage}%)
                                                     </span>
                                                 </p>
-                                                {/* panah kecil di bawah tooltip */}
                                                 <div className="absolute left-1/2 top-full h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-white" />
                                             </div>
 

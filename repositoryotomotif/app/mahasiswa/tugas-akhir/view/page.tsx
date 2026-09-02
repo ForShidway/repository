@@ -91,7 +91,7 @@ export default function DaftarTugasAkhirPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-20">
+    <main className="min-h-screen bg-[#F4F9F9] pb-20">
       {/* Hero Section */}
       <section
         className="relative overflow-hidden"
