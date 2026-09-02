@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
 
 export async function GET() {
     try {
@@ -20,6 +21,14 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await getSession();
+
+        if (!session || session.role !== "ADMIN") {
+            return NextResponse.json(
+                { message: "Akses ditolak. Hanya Admin yang dapat menambahkan program studi." },
+                { status: 403 }
+            );
+        }
         const body = await request.json();
         const name = body.name?.trim();
         const degree =  body.degree?.trim();

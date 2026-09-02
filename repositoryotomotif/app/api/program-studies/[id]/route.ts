@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ModelName } from "@/generated/prisma/internal/prismaNamespace";
+import { getSession } from "@/lib/auth";
 
 type RouteContext = { params: Promise<{id: string}>};
 export async function GET(
@@ -12,7 +13,7 @@ export async function GET(
         const programStudyId = Number(id);
         if (Number.isNaN(programStudyId)) {
             return NextResponse.json(
-                { message: "ID user tidak valid"},
+                { message: "ID program studi tidak valid"},
                 { status : 400}
             )
         }
@@ -44,6 +45,15 @@ export async function GET(
 
 export async function PUT(request: Request, context: RouteContext) {
     try {
+        const session = await getSession();
+        
+                if (!session || session.role !== "ADMIN") {
+                    return NextResponse.json(
+                        { message: "Akses ditolak. Hanya Admin yang dapat memperbarui program studi." },
+                        { status: 403 }
+                    );
+                }
+
         const {id} = await context.params;
         const programStudyId = Number(id);
 
@@ -122,6 +132,14 @@ export async function DELETE(
     request: Request, context: RouteContext
 ) {
     try {
+        const session = await getSession();
+
+        if (!session || session.role !== "ADMIN") {
+            return NextResponse.json(
+                { message: "Akses ditolak. Hanya Admin yang dapat menghapus program studi." },
+                { status: 403 }
+            );
+        }
         const { id } = await context.params;
         const programStudyId = Number(id);
         if (Number.isNaN(programStudyId)) {

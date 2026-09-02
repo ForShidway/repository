@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type MenuItem = {
     label: string;
@@ -118,7 +119,18 @@ const menuGroups: MenuGroup[] = [
 ];
 
 export default function Sidebar() {
+    const router = useRouter();
     const pathname = usePathname();
+
+    const handleLogout = async () => {
+         try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/login");
+            router.refresh();
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
 
     return (
         <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-slate-200 bg-white">
@@ -215,7 +227,7 @@ export default function Sidebar() {
                 </div>
 
                 <button
-                    type="button"
+                    type="button" onClick={handleLogout}
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:border-red-200 hover:text-red-600"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

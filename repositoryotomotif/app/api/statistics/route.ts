@@ -123,9 +123,14 @@ export async function GET() {
                 select: {
                     id: true,
                     judul: true,
-                    name: true,
                     fileName: true,
                     createdAt: true,
+                    mahasiswa: {
+                        select: {
+                            name: true,
+                            nim: true,
+                        },
+                    },
                 },
             });
 

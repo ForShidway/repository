@@ -48,7 +48,7 @@ type TugasAkhirTerbaru = {
 type Aktivitas = {
     id: number;
     judul: string;
-    name: string;
+    mahasiswa: Mahasiswa[];
     fileName: string | null;
     createdAt: string;
 };
@@ -630,6 +630,12 @@ function ActivityItem({
         }
     );
 
+    const mahasiswaText = activity.mahasiswa.length
+        ? activity.mahasiswa
+              .map((m) => `${m.name} (${m.nim})`)
+              .join(", ")
+        : "-";
+
     return (
         <div className="relative flex gap-4">
             {!last && (
@@ -643,12 +649,11 @@ function ActivityItem({
                 </p>
 
                 <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">  {activity.judul} </p>
-                <p className="mt-1 text-[11px] text-slate-400"> {activity.name} •{" "} {time} </p>
+                <p className="mt-1 text-[11px] text-slate-400"> {mahasiswaText} •{" "} {time} </p>
             </div>
         </div>
     );
 }
-
 function EmptyState({
     text,
 }: {

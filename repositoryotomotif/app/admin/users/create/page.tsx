@@ -2,20 +2,26 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { discoverValidationDepths } from "next/dist/server/app-render/instant-validation/instant-validation";
 
 export default function CreateUserPage() {
     const router = useRouter();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [role, setRole] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setError("");
-        if (!name.trim() || !email.trim()) {
-            setError("Nama dan email Harus diisi");
+        if (!name.trim() || !email.trim() || !password || !role.trim()) {
+            setError("Nama, email, password, dan role harus diisi");
+            return;
+        }
+        if (password.length < 8 ) {
+            setError("Password minimal harus berisi 8 karakter");
             return;
         }
         try {
@@ -28,15 +34,22 @@ export default function CreateUserPage() {
                 body: JSON.stringify({
                     name: name.trim(),
                     email: email.trim(),
+                    password,
+                    role,
                 }),
             });
 
-            const data = await response.json();
+            const contentType = response.headers.get("content-type") || "";
+            const data = contentType.includes("application/json")
+                ? await response.json()
+                : null;
+
             if (!response.ok) {
                 throw new Error(
-                    data.message || "Gagal membuat User"
+                    data?.message || "Gagal membuat User"
                 );
             }
+
             router.push("/admin/users");
             router.refresh();
         } catch (error) {
@@ -52,16 +65,16 @@ export default function CreateUserPage() {
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold txt-gray-900"> Tambah User</h1>
+                    <h1 className="text-3xl font-bold text-gray-900"> Tambah User</h1>
                     <p className="mt-2 text-gray-600">Tambahkan pengguna baru ke Repositori Otomotif</p>
                 </div>
-                <div className="rounded-xl border bg-whte p-6 shadow-sm">
+                <div className="rounded-xl border bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
                                 Nama
                             </label>
-                            <input type="text" id="name" value={name} onChange={(event) => setName(event.target.value)} />
+                            <input type="text" id="name" value={name} onChange={(event) => setName(event.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
                         </div>
                         <div>
                             <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
@@ -70,6 +83,26 @@ export default function CreateUserPage() {
                             <input type="email" id="email" value={email} onChange={(event) => setEmail(event.target.value)}
                             placeholder="contoh@gmail.com" className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" 
                             />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">
+                                Password
+                            </label>
+                            <input type={showPassword ? "text" : "password"} id="password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                        </div>
+                        <div>
+                            <label htmlFor="role" className="mb-2 block text-sm font-medium text-gray-700">
+                                Role
+                            </label>
+                            <select
+                                id="role"
+                                value={role}
+                                onChange={(event) => setRole(event.target.value as "MAHASISWA" | "ADMIN")}
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            >
+                                <option value="MAHASISWA">Mahasiswa</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
                         </div>
 
                         {error && (
@@ -87,8 +120,6 @@ export default function CreateUserPage() {
                                 {loading ? "Menyimpan..." : "Simpan User"}
                             </button>
                         </div>
-
-
                     </form>
 
                 </div>

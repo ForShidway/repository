@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
 type MahasiswaUser = {
@@ -16,6 +17,7 @@ const dummyUser: MahasiswaUser = {
 };
 
 export default function NavbarMahasiswa() {
+    const router = useRouter();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -33,9 +35,14 @@ export default function NavbarMahasiswa() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    function handleLogout() {
-        // Sesuaikan dengan mekanisme logout kamu (misal signOut(), fetch ke /api/logout, dll)
-        console.log("Logout...");
+    async function handleLogout() {
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/login");
+            router.refresh();
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
     }
 
     return (

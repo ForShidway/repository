@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
+import { getSession } from "@/lib/auth";
 
 type RouteContext = {
     params: Promise<{id: string}>;
@@ -46,6 +47,15 @@ export async function PUT(
     context : RouteContext
 ) {
     try {
+        const session = await getSession();
+
+        if (!session || session.role !== "ADMIN") {
+            return NextResponse.json(
+                { message: "Akses ditolak. Hanya Admin yang dapat memperbarui SDGs." },
+                { status: 403 }
+            );
+        }
+
         const { id } = await context.params;
         const sdgsId = Number(id);
         if(Number.isNaN(sdgsId)) {
@@ -109,6 +119,15 @@ export async function DELETE(
     context: RouteContext
 ) {
     try {
+        const session = await getSession();
+
+        if (!session || session.role !== "ADMIN") {
+            return NextResponse.json(
+                { message: "Akses ditolak. Hanya Admin yang dapat menghapus SDGs." },
+                { status: 403 }
+            );
+        }
+
         const { id } = await context.params;
         const sdgsId= Number(id);
         if(Number.isNaN(sdgsId)) {

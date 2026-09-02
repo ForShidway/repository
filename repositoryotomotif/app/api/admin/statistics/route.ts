@@ -81,6 +81,7 @@ export async function GET() {
             include: {
                 programStudy: true,
                 pembimbing: true,
+                mahasiswa: true,
             },
         });
 
@@ -92,9 +93,14 @@ export async function GET() {
             select: {
                 id: true,
                 judul: true,
-                name: true,
                 fileName: true,
                 createdAt: true,
+                mahasiswa: {
+                    select: {
+                        name: true,
+                        nim: true,
+                    },
+                },
             },
         });
 

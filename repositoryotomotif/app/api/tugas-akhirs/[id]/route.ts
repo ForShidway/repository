@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { getSession } from "@/lib/auth"
 
 type RouteContex = {
     params: Promise<{
@@ -62,6 +63,14 @@ export async function DELETE(
     context: RouteContex
 ) {
     try {
+        const session = await getSession();
+        
+                if (!session || session.role !== "ADMIN") {
+                    return NextResponse.json(
+                        { message: "Akses ditolak. Hanya Admin yang dapat menghapus tugas akhir." },
+                        { status: 403 }
+                    );
+                }
         const {id} = await context.params;
         const tugasAkhirId= Number(id);
         if ( Number.isNaN(tugasAkhirId)) {

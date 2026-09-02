@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { getSession } from "@/lib/auth";
 
 export async function GET(){
     try {
@@ -32,8 +33,15 @@ export async function GET(){
 
 export async function POST(request: Request) {
     try{
-        const formData= await request.formData();
+        const session = await getSession();
 
+        if (!session || session.role !== "MAHASISWA") {
+            return NextResponse.json(
+                { message: "Akses ditolak. Hanya Mahasiswa yang dapat membuat tugas akhir." },
+                { status: 403 }
+            );
+        }
+        const formData= await request.formData();
         const mahasiswasRaw = formData.get("mahasiswas");
         let mahasiswas: { name:string; nim:string}[] = [];
         if (mahasiswasRaw) {
