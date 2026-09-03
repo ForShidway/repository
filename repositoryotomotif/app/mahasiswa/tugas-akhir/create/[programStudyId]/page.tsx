@@ -57,6 +57,7 @@ export default function CreateTugasAkhirPage({
     const [keywordInput, setKeywordInput] = useState("");
     const [keywords, setKeywords] = useState<string[]>([]);
 
+    const [abstract, setAbstract] = useState("");
     const [ruangans, setRuangans] = useState<Ruangan[]>([]);
     const [dosens, setDosens] = useState<Dosen[]>([]);
     const [programStudy, setProgramStudy] = useState<ProgramStudy | null> (null);
@@ -139,6 +140,7 @@ export default function CreateTugasAkhirPage({
         setError("");
 
         const mahasiswaValid = mahasiswas.every((m) => m.name.trim() && m.nim.trim());
+        const abstractWordCount = countWords(abstract);
         if (!mahasiswaValid || !tahunMasuk || !judul.trim() || !pembimbingId || !programStudyId ||selectedSDGs.length === 0)    {
             setError("Semua data Tugas Akhir harus di isi, minimal satu SDGS harus dipilih");
             return;
@@ -154,6 +156,13 @@ export default function CreateTugasAkhirPage({
 
             formData.append("tahunMasuk", tahunMasuk);
             formData.append("judul", judul.trim());
+            if (abstract.trim()) {
+                formData.append("abstract", abstract.trim());
+            }
+            if (abstractWordCount > 350) {
+                setError(`Abstract maksimal 350 kata, (saat ini ${abstractWordCount} kata)`);
+                return;
+            }
             if (mataKuliahRelevan.trim()) {
                 formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
             }
@@ -250,6 +259,10 @@ export default function CreateTugasAkhirPage({
         setMahasiswas((current) => current.filter((_,i) => i !== index));
     }
 
+    function countWords(text: string) {
+        return text.trim().split(/\s+/).filter(Boolean).length;
+    }
+
     return (
         <main className="min-h-screen bg-[#F4F9F9] p-8" >
             <div className="mx-auto max-w-2xl">
@@ -325,7 +338,30 @@ export default function CreateTugasAkhirPage({
                             </label>
                             <textarea id="judul" value={judul} onChange={(e) => setJudul(e.target.value)  }  rows={5} className="w-full rounded-lg border px-4 py-3" placeholder="Masukkan judul tugas akhir"/>
                         </div>
-                        
+
+                        <div>
+                            <div className="mb-2 flex items-center justify-between">
+                                <label htmlFor="abstrak" className="block text-sm font-medium">
+                                    Abstract <span className="font-normal text-slate-400">(opsional, maksimal 350 kata)</span>
+                                </label>
+                                <span className={`text-xs font-medium ${countWords(abstract) > 350 ? "text-red-500" : "text-slate-400"}`}>
+                                    {countWords(abstract)} / 350 kata
+                                </span>
+                            </div>
+                            <textarea
+                                id="abstrak"
+                                value={abstract}
+                                onChange={(e) => setAbstract(e.target.value)}
+                                rows={8}
+                                className={`w-full rounded-lg border border-black px-4 py-3 text-sm outline-none transition focus:ring-2 ${
+                                    countWords(abstract) > 350
+                                        ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
+                                        : "border-black focus:border-blue-500 focus:ring-blue-500/10"
+                                }`}
+                                placeholder="Tuliskan ringkasan singkat penelitian Tugas Akhir..."
+                            />
+                        </div>
+
                         <div>
                             <label htmlFor="ruangan" className="mb-2 block text-sm font-medium">
                                 Tempat Pelaksanaan TA
@@ -343,7 +379,7 @@ export default function CreateTugasAkhirPage({
                                 )}
                             </select>
                         </div>
-
+                        
                         <div>
                             <label htmlFor="mataKuliahRelevan" className="mb-2 block text-sm font-medium">
                                 Mata Kuliah yang Relevan

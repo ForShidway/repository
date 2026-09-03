@@ -64,6 +64,7 @@ model TugasAkhir {
   id Int @id @default(autoincrement())
   tahunMasuk Int
   judul String @db.Text
+  abstract String?  @db.Text
   mataKuliahRelevan String?
 
   ruanganId Int?

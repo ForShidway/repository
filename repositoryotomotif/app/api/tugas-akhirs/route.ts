@@ -83,6 +83,18 @@ export async function POST(request: Request) {
             )
         }
 
+        const abstractRaw  = formData.get("abstract");
+        const abstract = abstractRaw ? abstractRaw.toString().trim() : null;
+        if (abstract) {
+            const wordCount = abstract.split(/\s+/).filter(Boolean).length;
+            if (wordCount > 350) {
+                return NextResponse.json (
+                    {message: `Abstract Maksimal 350 kata, (saat ni ${wordCount} kata)`},
+                    { status : 400}
+                )
+            } 
+        }
+
         const keywordsRaw = formData.get("keywords")
         let keywords: string[] =[];
         if (keywordsRaw) {
@@ -105,6 +117,8 @@ export async function POST(request: Request) {
                 { status : 404}
             )
         }
+
+
         const keywordsUnik = Array.from(new Set(keywords));
 
         const tahunMasuk = Number(formData.get("tahunMasuk"));
@@ -311,10 +325,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // ==========================================
-// STEP 9 — SIMPAN FILE
-// ==========================================
-
         let uniqueFileName: string | null = null;
         let filePath: string | null = null;
 
@@ -353,7 +363,7 @@ export async function POST(request: Request) {
         
         const tugasAkhir = await prisma.tugasAkhir.create ({
             data: {
-                tahunMasuk, judul, mataKuliahRelevan, ruanganId, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
+                tahunMasuk, judul, abstract, mataKuliahRelevan, ruanganId, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,

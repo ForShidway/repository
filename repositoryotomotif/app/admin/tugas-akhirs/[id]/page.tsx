@@ -41,6 +41,7 @@ type Keyword = {
 type TugasAkhirDetail = {
     id: number;
     judul: string;
+    abstract: string | null;
     tahunMasuk: number;
     mataKuliahRelevan: string;
     fileName: string | null;
@@ -193,6 +194,7 @@ export default function DetailTugasAkhirPage({
                                 <p className="text-sm text-slate-500">Judul Tugas Akhir</p>
                                 <p className="mt-1 font-semibold text-slate-900">{data.judul}</p>
                             </div>
+                        
                             <div>
                                 <p className="text-sm text-slate-500">Program Studi</p>
                                 <p className="mt-1 text-slate-800">
@@ -348,6 +350,20 @@ export default function DetailTugasAkhirPage({
                         </div>
                     )}
                 </div>
+                {data.abstract && (
+                            <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                                <h2 className="mb-3 flex items-center gap-2 font-bold text-slate-900">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+                                    </svg>
+                                    Abstrak
+                                </h2>
+                                <p className="whitespace-pre-line text-sm leading-7 text-slate-700">
+                                    {data.abstract}
+                                </p>
+                            </div>
+                        )}
 
                 {/* File Proposal (aksi) */}
                 {data.fileName && (

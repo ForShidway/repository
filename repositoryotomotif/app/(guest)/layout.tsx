@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/guest/footer";
 
 export default function GuestLayout({
     children,
@@ -6,11 +7,12 @@ export default function GuestLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div>
+        <div className="min-h-screen bg-slate-50">
             <Navbar />
-            <main className="min-h-screen bg-slate-50">  
+            <main className="min-h-screen bg-slate-50">
                 {children}
             </main>
+            <Footer />
         </div>
-    )
+    );
 }

@@ -44,10 +44,16 @@ type HomeData = {
     tugasAkhirTerbaru: TugasAkhir[];
 };
 
+// Skema warna baru:
+// - Navy (#0B1F3A -> #132D52) sebagai warna utama/hero, kesan teknik & profesional
+// - Biru (blue-700/800) sebagai warna aksi/brand di area terang
+// - Oranye (orange-500) sebagai SATU-SATUNYA warna aksen, dipakai konsisten untuk CTA utama & highlight
+// Ikon fitur & statistik memakai satu ramp warna (biru) agar tidak terkesan "pelangi"
+
 const features = [
     {
         iconBg: "bg-blue-50",
-        iconColor: "text-blue-600",
+        iconColor: "text-blue-800",
         title: "Pencarian Cerdas",
         desc: "Cari Tugas Akhir berdasarkan judul, nama mahasiswa, NIM, atau bidang teknologi.",
         icon: (
@@ -58,8 +64,8 @@ const features = [
         ),
     },
     {
-        iconBg: "bg-emerald-50",
-        iconColor: "text-emerald-600",
+        iconBg: "bg-blue-50",
+        iconColor: "text-blue-800",
         title: "Filter Lengkap",
         desc: "Filter berdasarkan program studi, tahun, SDGs, dosen pembimbing, dan ruangan.",
         icon: (
@@ -69,8 +75,8 @@ const features = [
         ),
     },
     {
-        iconBg: "bg-violet-50",
-        iconColor: "text-violet-600",
+        iconBg: "bg-blue-50",
+        iconColor: "text-blue-800",
         title: "Statistik Informatif",
         desc: "Lihat statistik dan analisis data Tugas Akhir berdasarkan berbagai kriteria.",
         icon: (
@@ -127,7 +133,7 @@ export default function GuestHomePage() {
         return (
             <main className="flex min-h-[calc(100vh-72px)] items-center justify-center">
                 <div className="text-center">
-                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-800" />
                     <p className="text-sm text-slate-500">Memuat Repository...</p>
                 </div>
             </main>
@@ -154,10 +160,9 @@ export default function GuestHomePage() {
     const stats = [
         {
             iconBg: "bg-blue-50",
-            iconColor: "text-blue-600",
+            iconColor: "text-blue-800",
             value: data?.statistics.totalTugasAkhir ?? 0,
             label: "Tugas Akhir",
-            sub: "Tersedia",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
@@ -168,11 +173,10 @@ export default function GuestHomePage() {
             ),
         },
         {
-            iconBg: "bg-emerald-50",
-            iconColor: "text-emerald-600",
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-800",
             value: data?.statistics.totalDosen ?? 0,
             label: "Dosen Pembimbing",
-            sub: "Aktif",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -183,11 +187,10 @@ export default function GuestHomePage() {
             ),
         },
         {
-            iconBg: "bg-violet-50",
-            iconColor: "text-violet-600",
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-800",
             value: data?.statistics.totalSDGs ?? 0,
             label: "SDGs",
-            sub: "Tersedia",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -200,7 +203,6 @@ export default function GuestHomePage() {
             iconColor: "text-orange-600",
             value: periodeTersedia,
             label: "Periode",
-            sub: "Tersedia",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -215,40 +217,38 @@ export default function GuestHomePage() {
     return (
         <main>
             {/* =========================================
-                HERO
+                HERO — navy gelap agar kontras & terasa lebih "teknik/profesional"
             ========================================= */}
-            <section className="relative bg-[#E4FBFF]">
-                <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-14 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-32 lg:pt-16">
-                    {/* Left: text */}
-                    <div>
-                        <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-700">
-                            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                            Selamat Datang di Repository Jurusan Teknik Otomotif
-                        </span>
+            <section className="relative bg-gradient-to-br from-[#0B1F3A] to-[#132D52]">
+                <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-35 pt-14 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-32 lg:pt-16">
 
-                        <h1 className="text-4xl font-bold leading-tight tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
+                    <div>
+                        <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white ring-1 ring-inset ring-white/15">
+                            <span className="h-2 w-2 rounded-full bg-orange-400" />Selamat Datang di Repository Jurusan Teknik Otomotif</span>
+
+                        <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
                             Pusat Pengetahuan
-                            <span className="block text-blue-600">
+                            <span className="block text-orange-400">
                                 Teknologi Otomotif
                             </span>
                         </h1>
 
-                        <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+                        <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">
                             Jelajahi koleksi Tugas Akhir mahasiswa D3 dan D4 Teknologi
-                            Otomotif Universitas  Negeri Padang. Temukan inovasi, penelitian,
+                            Otomotif Universitas Negeri Padang. Temukan inovasi, penelitian,
                             dan solusi teknologi untuk masa depan otomotif.
                         </p>
 
                         <div className="mt-8 flex flex-wrap gap-3">
                             <Link
                                 href="/jelajahirepository"
-                                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-600"
                             >
                                 📖 Jelajahi Repository
                             </Link>
                             <Link
                                 href="/dosen"
-                                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:border-blue-200"
+                                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                             >
                                 👥 Lihat Dosen
                             </Link>
@@ -257,15 +257,15 @@ export default function GuestHomePage() {
 
                     {/* Right: illustration placeholder (no photo) */}
                     <div className="relative">
-                        <div className="absolute -right-6 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-blue-100/70 lg:h-[480px] lg:w-[480px]" />
+                        <div className="absolute -right-6 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-white/5 lg:h-[480px] lg:w-[480px]" />
 
-                        <div className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-[28px] bg-gradient-to-br from-blue-600 to-indigo-700 shadow-xl sm:h-[400px] lg:h-[460px]">
+                        <div className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-[28px] border border-white/10 bg-[#0E2444] shadow-xl sm:h-[400px] lg:h-[460px]">
                             {/* dekorasi titik-titik */}
                             <div
                                 className="absolute inset-0 opacity-20"
                                 style={{
                                     backgroundImage:
-                                        "radial-gradient(circle, rgba(255,255,255,0.6) 1.5px, transparent 1.5px)",
+                                        "radial-gradient(circle, rgba(255,255,255,0.5) 1.5px, transparent 1.5px)",
                                     backgroundSize: "22px 22px",
                                 }}
                             />
@@ -288,16 +288,30 @@ export default function GuestHomePage() {
                                 <path d="M5 12h13" />
                             </svg>
 
-                            <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium text-white backdrop-blur">
+                            <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-orange-500/15 px-4 py-1.5 text-sm font-medium text-orange-300 ring-1 ring-inset ring-orange-400/20">
                                 Repository Otomotif
                             </span>
                         </div>
                     </div>
                 </div>
 
+                {/* Wave divider — transisi lengkung dari navy ke section putih, di belakang stats card */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 translate-y-10 overflow-hidden leading-[0]">
+                    <svg
+                        viewBox="0 0 1440 110"
+                        preserveAspectRatio="none"
+                        className="h-[56px] w-full sm:h-[90px]"
+                    >
+                        <path
+                            d="M0,50 C240,100 480,0 720,35 C960,70 1200,10 1440,55 L1440,110 L0,110 Z"
+                            fill="#FFFFFF"
+                        />
+                    </svg>
+                </div>
+
                 {/* Stats card — overlaps bottom edge of hero */}
                 <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2 px-6 lg:px-8">
-                    <div className="mx-auto max-w-6xl rounded-2xl border border-slate-100 bg-white px-6 py-7 shadow-xl shadow-slate-200/60 sm:px-10">
+                    <div className="mx-auto max-w-6xl rounded-2xl border border-slate-300 bg-white px-6 py-7 shadow-xl shadow-slate-900/10 sm:px-10">
                         <div className="grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:gap-6">
                             {stats.map((s) => (
                                 <div key={s.label} className="flex items-center gap-3">
@@ -313,7 +327,6 @@ export default function GuestHomePage() {
                                         <p className="text-sm font-medium leading-tight text-slate-700">
                                             {s.label}
                                         </p>
-                                        <p className="text-xs text-slate-400">{s.sub}</p>
                                     </div>
                                 </div>
                             ))}
@@ -323,29 +336,26 @@ export default function GuestHomePage() {
             </section>
 
             {/* Spacer to compensate for the overlapping stats card */}
-            <div className="h-20 sm:h-16 bg-[#F4F9F9]" />
+            <div className="h-20 bg-white sm:h-16" />
 
-            {/* =========================================
-                FITUR REPOSITORY
-            ========================================= */}
-            <section className=" bg-[#F4F9F9]" >
-                <div className="mx-auto max-w-7xl   px-6 py-20 lg:px-8">
-                     <div className="mx-auto mb-12 max-w-2xl text-center">
+            <section className="bg-white">
+                <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+                    <div className="mx-auto mb-12 max-w-2xl text-center">
                         <h2 className="text-3xl font-bold text-slate-900">
                             Fitur Repository
                         </h2>
-                        <div className="mx-auto mt-3 h-1 w-14 rounded-full bg-blue-600" />
+                        <div className="mx-auto mt-3 h-1 w-14 rounded-full bg-orange-500" />
                         <p className="mt-4 text-slate-500">
                             Temukan berbagai fitur yang membantu Anda menjelajahi dan
                             memahami koleksi Tugas Akhir
                         </p>
                     </div>
 
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 bg-[#F4F9F9]">
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 bg-white">
                         {features.map((f) => (
                             <div
                                 key={f.title}
-                                className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                                className="rounded-2xl border border-slate-300 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
                             >
                                 <div
                                     className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${f.iconBg} ${f.iconColor}`}
