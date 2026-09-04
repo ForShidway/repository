@@ -36,6 +36,7 @@ model Dosen {
   pembimbingTa TugasAkhir[] @relation ("PembimbingTA")
   pembimbing2Ta TugasAkhir[] @relation ("Pembimbing2TA")
   dosenPa TugasAkhir[] @relation("DosenPA")
+  pembimbingPi LaporanPi[] @relation("PembimbingPI")
 }
 
 model ProgramStudy {
@@ -48,6 +49,7 @@ model ProgramStudy {
   updatedAt DateTime @updatedAt
 
   tugasAkhirs TugasAkhir[]
+  artikelJurnals ArtikelJurnal[]
   @@unique([name, degree])
 }
 
@@ -123,6 +125,59 @@ model Keyword {
 
   tugasAkhirId Int
   tugasAkhir TugasAkhir @relation(fields: [tugasAkhirId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
    @@unique([tugasAkhirId, kata])
+}
+
+model ArtikelJurnal {
+  id Int @id @default(autoincrement())
+  name String
+  nim String
+  tahun Int
+  judul String @db.Text
+  abstract String @db.Text
+  
+  ProgramStudyId Int?
+  programStudy ProgramStudy? @relation(fields: [ProgramStudyId], references: [id])
+
+  fileName String?
+  filePath String?
+  fileSize Int?
+  fileType String?
+
+  keywords JurnalKeyword[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JurnalKeyword {
+  id Int @id @default(autoincrement())
+  kata String
+
+  artikelJurnalId Int
+  artikelJurnal ArtikelJurnal @relation(fields: [artikelJurnalId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  @@unique([artikelJurnalId, kata])
+  
+}
+
+model LaporanPi {
+  id Int @id @default(autoincrement())
+  name String
+  nim String
+  namaInstansi String
+
+  dosenPembimbingId Int
+  dosenPembimbing Dosen @relation("PembimbingPI", fields: [dosenPembimbingId], references: [id])
+
+  tanggalMulai DateTime
+  tanggalSelesai DateTime
+
+  fileName String
+  filePath String
+  fileSize Int
+  fileType String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

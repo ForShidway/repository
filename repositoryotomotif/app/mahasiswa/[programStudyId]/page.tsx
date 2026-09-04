@@ -23,13 +23,13 @@ const folderCategories: FolderCategory[] = [
     description: "Unggah dokumen dan data tugas akhir mahasiswa.",
   },
   {
-    id: "laporan-pkl",
-    label: "Laporan PKL",
-    description: "Kelola dokumen dan laporan praktik kerja lapangan.",
+    id: "artikel-jurnal",
+    label: "Artikel Jurnal",
+    description: "Unggah dokumen artikel jurnal.",
   },
   {
-    id: "laporan-praktek",
-    label: "Laporan Praktik",
+    id: "laporan-pelatihan-industri",
+    label: "Laporan Pi",
     description: "Upload laporan praktik yang relevan dengan program studi.",
   },
 ];
@@ -73,9 +73,19 @@ export default function MahasiswaProgramStudyFolderPage() {
   }, [programStudyId]);
 
   function handleSelectFolder(category: FolderCategory) {
+    if (category.id === "artikel-jurnal") {
+      router.push(`/mahasiswa/artikel-jurnal/create/${programStudyId}`);
+      return;
+    }
+
     router.push(
       `/mahasiswa/tugas-akhir/create/${programStudyId}?category=${encodeURIComponent(category.label)}`
     );
+
+    router.push(
+      `/mahasiswa/laporan-pi/create/${programStudyId}?category=${encodeURIComponent(category.label)}`
+    );
+
   }
 
   if (loading) {
