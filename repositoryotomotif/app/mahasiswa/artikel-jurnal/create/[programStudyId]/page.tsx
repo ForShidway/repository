@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 type ProgramStudy = {
   id: number;
@@ -30,6 +30,9 @@ function formatBytes(bytes: number) {
 }
 
 export default function ArtikelJurnalForm() {
+    const params = useParams<{ programStudyId: string }>();
+    const routeProgramStudyId = params.programStudyId;
+
   const [name, setName] = useState("");
   const [nim, setNim] = useState("");
   const [tahun, setTahun] = useState(String(CURRENT_YEAR));
@@ -40,24 +43,28 @@ export default function ArtikelJurnalForm() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordError, setKeywordError] = useState<string | null>(null);
 
-  const [programStudyId, setProgramStudyId] = useState("");
-  const [programStudies, setProgramStudies] = useState<ProgramStudy[]>([]);
+  const [programStudy, setProgramStudy] = useState<ProgramStudy | null>(null);
+    const [loadingProgramStudy, setLoadingProgramStudy] = useState(Boolean(routeProgramStudyId));
 
     useEffect(() => {
-        async function fetchProgramStudies() {
+        async function fetchProgramStudy() {
             try {
-                const res = await fetch("/api/program-studies");
+                const res = await fetch(`/api/program-studies/${routeProgramStudyId}`);
                 const data = await res.json();
                 if (res.ok) {
-                    setProgramStudies(data);
+                    setProgramStudy(data);
                 }
             } catch (error) {
                 console.error("Gagal mengambil program studi", error);
+            } finally {
+                setLoadingProgramStudy(false);
             }
         }
 
-        fetchProgramStudies();
-    }, []);
+        if (routeProgramStudyId) {
+            fetchProgramStudy();
+        }
+    }, [routeProgramStudyId]);
 
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -145,7 +152,8 @@ export default function ArtikelJurnalForm() {
     abstract.trim() &&
     !abstractOverLimit &&
     tahun.trim() &&
-    programStudyId &&
+    routeProgramStudyId &&
+    programStudy &&
     !fileError &&
     submit.status !== "submitting";
 
@@ -160,7 +168,7 @@ export default function ArtikelJurnalForm() {
     formData.append("nim", nim.trim());
     formData.append("tahun", tahun.trim());
     formData.append("judul", judul.trim());
-    formData.append("programStudyId", programStudyId)
+    formData.append("programStudyId", routeProgramStudyId);
     formData.append("abstract", abstract.trim());
     keywords.forEach((k) => formData.append("keywords", k));
     if (file) formData.append("file", file);
@@ -263,21 +271,20 @@ export default function ArtikelJurnalForm() {
                         </div>
 
                         <div>
-                          <label htmlFor="programStudy" className="mb-2 block text-sm font-medium text-gray-700">Program Studi</label>
-                          <select
-                              id="programStudy"
-                              value={programStudyId}
-                              onChange={(e) => setProgramStudyId(e.target.value)}
-                              className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                              required
-                          >
-                              <option value="">-- Pilih Program Studi --</option>
-                              {programStudies.map((ps) => (
-                                  <option key={ps.id} value={ps.id}>
-                                      {ps.degree} {ps.name}
-                                  </option>
-                              ))}
-                          </select>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Program Studi
+                            </label>
+                            <div className="w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                                {loadingProgramStudy ? (
+                                    <p className="text-sm text-gray-500">Memuat Program Studi...</p>
+                                ) : programStudy ? (
+                                    <p className="font-semibold text-blue-800">
+                                        {programStudy.degree} {programStudy.name}
+                                    </p>
+                                ) : (
+                                    <p className="text-sm text-red-500">Program Studi tidak ditemukan</p>
+                                )}
+                            </div>
                         </div>
 
                         {/* ABSTRAK */}

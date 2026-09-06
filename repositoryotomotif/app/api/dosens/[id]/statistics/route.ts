@@ -99,12 +99,34 @@ export async function GET(
             jumlah: item._count.id,
         }));
 
+        const laporanPi = await prisma.laporanPi.findMany({
+            where: {
+                dosenPembimbingId: dosenId,
+            },
+            select: {
+                tanggalMulai: true,
+            },
+        });
+        const laporanPiPerTahun = laporanPi.reduce<{ tahun: number; jumlah: number }[]>(
+            (result, laporan) => {
+                const tahun = laporan.tanggalMulai.getFullYear();
+                const existing = result.find((item) => item.tahun === tahun);
+                if (existing) {
+                    existing.jumlah += 1;
+                } else {
+                    result.push({ tahun, jumlah: 1 });
+                }
+                return result;
+            },
+            []
+        ).sort((a, b) => a.tahun - b.tahun);
+
         return NextResponse.json ({
             dosen: {
                 id: dosen.id,
                 name: dosen.name,
             }, statistik : {
-                currentYear, bimbinganTahunIni, totalBimbingan, statistikPerTahun, statistikPerProgramStudy,
+                currentYear, bimbinganTahunIni, totalBimbingan, statistikPerTahun, statistikPerProgramStudy, laporanPiPerTahun,
             }, tugasAkhir,
         });
     } catch (error) {

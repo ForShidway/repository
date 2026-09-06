@@ -39,14 +39,36 @@ export async function POST(request: Request) {
         const abstract = formData.get("abstract")?.toString().trim() ?? "";
         const tahunRaw = formData.get("tahun")?.toString().trim() ?? "";
         const tahun = Number(tahunRaw);
+        const programStudyIdRaw = formData.get("programStudyId")?.toString().trim() ?? "";
+        const programStudyId = Number(programStudyIdRaw);
         const fileEntry = formData.get("file");
         const file = fileEntry instanceof File && fileEntry.size > 0
             ? fileEntry
             : null;
 
-        if (!name || !nim || !judul || !abstract || !tahunRaw || !Number.isInteger(tahun)) {
+        if (
+            !name ||
+            !nim ||
+            !judul ||
+            !abstract ||
+            !tahunRaw ||
+            !Number.isInteger(tahun) ||
+            !programStudyIdRaw ||
+            !Number.isInteger(programStudyId)
+        ) {
             return NextResponse.json(
-                { message: "name, nim, tahun, judul, dan abstract wajib diisi" },
+                { message: "name, nim, tahun, judul, abstract, dan program studi wajib diisi" },
+                { status: 400 },
+            );
+        }
+
+        const programStudy = await prisma.programStudy.findUnique({
+            where: { id: programStudyId },
+            select: { id: true },
+        });
+        if (!programStudy) {
+            return NextResponse.json(
+                { message: "Program studi tidak ditemukan" },
                 { status: 400 },
             );
         }
@@ -119,6 +141,7 @@ export async function POST(request: Request) {
                 tahun,
                 judul,
                 abstract,
+                ProgramStudyId: programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,

@@ -16,7 +16,7 @@ type FolderCategory = {
   description: string;
 };
 
-const folderCategories: FolderCategory[] = [
+const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
   {
     id: "tugas-akhir",
     label: "Tugas Akhir",
@@ -73,18 +73,12 @@ export default function MahasiswaProgramStudyFolderPage() {
   }, [programStudyId]);
 
   function handleSelectFolder(category: FolderCategory) {
-    if (category.id === "artikel-jurnal") {
-      router.push(`/mahasiswa/artikel-jurnal/create/${programStudyId}`);
-      return;
+    switch (category.id) {
+      case "artikel-jurnal": router.push(`/mahasiswa/artikel-jurnal/create/${programStudyId}`); break;
+      case "laporan-pelatihan-industri": router.push(`/mahasiswa/laporan-pi/create/${programStudyId}`); break;
+      case "tugas-akhir":
+        default: router.push(`/mahasiswa/tugas-akhir/create/${programStudyId}?category=${encodeURIComponent(category.label)}`); break;
     }
-
-    router.push(
-      `/mahasiswa/tugas-akhir/create/${programStudyId}?category=${encodeURIComponent(category.label)}`
-    );
-
-    router.push(
-      `/mahasiswa/laporan-pi/create/${programStudyId}?category=${encodeURIComponent(category.label)}`
-    );
 
   }
 
@@ -97,6 +91,11 @@ export default function MahasiswaProgramStudyFolderPage() {
       </main>
     );
   }
+
+   const isD3 = programStudy?.degree?.toUpperCase() === "D3";
+    const folderCategories = isD3
+        ? ALL_FOLDER_CATEGORIES.filter((c) => c.id === "tugas-akhir")
+        : ALL_FOLDER_CATEGORIES;
 
   return (
     <main className="min-h-screen bg-[#F4F9F9] px-8 py-10 sm:px-6 lg:px-8">

@@ -13,6 +13,8 @@ export async function GET() {
             totalSDGs,
             totalUser,
             totalProgramStudy,
+            totalArtikelJurnal,
+            totalLaporanPi,
         ] = await Promise.all([
             prisma.tugasAkhir.count(),
             prisma.dosen.count(),
@@ -28,8 +30,11 @@ export async function GET() {
                     isActive: true,
                 },
             }),
+            prisma.artikelJurnal.count(),
+            prisma.laporanPi.count(),
         ]);
 
+        //tugas akhir
         const startYear = currentYear - 5;
         const tugasAkhirSemua = await prisma.tugasAkhir.findMany({
             select: {
@@ -104,6 +109,76 @@ export async function GET() {
             },
         });
 
+        //artikel jurnal
+        
+        const artikelJurnalSemua = await prisma.artikelJurnal.findMany({
+            select: {
+                tahun: true,
+            },
+        });
+
+        const artikelPerTahun = Array.from({ length: 6 }, (_, index) => {
+            const tahun = startYear + index;
+
+            return {
+                tahun,
+                jumlah: artikelJurnalSemua.filter(
+                    (aj) => aj.tahun === tahun
+                ).length,
+            };
+        });
+
+        const programStudies1 = await prisma.programStudy.findMany({
+            where: {
+                isActive: true,
+            },
+            include: {
+                artikelJurnals: {
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+            orderBy: {
+                name: "asc",
+            },
+        });
+
+        const distribusiProgramStudy1 = programStudies1
+            .map((programStudy) => ({
+                id: programStudy.id,
+                name: programStudy.name,
+                degree: programStudy.degree,
+                jumlah: programStudy.artikelJurnals.length,
+            }))
+            .sort((a, b) => b.jumlah - a.jumlah);
+
+        const artikelJurnalTerbaru = await prisma.artikelJurnal.findMany({
+            orderBy: {
+                createdAt: "desc",
+            },
+            take: 5,
+            include: {
+                programStudy: true,
+            },
+        });
+
+        //laporan pi
+        const laporanPiSemua = await prisma.laporanPi.findMany({
+            select: {
+                tanggalMulai: true,
+            },
+        });
+        const laporanPiPerTahun = Array.from({ length: 6 }, (_, index) => {
+            const tahun = startYear + index;
+            return {
+                tahun,
+                jumlah: laporanPiSemua.filter(
+                    (laporan) => laporan.tanggalMulai.getFullYear() === tahun
+                ).length,
+            };
+        });
+
         return NextResponse.json({
             summary: {
                 totalTugasAkhir,
@@ -113,10 +188,16 @@ export async function GET() {
                 totalUser,
                 totalProgramStudy,
                 totalMahasiswa: totalTugasAkhir,
+                totalArtikelJurnal,
+                totalLaporanPi,
             },
             tugasPerTahun,
+            artikelPerTahun,
+            laporanPiPerTahun,
             distribusiProgramStudy,
+            distribusiArtikelProgramStudy: distribusiProgramStudy1,
             tugasAkhirTerbaru,
+            artikelJurnalTerbaru,
             aktivitasTerbaru,
         });
     } catch (error) {

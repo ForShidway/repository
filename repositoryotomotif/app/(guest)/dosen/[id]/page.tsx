@@ -50,6 +50,11 @@ type StatistikProgramStudy = {
     jumlah: number;
 };
 
+type StatistikLaporanPi = {
+    tahun: number;
+    jumlah: number;
+};
+
 type StatistikResponse = {
     dosen: {
         id: number;
@@ -62,6 +67,7 @@ type StatistikResponse = {
         totalBimbingan: number;
         statistikPerTahun: StatistikTahun[];
         statistikPerProgramStudy: StatistikProgramStudy[];
+        laporanPiPerTahun: StatistikTahun[];
     };
 
     tugasAkhir: TugasAkhir[];
@@ -111,6 +117,30 @@ export default function StatistikDosenPage() {
                     <span className="font-medium text-slate-500">
                         ({percentage}%)
                     </span>
+                </p>
+            </div>
+        );
+    }
+
+    function LaporanPiTooltip({
+        active,
+        payload,
+        total,
+    }: {
+        active?: boolean;
+        payload?: any[];
+        total: number;
+    }) {
+        if (!active || !payload || !payload.length) return null;
+
+        const data = payload[0].payload as StatistikLaporanPi;
+        const percentage = total > 0 ? Math.round((data.jumlah / total) * 100) : 0;
+
+        return (
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-lg">
+                <p className="font-semibold text-slate-800">Tahun {data.tahun}</p>
+                <p className="mt-1 text-sm font-bold text-emerald-600">
+                    {data.jumlah} laporan PI <span className="font-medium text-slate-500">({percentage}%)</span>
                 </p>
             </div>
         );
@@ -482,6 +512,68 @@ export default function StatistikDosenPage() {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div className="mb-6">
+                            <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PI</h2>
+                            <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai laporan.</p>
+                        </div>
+
+                        {statistik.laporanPiPerTahun.every((item) => item.jumlah === 0) ? (
+                            <div className="flex h-64 items-center justify-center">
+                                <p className="text-sm text-slate-400">Belum ada data laporan PI.</p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center gap-6 sm:flex-row">
+                                <div className="h-56 w-full sm:w-1/2">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0)}
+                                                dataKey="jumlah"
+                                                nameKey="tahun"
+                                                innerRadius={55}
+                                                outerRadius={85}
+                                                paddingAngle={statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0).length > 1 ? 3 : 0}
+                                            >
+                                                {statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0).map((item, index) => (
+                                                    <Cell
+                                                        key={item.tahun}
+                                                        fill={PROGRAM_COLORS[index % PROGRAM_COLORS.length]}
+                                                        stroke="#fff"
+                                                        strokeWidth={2}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                content={
+                                                    <LaporanPiTooltip
+                                                        total={statistik.laporanPiPerTahun.reduce((sum, item) => sum + item.jumlah, 0)}
+                                                    />
+                                                }
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+
+                                <div className="w-full space-y-3 sm:w-1/2">
+                                    {statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0).map((item, index) => {
+                                        const totalLaporanPi = statistik.laporanPiPerTahun.reduce((sum, value) => sum + value.jumlah, 0);
+                                        const percentage = totalLaporanPi > 0 ? Math.round((item.jumlah / totalLaporanPi) * 100) : 0;
+                                        return (
+                                            <div key={item.tahun} className="flex items-center justify-between gap-3 text-sm">
+                                                <div className="flex min-w-0 items-center gap-2">
+                                                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: PROGRAM_COLORS[index % PROGRAM_COLORS.length] }} />
+                                                    <span className="font-medium text-slate-700">{item.tahun}</span>
+                                                </div>
+                                                <span className="shrink-0 font-semibold text-slate-600">{item.jumlah} · {percentage}%</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         )}
                     </div>
