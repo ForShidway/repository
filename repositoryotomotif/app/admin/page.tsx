@@ -225,36 +225,6 @@ export default function AdminDashboard() {
                     </div>
                 </section>
 
-                <section className="mt-6 grid gap-6 lg:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900">Grafik Artikel Jurnal</h2>
-                                <p className="mt-1 text-sm text-slate-500">Jumlah artikel jurnal per tahun</p>
-                            </div>
-                            <span className="rounded-lg bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-700">Per Tahun</span>
-                        </div>
-                        <div className="mt-8">
-                            <YearChart data={data.artikelPerTahun} label="Artikel" color="bg-cyan-500" hoverColor="group-hover:bg-cyan-600" />
-                        </div>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900">Grafik Laporan PI</h2>
-                                <p className="mt-1 text-sm text-slate-500">Jumlah laporan PI per tahun mulai</p>
-                            </div>
-                            <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Per Tahun</span>
-                        </div>
-                        <div className="mt-8">
-                            <YearChart data={data.laporanPiPerTahun} label="Laporan PI" color="bg-emerald-500" hoverColor="group-hover:bg-emerald-600" />
-                        </div>
-                    </div>
-                </section>
-
-                
-
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     <StatCard
                         icon={<FileText className="h-5 w-5" />}
@@ -357,15 +327,24 @@ export default function AdminDashboard() {
                     </div>
                 </section>
 
-                <section className="mt-6 grid gap-6 lg:grid-cols-2">
+                <section className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-900">Grafik Artikel Jurnal</h2>
+                                <p className="mt-1 text-sm text-slate-500">Jumlah artikel jurnal per tahun</p>
+                            </div>
+                            <span className="rounded-lg bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-700">Per Tahun</span>
+                        </div>
+                        <div className="mt-8">
+                            <YearChart data={data.artikelPerTahun} label="Artikel" color="bg-cyan-500" hoverColor="group-hover:bg-cyan-600" />
+                        </div>
+                    </div>
+
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">
-                                Distribusi Artikel Jurnal
-                            </h2>
-                            <p className="mt-1 text-sm text-slate-500">
-                                Berdasarkan program studi
-                            </p>
+                            <h2 className="text-lg font-bold text-slate-900">Distribusi Artikel Jurnal</h2>
+                            <p className="mt-1 text-sm text-slate-500">Berdasarkan program studi</p>
                         </div>
                         {data.distribusiArtikelProgramStudy.length === 0 ? (
                             <div className="mt-6">
@@ -386,15 +365,26 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </div>
+                </section>
+
+                <section className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-900">Grafik Laporan PI</h2>
+                                <p className="mt-1 text-sm text-slate-500">Jumlah laporan PI per tahun mulai</p>
+                            </div>
+                            <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Per Tahun</span>
+                        </div>
+                        <div className="mt-8">
+                            <YearChart data={data.laporanPiPerTahun} label="Laporan PI" color="bg-emerald-500" hoverColor="group-hover:bg-emerald-600" />
+                        </div>
+                    </div>
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">
-                                Distribusi Laporan PI
-                            </h2>
-                            <p className="mt-1 text-sm text-slate-500">
-                                Berdasarkan tahun mulai
-                            </p>
+                            <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PI</h2>
+                            <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai</p>
                         </div>
                         {data.laporanPiPerTahun.every((item) => item.jumlah === 0) ? (
                             <div className="mt-6">

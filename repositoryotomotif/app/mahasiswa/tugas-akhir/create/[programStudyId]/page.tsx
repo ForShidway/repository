@@ -52,6 +52,7 @@ export default function CreateTugasAkhirPage({
     const [pembimbingId, setPembimbingId] = useState("");
     const [pembimbing2Id, setPembimbing2Id] = useState("")
     const [dosenPaId, setDosenPaId] = useState("")
+    const [pengujiIds, setPengujiIds] = useState<string[]>([""]);
     const [file, setFile] = useState<File | null>(null);
 
     const [keywordInput, setKeywordInput] = useState("");
@@ -176,6 +177,7 @@ export default function CreateTugasAkhirPage({
             if(dosenPaId) {
                 formData.append("dosenPaId", dosenPaId)
             }
+            formData.append("pengujiIds", JSON.stringify(pengujiIds.filter(Boolean)));
             formData.append("programStudyId", programStudyId);
             formData.append("sdgsId", JSON.stringify(selectedSDGs));
             formData.append("keywords", JSON.stringify(keywords));
@@ -218,6 +220,16 @@ export default function CreateTugasAkhirPage({
 
             return [...current, sdgId];
         });
+    }
+
+    function updatePenguji(index: number, value: string) {
+        setPengujiIds((current) => current.map((id, currentIndex) => currentIndex === index ? value : id));
+    }
+
+    function addPenguji() {
+        if (pengujiIds.length < 3) {
+            setPengujiIds((current) => [...current, ""]);
+        }
     }
 
    function addKeyword() {
@@ -493,6 +505,48 @@ export default function CreateTugasAkhirPage({
                                     )
                                 )}
                             </select>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 p-4">
+                            <p className="mb-3 text-sm font-semibold text-gray-700">Dosen Penguji</p>
+                            {pengujiIds.map((pengujiId, index) => {
+                                const role = index === 0 ? "Ketua" : index === 1 ? "Sekretaris" : "Anggota";
+                                const selectedOtherPengujiIds = pengujiIds.filter((_, currentIndex) => currentIndex !== index);
+                                return (
+                                    <div key={role} className="mb-3 last:mb-0">
+                                        <label htmlFor={`penguji-${index}`} className="mb-2 block text-sm font-medium">
+                                            {role}
+                                        </label>
+                                        <select
+                                            id={`penguji-${index}`}
+                                            value={pengujiId}
+                                            onChange={(event) => updatePenguji(index, event.target.value)}
+                                            className="w-full rounded-lg border px-4 py-3"
+                                        >
+                                            <option value="">-- Pilih Dosen {role} --</option>
+                                            {dosens
+                                                .filter((dosen) =>
+                                                    String(dosen.id) !== pembimbingId &&
+                                                    String(dosen.id) !== pembimbing2Id &&
+                                                    !selectedOtherPengujiIds.includes(String(dosen.id))
+                                                )
+                                                .map((dosen) => (
+                                                    <option key={dosen.id} value={dosen.id}>{dosen.name}</option>
+                                                ))}
+                                        </select>
+                                    </div>
+                                );
+                            })}
+                            {pengujiIds.length < 3 && (
+                                <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+                                    <input
+                                        type="checkbox"
+                                        checked={false}
+                                        onChange={addPenguji}
+                                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Ada dosen penguji lain
+                                </label>
+                            )}
                         </div>
                         <div>
                             <label htmlFor="" className="mb-2 block text-sm font-medium text-gray-700">Program Studi</label>

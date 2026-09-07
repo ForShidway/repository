@@ -133,6 +133,20 @@ export async function POST(request: Request) {
         const pembimbing2Id = pembimbingId2 ? Number(pembimbingId2) : null ;
         const dosenPaRaw = formData.get("dosenPaId");
         const dosenPaId = dosenPaRaw ? Number(dosenPaRaw) : null ;
+        const pengujiRaw = formData.get("pengujiIds");
+        let pengujiIds: number[] = [];
+        if (pengujiRaw) {
+            try {
+                const parsed = JSON.parse(pengujiRaw.toString());
+                if (!Array.isArray(parsed)) throw new Error("invalid");
+                pengujiIds = parsed.map((id) => Number(id));
+            } catch {
+                return NextResponse.json(
+                    { message: "Format dosen penguji tidak valid" },
+                    { status: 400 },
+                );
+            }
+        }
         const programStudyId = Number(formData.get("programStudyId"))
 
         const sdgsRaw = formData.get("sdgsId");
@@ -201,6 +215,25 @@ export async function POST(request: Request) {
                 { message: "Pembimbing 1 dan Pembimbing 2 tidak boleh orang yang sama"},
                 { status : 400}
             )
+        }
+
+        if (pengujiIds.length > 3 || pengujiIds.some((id) => !Number.isInteger(id) || id <= 0)) {
+            return NextResponse.json(
+                { message: "Maksimal tiga dosen penguji dapat dipilih" },
+                { status: 400 },
+            );
+        }
+        if (new Set(pengujiIds).size !== pengujiIds.length) {
+            return NextResponse.json(
+                { message: "Dosen penguji tidak boleh dipilih lebih dari sekali" },
+                { status: 400 },
+            );
+        }
+        if (pengujiIds.some((id) => id === pembimbingId || id === pembimbing2Id || id === dosenPaId)) {
+            return NextResponse.json(
+                { message: "Dosen penguji harus berbeda dari dosen pembimbing dan dosen PA" },
+                { status: 400 },
+            );
         }
 
         if (sdgsId.length === 0) {
@@ -283,6 +316,16 @@ export async function POST(request: Request) {
                     { status: 404}
                 )
             }
+        }
+
+        const pengujiDosens = pengujiIds.length > 0
+            ? await prisma.dosen.findMany({ where: { id: { in: pengujiIds } }, select: { id: true } })
+            : [];
+        if (pengujiDosens.length !== pengujiIds.length) {
+            return NextResponse.json(
+                { message: "Salah satu dosen penguji tidak ditemukan" },
+                { status: 404 },
+            );
         }
 
         const programStudy = await prisma.programStudy.findUnique({
@@ -378,7 +421,14 @@ export async function POST(request: Request) {
                 },
                 sdgs:{ connect: sdgsId.map((id) => ({
                     id,
-                }))}
+                }))},
+                penguji: {
+                    create: pengujiIds.map((dosenId, index) => ({
+                        dosenId,
+                        urutan: index + 1,
+                        peran: index === 0 ? "KETUA" : index === 1 ? "SEKRETARIS" : "ANGGOTA",
+                    })),
+                },
             }, include : {
                 ruangan: true,
                 pembimbing: true,
@@ -387,7 +437,11 @@ export async function POST(request: Request) {
                 sdgs: true,
                 mahasiswa: {
                     orderBy : {urutan:"asc"},
-                }
+                },
+                penguji: {
+                    orderBy: { urutan: "asc" },
+                    include: { dosen: true },
+                },
             }
         });
         return NextResponse.json(

@@ -36,6 +36,7 @@ model Dosen {
   pembimbingTa TugasAkhir[] @relation ("PembimbingTA")
   pembimbing2Ta TugasAkhir[] @relation ("Pembimbing2TA")
   dosenPa TugasAkhir[] @relation("DosenPA")
+  pengujiTa PengujiTugasAkhir[]
   pembimbingPi LaporanPi[] @relation("PembimbingPI")
 }
 
@@ -89,9 +90,30 @@ model TugasAkhir {
   mahasiswa Mahasiswa[]
   sdgs SDGs[]
   keywords Keyword[]
+  penguji PengujiTugasAkhir[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum PeranPenguji {
+  KETUA
+  SEKRETARIS
+  ANGGOTA
+}
+
+model PengujiTugasAkhir {
+  id Int @id @default(autoincrement())
+  tugasAkhirId Int
+  dosenId Int
+  urutan Int
+  peran PeranPenguji
+
+  tugasAkhir TugasAkhir @relation(fields: [tugasAkhirId], references: [id], onDelete: Cascade)
+  dosen Dosen @relation(fields: [dosenId], references: [id])
+
+  @@unique([tugasAkhirId, dosenId])
+  @@unique([tugasAkhirId, urutan])
 }
 
 model SDGs  {
