@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isMahasiswaRoute && session.role !== "MAHASISWA") {
-        return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+        return NextResponse.redirect(new URL("/admin", request.url));
     }
 
     return NextResponse.next();

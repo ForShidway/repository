@@ -84,8 +84,8 @@ export default function RegisterPage() {
                 <div className="flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-14">
 
                     {/* Logo */}
-                    <div className="mb-10 flex justify-end">
-                        <div className="flex items-center gap-3">
+                    <div className="mb-10 flex justify-center">
+                        <div className="flex  gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-100">
                                 RO
                             </div>

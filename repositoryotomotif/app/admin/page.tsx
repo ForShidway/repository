@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { FileText, GraduationCap, Users, Building2, Globe2 } from "lucide-react";
+import StatistikDashboard from "@/components/admin/StatistikDashboard";
 
 type Summary = {
     totalTugasAkhir: number;
@@ -420,6 +421,14 @@ export default function AdminDashboard() {
                         )}
                     </div>
                 </section>
+
+                <StatistikDashboard
+                    programStudyOptions={data.distribusiProgramStudy.map((programStudy) => ({
+                        id: programStudy.id,
+                        name: programStudy.name,
+                        degree: programStudy.degree,
+                    }))}
+                />
 
                 <section className="mt-6">
                     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
