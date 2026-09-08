@@ -65,8 +65,11 @@ type StatistikResponse = {
         currentYear: number;
         bimbinganTahunIni: number;
         totalBimbingan: number;
+        totalMenguji: number;
         statistikPerTahun: StatistikTahun[];
+        pengujiPerTahun : StatistikTahun[];
         statistikPerProgramStudy: StatistikProgramStudy[];
+        statistikPerProgramStudyPenguji: StatistikProgramStudy[];
         laporanPiPerTahun: StatistikTahun[];
     };
 
@@ -90,8 +93,18 @@ export default function StatistikDosenPage() {
 
     const ITEMS_PER_PAGE = 6;
 
-    const PROGRAM_COLORS = [ "#3b82f6",  "#10b981",  "#8b5cf6",  "#f97316", "#ef4444", 
-        "#14b8a6", ]
+    const currentYear = new Date().getFullYear();
+    const [startYear, setStartYear] = useState(currentYear - 4);
+    const [endYear, setEndYear] = useState(currentYear);
+
+    const PROGRAM_COLORS = [
+        "#3b82f6",
+        "#10b981",
+        "#8b5cf6",
+        "#f97316",
+        "#ef4444",
+        "#14b8a6",
+    ];
 
     function ProgramStudyTooltip({
         active,
@@ -250,6 +263,39 @@ export default function StatistikDosenPage() {
         setPage(1);
     }, [search]);
 
+    const availableYears = useMemo(() => {
+        const allYears = [
+            ...(data?.statistik.statistikPerTahun.map((item) => item.tahun) ?? []),
+            ...(data?.statistik.pengujiPerTahun.map((item) => item.tahun) ?? []),
+            ...(data?.statistik.laporanPiPerTahun.map((item) => item.tahun) ?? []),
+        ];
+        if (allYears.length === 0) return { min: currentYear, max: currentYear };
+        return { min: Math.min(...allYears), max: Math.max(...allYears) };
+    }, [data, currentYear]);
+
+    const gabunganPerTahun = useMemo(() => {
+        const tahunSet = new Set([
+            ...(data?.statistik.statistikPerTahun.map((item) => item.tahun) ?? []),
+            ...(data?.statistik.pengujiPerTahun.map((item) => item.tahun) ?? []),
+            ...(data?.statistik.laporanPiPerTahun.map((item) => item.tahun) ?? []),
+        ]);
+
+        return Array.from(tahunSet)
+            .filter((tahun) => tahun >= startYear && tahun <= endYear)
+            .sort((a, b) => a - b)
+            .map((tahun) => {
+                const dibimbing = data?.statistik.statistikPerTahun.find((item) => item.tahun === tahun);
+                const diuji = data?.statistik.pengujiPerTahun.find((item) => item.tahun === tahun);
+                const laporanPi = data?.statistik.laporanPiPerTahun.find((item) => item.tahun === tahun);
+                return {
+                    tahun,
+                    jumlahDibimbing: dibimbing?.jumlah ?? 0,
+                    jumlahDiuji: diuji?.jumlah ?? 0,
+                    jumlahPi: laporanPi?.jumlah ?? 0,
+                };
+            });
+    }, [data, startYear, endYear]);
+
     // ==========================================
     // LOADING
     // ==========================================
@@ -302,6 +348,16 @@ export default function StatistikDosenPage() {
         tugasAkhir,
     } = data;
 
+    const yearOptions = Array.from(
+        { length: availableYears.max - availableYears.min + 1 },
+        (_, index) => availableYears.min + index
+    );
+
+    const maxGabungan = Math.max(
+        ...gabunganPerTahun.map((item) => Math.max(item.jumlahDibimbing, item.jumlahDiuji, item.jumlahPi)),
+        1
+    );
+
     const maxJumlah =
         Math.max(
             ...statistik.statistikPerTahun.map(
@@ -309,6 +365,100 @@ export default function StatistikDosenPage() {
             ),
             1
         );
+
+    const programStudyData = statistik.statistikPerProgramStudy.filter(
+        (program) => program.jumlah > 0
+    );
+    const totalProgramStudy = programStudyData.reduce(
+        (total, program) => total + program.jumlah,
+        0
+    );
+    const programStudyPengujiData = statistik.statistikPerProgramStudyPenguji.filter(
+        (program) => program.jumlah > 0
+    );
+    const totalProgramStudyPenguji = programStudyPengujiData.reduce(
+        (total, program) => total + program.jumlah,
+        0
+    );
+    const laporanPiData = statistik.laporanPiPerTahun.filter(
+        (laporan) => laporan.jumlah > 0
+    );
+    const totalLaporanPi = laporanPiData.reduce(
+        (total, laporan) => total + laporan.jumlah,
+        0
+    );
+
+    const renderProgramStudyDonut = (
+        title: string,
+        description: string,
+        programs: StatistikProgramStudy[],
+        total: number
+    ) => (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-6">
+                <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+                <p className="mt-1 text-sm text-slate-500">{description}</p>
+            </div>
+
+            {programs.length === 0 ? (
+                <div className="flex h-56 items-center justify-center">
+                    <p className="text-sm text-slate-400">Belum ada data program studi.</p>
+                </div>
+            ) : (
+                <div className="flex flex-col items-center gap-5">
+                    <div className="relative h-56 w-full max-w-[240px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={programs}
+                                    dataKey="jumlah"
+                                    nameKey="name"
+                                    innerRadius={55}
+                                    outerRadius={85}
+                                    paddingAngle={programs.length > 1 ? 3 : 0}
+                                >
+                                    {programs.map((program, index) => (
+                                        <Cell
+                                            key={program.id}
+                                            fill={PROGRAM_COLORS[index % PROGRAM_COLORS.length]}
+                                            stroke="#fff"
+                                            strokeWidth={2}
+                                        />
+                                    ))}
+                                </Pie>
+                                <Tooltip content={<ProgramStudyTooltip total={total} />} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                            <p className="text-2xl font-bold text-slate-900">{total}</p>
+                            <p className="text-xs text-slate-400">Total TA</p>
+                        </div>
+                    </div>
+
+                    <div className="w-full max-w-[280px] space-y-3">
+                        {programs.map((program, index) => {
+                            const percentage = Math.round((program.jumlah / total) * 100);
+
+                            return (
+                                <div key={program.id} className="flex items-center justify-between gap-3 text-sm">
+                                    <div className="flex min-w-0 items-center gap-2">
+                                        <span
+                                            className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                            style={{ backgroundColor: PROGRAM_COLORS[index % PROGRAM_COLORS.length] }}
+                                        />
+                                        <span className="truncate font-medium text-slate-700">{program.name}</span>
+                                    </div>
+                                    <span className="shrink-0 font-semibold text-slate-600">
+                                        {program.jumlah} · {percentage}%
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </section>
+    );
 
     return (
         <main className="min-h-screen bg-[#F4F9F9] px-6 py-8 md:px-8">
@@ -376,6 +526,8 @@ export default function StatistikDosenPage() {
                             </div>
 
                             <div>
+
+                          
                                 <h2 className="text-2xl font-bold text-slate-900">
                                     {dosen.name}
                                 </h2>
@@ -389,43 +541,40 @@ export default function StatistikDosenPage() {
 
                         {/* KPI */}
 
-                        <div className="grid grid-cols-2 gap-4 lg:w-[440px]">
-
+                        <div className="grid grid-cols-3 gap-4 lg:w-[600px]">
                             <div className="rounded-xl border border-slate-100 bg-slate-50 p-5 text-center">
                                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                                     Bimbingan Tahun Ini
                                 </p>
-
                                 <p className="mt-2 text-4xl font-bold text-blue-600">
-                                    {
-                                        statistik.bimbinganTahunIni
-                                    }
+                                    {statistik.bimbinganTahunIni}
                                 </p>
-
                                 <p className="mt-1 text-xs text-slate-500">
-                                    TA pada{" "}
-                                    {
-                                        statistik.currentYear
-                                    }
+                                    TA pada {statistik.currentYear}
                                 </p>
                             </div>
-
                             <div className="rounded-xl border border-slate-100 bg-slate-50 p-5 text-center">
                                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                                     Total Bimbingan
                                 </p>
-
                                 <p className="mt-2 text-4xl font-bold text-slate-900">
-                                    {
-                                        statistik.totalBimbingan
-                                    }
+                                    {statistik.totalBimbingan}
                                 </p>
-
                                 <p className="mt-1 text-xs text-slate-500">
                                     seluruh TA
                                 </p>
                             </div>
-
+                            <div className="rounded-xl border border-slate-100 bg-slate-50 p-5 text-center">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Total Menguji
+                                </p>
+                                <p className="mt-2 text-4xl font-bold text-violet-600">
+                                    {statistik.totalMenguji}
+                                </p>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    sebagai penguji TA
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -434,271 +583,222 @@ export default function StatistikDosenPage() {
                     CHART + SUMMARY
                 ================================== */}
 
-                <section className="mb-8 grid gap-6 lg:grid-cols-2">
-
-                    {/* CHART */}
-
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-
-                        <div className="mb-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
+                        <div>
                             <h2 className="text-lg font-bold text-slate-900">
-                                Statistik Bimbingan per Tahun
+                                Statistik Bimbingan, Penguji &amp; PI per Tahun
                             </h2>
-
                             <p className="mt-1 text-sm text-slate-500">
-                                Jumlah Tugas Akhir yang
-                                dibimbing berdasarkan
-                                tahun masuk.
+                                Perbandingan jumlah TA yang dibimbing, diuji, dan laporan PI per tahun.
                             </p>
                         </div>
 
-                        {statistik.statistikPerTahun.length ===
-                        0 ? (
-                            <div className="flex h-64 items-center justify-center">
-                                <p className="text-sm text-slate-400">
-                                    Belum ada data bimbingan.
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="flex h-64 items-end gap-4 overflow-visible px-2 pb-8 pt-16">
-                                {statistik.statistikPerTahun.map((item) => {
-                                    const totalTahun = statistik.statistikPerTahun.reduce(
-                                        (sum, i) => sum + i.jumlah,
-                                        0
-                                    );
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={startYear}
+                                onChange={(e) => setStartYear(Number(e.target.value))}
+                                className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700"
+                            >
+                                {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
+                            </select>
+                            <span className="text-xs text-slate-400">sampai</span>
+                            <select
+                                value={endYear}
+                                onChange={(e) => setEndYear(Number(e.target.value))}
+                                className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700"
+                            >
+                                {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="mb-4 flex items-center gap-5 text-xs">
+                        <div className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                            <span className="font-medium text-slate-600">Dibimbing</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
+                            <span className="font-medium text-slate-600">Diuji</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                            <span className="font-medium text-slate-600">PLI</span>
+                        </div>
+                    </div>
 
-                                    const percentage =
-                                        totalTahun > 0
-                                            ? Math.round((item.jumlah / totalTahun) * 100)
-                                            : 0;
+                    {gabunganPerTahun.length === 0 ? (
+                        <div className="flex h-64 items-center justify-center">
+                            <p className="text-sm text-slate-400">
+                                Belum ada data pada rentang tahun ini.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex h-80 items-end gap-4 overflow-x-auto overflow-y-visible px-2 pb-8 pt-16">
+                            {gabunganPerTahun.map((item) => {
+                                const heightDibimbing = Math.max(
+                                    (item.jumlahDibimbing / maxGabungan) * 160,
+                                    item.jumlahDibimbing > 0 ? 12 : 0
+                                );
+                                const heightDiuji = Math.max(
+                                    (item.jumlahDiuji / maxGabungan) * 160,
+                                    item.jumlahDiuji > 0 ? 12 : 0
+                                );
+                                const heightPi = Math.max(
+                                    (item.jumlahPi / maxGabungan) * 160,
+                                    item.jumlahPi > 0 ? 12 : 0
+                                );
 
-                                    const height = Math.max(
-                                        (item.jumlah / maxJumlah) * 160,
-                                        12
-                                    );
+                                return (
+                                    <div
+                                        key={item.tahun}
+                                        className="group relative flex min-w-[70px] flex-1 flex-col items-center justify-end overflow-visible"
+                                    >
+                                        <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs opacity-0 shadow-lg transition group-hover:opacity-100">
+                                            <p className="font-semibold text-slate-800">
+                                                Tahun {item.tahun}
+                                            </p>
+                                            <p className="mt-0.5 font-bold text-blue-600">
+                                                {item.jumlahDibimbing} TA Dibimbing
+                                            </p>
+                                            <p className="font-bold text-violet-600">
+                                                {item.jumlahDiuji} TA Diuji
+                                            </p>
+                                            <p className="font-bold text-emerald-600">
+                                                {item.jumlahPi} PLI
+                                            </p>
+                                            <div className="absolute left-1/2 top-full h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-white" />
+                                        </div>
 
-                                    return (
-                                        <div
-                                            key={item.tahun}
-                                            className="group relative flex min-w-[55px] flex-1 flex-col items-center justify-end overflow-visible"
-                                        >
-                                            <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs opacity-0 shadow-lg transition group-hover:opacity-100">
-                                                <p className="font-semibold text-slate-800">
-                                                    Tahun {item.tahun}
-                                                </p>
-                                                <p className="mt-0.5 font-bold text-blue-600">
-                                                    {item.jumlah} TA{" "}
-                                                    <span className="font-medium text-slate-500">
-                                                        ({percentage}%)
-                                                    </span>
-                                                </p>
-                                                <div className="absolute left-1/2 top-full h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-white" />
+                                        <div className="flex items-end gap-1.5">
+                                            <div className="flex flex-col items-center">
+                                                <span className="mb-1 text-xs font-bold text-slate-600">
+                                                    {item.jumlahDibimbing}
+                                                </span>
+                                                <div
+                                                    className="w-6 cursor-pointer rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
+                                                    style={{ height: `${heightDibimbing}px` }}
+                                                />
                                             </div>
 
-                                            <span className="mb-2 text-xs font-bold text-slate-600">
-                                                {item.jumlah}
-                                            </span>
+                                            <div className="flex flex-col items-center">
+                                                <span className="mb-1 text-xs font-bold text-slate-600">
+                                                    {item.jumlahDiuji}
+                                                </span>
+                                                <div
+                                                    className="w-6 cursor-pointer rounded-t-lg bg-violet-500 transition hover:bg-violet-600"
+                                                    style={{ height: `${heightDiuji}px` }}
+                                                />
+                                            </div>
 
-                                            <div
-                                                className="w-10 cursor-pointer rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
-                                                style={{
-                                                    height: `${height}px`,
-                                                }}
-                                            />
+                                            <div className="flex flex-col items-center">
+                                                <span className="mb-1 text-xs font-bold text-slate-600">
+                                                    {item.jumlahPi}
+                                                </span>
+                                                <div
+                                                    className="w-6 cursor-pointer rounded-t-lg bg-emerald-500 transition hover:bg-emerald-600"
+                                                    style={{ height: `${heightPi}px` }}
+                                                />
+                                            </div>
+                                        </div>
 
-                                            <span className="mt-3 text-xs font-medium text-slate-500">
-                                                {item.tahun}
+                                        <span className="mt-3 text-xs font-medium text-slate-500">
+                                            {item.tahun}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* PROGRAM STUDY */}
+
+                <div className="mt-8 grid gap-6 lg:grid-cols-3">
+                    {renderProgramStudyDonut(
+                        "TA Dibimbing per Program Studi",
+                        "Sebaran Tugas Akhir yang pernah dibimbing.",
+                        programStudyData,
+                        totalProgramStudy
+                    )}
+                    {renderProgramStudyDonut(
+                        "TA Diuji per Program Studi",
+                        "Sebaran Tugas Akhir yang pernah diuji.",
+                        programStudyPengujiData,
+                        totalProgramStudyPenguji
+                    )}
+                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="mb-6">
+                        <h2 className="text-lg font-bold text-slate-900">
+                            Laporan PI per Tahun
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-500">
+                            Distribusi jumlah laporan Praktik Industri berdasarkan tahun mulai.
+                        </p>
+                    </div>
+
+                    {laporanPiData.length === 0 ? (
+                        <div className="flex h-56 items-center justify-center">
+                            <p className="text-sm text-slate-400">Belum ada data laporan PI.</p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center gap-5">
+                            <div className="relative h-56 w-full max-w-[240px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={laporanPiData}
+                                            dataKey="jumlah"
+                                            nameKey="tahun"
+                                            innerRadius={55}
+                                            outerRadius={85}
+                                            paddingAngle={laporanPiData.length > 1 ? 3 : 0}
+                                        >
+                                            {laporanPiData.map((laporan, index) => (
+                                                <Cell
+                                                    key={laporan.tahun}
+                                                    fill={PROGRAM_COLORS[index % PROGRAM_COLORS.length]}
+                                                    stroke="#fff"
+                                                    strokeWidth={2}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            content={<LaporanPiTooltip total={totalLaporanPi} />}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                    <p className="text-2xl font-bold text-slate-900">{totalLaporanPi}</p>
+                                    <p className="text-xs text-slate-400">Total PI</p>
+                                </div>
+                            </div>
+
+                            <div className="w-full max-w-[280px] space-y-3">
+                                {laporanPiData.map((laporan, index) => {
+                                    const percentage = Math.round((laporan.jumlah / totalLaporanPi) * 100);
+
+                                    return (
+                                        <div key={laporan.tahun} className="flex items-center justify-between gap-3 text-sm">
+                                            <div className="flex items-center gap-2">
+                                                <span
+                                                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                                    style={{ backgroundColor: PROGRAM_COLORS[index % PROGRAM_COLORS.length] }}
+                                                />
+                                                <span className="font-medium text-slate-700">{laporan.tahun}</span>
+                                            </div>
+                                            <span className="font-semibold text-slate-600">
+                                                {laporan.jumlah} · {percentage}%
                                             </span>
                                         </div>
                                     );
                                 })}
                             </div>
-                        )}
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="mb-6">
-                            <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PI</h2>
-                            <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai laporan.</p>
                         </div>
-
-                        {statistik.laporanPiPerTahun.every((item) => item.jumlah === 0) ? (
-                            <div className="flex h-64 items-center justify-center">
-                                <p className="text-sm text-slate-400">Belum ada data laporan PI.</p>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center gap-6 sm:flex-row">
-                                <div className="h-56 w-full sm:w-1/2">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0)}
-                                                dataKey="jumlah"
-                                                nameKey="tahun"
-                                                innerRadius={55}
-                                                outerRadius={85}
-                                                paddingAngle={statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0).length > 1 ? 3 : 0}
-                                            >
-                                                {statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0).map((item, index) => (
-                                                    <Cell
-                                                        key={item.tahun}
-                                                        fill={PROGRAM_COLORS[index % PROGRAM_COLORS.length]}
-                                                        stroke="#fff"
-                                                        strokeWidth={2}
-                                                    />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip
-                                                content={
-                                                    <LaporanPiTooltip
-                                                        total={statistik.laporanPiPerTahun.reduce((sum, item) => sum + item.jumlah, 0)}
-                                                    />
-                                                }
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-
-                                <div className="w-full space-y-3 sm:w-1/2">
-                                    {statistik.laporanPiPerTahun.filter((item) => item.jumlah > 0).map((item, index) => {
-                                        const totalLaporanPi = statistik.laporanPiPerTahun.reduce((sum, value) => sum + value.jumlah, 0);
-                                        const percentage = totalLaporanPi > 0 ? Math.round((item.jumlah / totalLaporanPi) * 100) : 0;
-                                        return (
-                                            <div key={item.tahun} className="flex items-center justify-between gap-3 text-sm">
-                                                <div className="flex min-w-0 items-center gap-2">
-                                                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: PROGRAM_COLORS[index % PROGRAM_COLORS.length] }} />
-                                                    <span className="font-medium text-slate-700">{item.tahun}</span>
-                                                </div>
-                                                <span className="shrink-0 font-semibold text-slate-600">{item.jumlah} · {percentage}%</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* PROGRAM STUDY */}
-
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-
-                        <div className="mb-6">
-                            <h2 className="text-lg font-bold text-slate-900">
-                                Ringkasan Program Studi
-                            </h2>
-
-                            <p className="mt-1 text-sm text-slate-500">
-                                Sebaran mahasiswa yang
-                                pernah dibimbing.
-                            </p>
-                        </div>
-
-                        {statistik
-                            .statistikPerProgramStudy
-                            .length === 0 ? (
-                            <div className="flex h-64 items-center justify-center">
-                                <p className="text-sm text-slate-400">
-                                    Belum ada data.
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="space-y-5">
-
-                                {statistik.statistikPerProgramStudy.length === 0 ? (
-                                    <div className="flex h-64 items-center justify-center">
-                                        <p className="text-sm text-slate-400">Belum ada data.</p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center gap-6 sm:flex-row">
-                                        {/* DONUT CHART */}
-                                        <div className="h-56 w-full sm:w-1/2">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <PieChart>
-                                                    <Pie
-                                                        data={statistik.statistikPerProgramStudy}
-                                                        dataKey="jumlah"
-                                                        nameKey="name"
-                                                        innerRadius={55}
-                                                        outerRadius={85}
-                                                        paddingAngle={3}
-                                                    >
-                                                        {statistik.statistikPerProgramStudy.map(
-                                                            (_, index) => (
-                                                                <Cell
-                                                                    key={index}
-                                                                    fill={
-                                                                        PROGRAM_COLORS[
-                                                                            index % PROGRAM_COLORS.length
-                                                                        ]
-                                                                    }
-                                                                    stroke="#fff"
-                                                                    strokeWidth={2}
-                                                                />
-                                                            )
-                                                        )}
-                                                    </Pie>
-                                                    <Tooltip
-                                                        content={
-                                                            <ProgramStudyTooltip
-                                                                total={statistik.totalBimbingan}
-                                                            />
-                                                        }
-                                                    />
-                                                </PieChart>
-                                            </ResponsiveContainer>
-                                        </div>
-
-                                        {/* LEGEND */}
-                                        <div className="w-full space-y-3 sm:w-1/2">
-                                            {statistik.statistikPerProgramStudy.map((program, index) => {
-                                                const percentage =
-                                                    statistik.totalBimbingan > 0
-                                                        ? Math.round(
-                                                            (program.jumlah /
-                                                                statistik.totalBimbingan) *
-                                                                100
-                                                        )
-                                                        : 0;
-
-                                                return (
-                                                    <div
-                                                        key={program.id}
-                                                        className="flex items-center justify-between gap-3 text-sm"
-                                                    >
-                                                        <div className="flex min-w-0 items-center gap-2">
-                                                            <span
-                                                                className="h-2.5 w-2.5 shrink-0 rounded-full"
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        PROGRAM_COLORS[
-                                                                            index % PROGRAM_COLORS.length
-                                                                        ],
-                                                                }}
-                                                            />
-                                                            <div className="min-w-0">
-                                                                <p className="truncate font-medium text-slate-700">
-                                                                    {program.name}
-                                                                </p>
-                                                                <p className="text-xs text-slate-400">
-                                                                    {program.degree}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <span className="shrink-0 font-semibold text-slate-600">
-                                                            {program.jumlah} · {percentage}%
-                                                        </span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-
-                            </div>
-                        )}
-                    </div>
+                    )}
                 </section>
+                </div>
 
                 {/* ==================================
                     DAFTAR TA

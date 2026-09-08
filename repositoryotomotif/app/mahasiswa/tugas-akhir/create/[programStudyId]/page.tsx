@@ -142,6 +142,10 @@ export default function CreateTugasAkhirPage({
 
         const mahasiswaValid = mahasiswas.every((m) => m.name.trim() && m.nim.trim());
         const abstractWordCount = countWords(abstract);
+        if (abstractWordCount > 350) {
+                setError(`Abstract maksimal 350 kata, (saat ini ${abstractWordCount} kata)`);
+                return;
+            }
         if (!mahasiswaValid || !tahunMasuk || !judul.trim() || !pembimbingId || !programStudyId ||selectedSDGs.length === 0)    {
             setError("Semua data Tugas Akhir harus di isi, minimal satu SDGS harus dipilih");
             return;
@@ -157,13 +161,10 @@ export default function CreateTugasAkhirPage({
 
             formData.append("tahunMasuk", tahunMasuk);
             formData.append("judul", judul.trim());
-            if (abstract.trim()) {
-                formData.append("abstract", abstract.trim());
-            }
-            if (abstractWordCount > 350) {
-                setError(`Abstract maksimal 350 kata, (saat ini ${abstractWordCount} kata)`);
-                return;
-            }
+            // if (abstract.trim()) {
+            //     formData.append("abstract", abstract.trim());
+            // }
+            
             if (mataKuliahRelevan.trim()) {
                 formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
             }
@@ -365,10 +366,10 @@ export default function CreateTugasAkhirPage({
                                 value={abstract}
                                 onChange={(e) => setAbstract(e.target.value)}
                                 rows={8}
-                                className={`w-full rounded-lg border border-black px-4 py-3 text-sm outline-none transition focus:ring-2 ${
+                                className={`w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-2 ${
                                     countWords(abstract) > 350
                                         ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                                        : "border-black focus:border-blue-500 focus:ring-blue-500/10"
+                                        : "border-slate-200 focus:border-blue-500 focus:ring-blue-500/10"
                                 }`}
                                 placeholder="Tuliskan ringkasan singkat penelitian Tugas Akhir..."
                             />
@@ -512,7 +513,7 @@ export default function CreateTugasAkhirPage({
                                 const role = index === 0 ? "Ketua" : index === 1 ? "Sekretaris" : "Anggota";
                                 const selectedOtherPengujiIds = pengujiIds.filter((_, currentIndex) => currentIndex !== index);
                                 return (
-                                    <div key={role} className="mb-3 last:mb-0">
+                                    <div key={index} className="mb-3 last:mb-0">
                                         <label htmlFor={`penguji-${index}`} className="mb-2 block text-sm font-medium">
                                             {role}
                                         </label>

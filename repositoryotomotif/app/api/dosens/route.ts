@@ -9,9 +9,26 @@ export async function GET() {
         const dosens = await prisma.dosen.findMany({
             orderBy: {
                 createdAt:"desc",
+            }, include: {
+                _count : {
+                    select: {
+                        pembimbingTa: true,
+                        pembimbing2Ta: true,
+                        pengujiTa: true,
+                        pembimbingPi:true
+                    }
+                }
             }
         });
-        return NextResponse.json(dosens);
+        const result = dosens.map((d) => ({
+            id: d.id,
+            name: d.name,
+            totalBimbinganTa: d._count.pembimbingTa + d._count.pembimbing2Ta,
+            totalPenguji: d._count.pengujiTa,
+            totalPembimbingPi: d._count.pembimbingPi
+        }));
+
+        return NextResponse.json(result);
     } catch (error) {
         console.error("GET DOSENS ERROR", error);
         return NextResponse.json(

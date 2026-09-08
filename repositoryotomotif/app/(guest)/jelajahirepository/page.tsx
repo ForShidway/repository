@@ -217,7 +217,7 @@ export default function KatalogTugasAkhirPage() {
 
         
 
-         <div className="sticky top-0 z-30 mb-6 rounded-2xl border border-black bg-white/95 p-3 backdrop-blur">
+         <div className="sticky top-0 z-30 mb-6 rounded-2xl border border-slate-300 bg-white/95 p-3 backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row">
                 <div className="relative flex-1">
                     <svg
@@ -311,28 +311,10 @@ export default function KatalogTugasAkhirPage() {
 
         </div>
 
-        <div className="mb-6 flex items-center gap-4 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-white px-6 py-5">
-    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-    </div>
-    <div>
-        <p className="text-sm font-semibold text-blue-700">
-            Menampilkan {paged.length} hasil
-        </p>
-        <p className="text-sm text-slate-500">
-            dari {filtered.length} dokumen repository
-        </p>
-    </div>
-</div>
-
+  
         <div className="flex flex-col lg:flex-row gap-8 items-start ">
           <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-8">
-            <div className="rounded-2xl border border-black-300 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
               
               <div className="mb-5 flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Filter Data</span>
@@ -346,7 +328,7 @@ export default function KatalogTugasAkhirPage() {
                   <option value="">-- Jenis Tugas --</option>
                   <option value="TUGAS AKHIR">Tugas Akhir</option>
                   <option value="ARTIKEL JURNAL">Artikel Jurnal</option>
-                  <option value="LAPORAN PI"></option>
+                  <option value="LAPORAN PI">Laporan PI</option>
                 </select>
               </div>
 
@@ -399,8 +381,29 @@ export default function KatalogTugasAkhirPage() {
           </aside>
 
           {/* MAIN CONTENT (Grid Cards) */}
-          <div className="flex-1 min-w-0">
+
+
           
+          <div className="flex-1 min-w-0">
+            <div className="mb-6 flex items-center gap-4 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-white px-6 py-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+              </div>
+              <div>
+                  <p className="text-sm font-semibold text-blue-700">
+                      Menampilkan {paged.length} hasil
+                  </p>
+                  <p className="text-sm text-slate-500">
+                      dari {filtered.length} dokumen repository
+                  </p>
+              </div>
+            </div>
+
             {/* Grid Cards (Gaya MahasiswaPage) */}
             {!error && paged.length === 0 ? (
               <div className="rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
@@ -421,8 +424,10 @@ export default function KatalogTugasAkhirPage() {
                   >
                     {view === "grid" ? (
                       <div className="h-full rounded-2xl border border-slate-300 bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-slate-400 hover:shadow-lg flex flex-col">
-                        <div className="mb-4 flex items-start justify-between gap-2">
-                          <div className="flex flex-wrap gap-2">
+                        <div className="mb-4 flex items-start gap-4">
+                            <ItemIcon jenis={item.jenis} />
+                            <div className="flex flex-1 items-start justify-between gap-2">
+                                <div className="flex flex-wrap gap-2">
                             <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${item.jenis === "TUGAS AKHIR" ? "bg-blue-50 text-blue-700" : item.jenis === "ARTIKEL JURNAL" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"}`}>
                               {item.jenis}
                             </span>
@@ -437,6 +442,8 @@ export default function KatalogTugasAkhirPage() {
                             →
                           </span>
                         </div>
+                        </div>
+
                         <h2 className="mb-3 text-lg font-bold leading-tight text-slate-900 line-clamp-3">
                           {item.judul}
                         </h2>
@@ -474,7 +481,9 @@ export default function KatalogTugasAkhirPage() {
 
                       </div>
                     ) : (
-                      <div className='flex flex-col gap-1.5 rounded-xl border border-slate-300 bg-white px-5 py-4 shadow-sm transition-all hover:border-slate-400 hover:shadow-md'>
+                      <div className='flex gap-4 rounded-xl border border-slate-300 bg-white px-5 py-4 shadow-sm transition-all hover:border-slate-400 hover:shadow-md'>
+                        <ItemIcon jenis={item.jenis} />
+                        <div className="flex flex-1 flex-col gap-1.5 min-w-0">
                         <div className='flex items-center justify-between gap-2'>
                           <div className='flex items-center gap-2'>
                             <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${item.jenis === "TUGAS AKHIR" ? "bg-blue-50 text-blue-700" : item.jenis === "ARTIKEL JURNAL" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"}`}>
@@ -517,6 +526,7 @@ export default function KatalogTugasAkhirPage() {
                         <h2 className='text-sm font-bold text-slate-900'>
                           {item.judul}
                         </h2>
+                      </div>
                       </div>
                     )}
                   </div>
@@ -561,4 +571,33 @@ export default function KatalogTugasAkhirPage() {
       </div>
     </main>
   );
+}
+
+function ItemIcon({ jenis }: { jenis: string }) {
+    if (jenis === "TUGAS AKHIR") return (
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#eff6ff" }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
+        </div>
+    );
+    if (jenis === "ARTIKEL JURNAL") return (
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#f0fdf4" }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+        </div>
+    );
+    return (
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#fff7ed" }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+        </div>
+    );
 }

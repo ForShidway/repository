@@ -27,7 +27,7 @@ export async function GET(
                 }, { status: 404}
             );
         }
-        const currentYear =  new Date().getFullYear();
+        const currentYear = new Date().getFullYear();
         const totalBimbingan = await prisma.tugasAkhir.count({
             where: {
                 pembimbingId: dosenId,
@@ -43,9 +43,61 @@ export async function GET(
             by: ["tahunMasuk"],
             where: {
                 pembimbingId: dosenId,
-            }, _count: { id: true},
-            orderBy: { tahunMasuk: "asc"}
+            },
+            _count: { id: true },
+            orderBy: { tahunMasuk: "asc" },
         });
+
+        const pengujiRecords = await prisma.pengujiTugasAkhir.findMany({
+            where: { dosenId: dosenId },
+            include: {
+                tugasAkhir: {
+                    select: {
+                        tahunMasuk: true,
+                        programStudy: {
+                            select: { id: true, name: true, degree: true },
+                        },
+                    },
+                },
+            },
+        });
+
+        const pengujiPerTahunMap = new Map<number, number>();
+        for (const record of pengujiRecords) {
+            const tahun = record.tugasAkhir.tahunMasuk;
+            pengujiPerTahunMap.set(tahun, (pengujiPerTahunMap.get(tahun) ?? 0) + 1);
+        }
+
+        const pengujiPerTahun = Array.from(pengujiPerTahunMap.entries())
+            .map(([tahun, jumlah]) => ({ tahun, jumlah }))
+            .sort((a, b) => a.tahun - b.tahun);
+
+        const totalMenguji = pengujiRecords.length;
+
+        const pengujiPerProgramStudyMap = new Map<number, {
+            id: number;
+            name: string;
+            degree: string;
+            jumlah: number;
+        }>();
+
+        for (const record of pengujiRecords) {
+            const programStudy = record.tugasAkhir.programStudy;
+            if (!programStudy) continue;
+
+            const current = pengujiPerProgramStudyMap.get(programStudy.id);
+            pengujiPerProgramStudyMap.set(programStudy.id, {
+                id: programStudy.id,
+                name: programStudy.name,
+                degree: programStudy.degree,
+                jumlah: (current?.jumlah ?? 0) + 1,
+            });
+        }
+
+        const statistikPerProgramStudyPenguji = Array.from(
+            pengujiPerProgramStudyMap.values()
+        ).sort((a, b) => b.jumlah - a.jumlah);
+
         const tugasAkhir = await prisma.tugasAkhir.findMany({
             where : {
                 pembimbingId: dosenId,
@@ -126,7 +178,7 @@ export async function GET(
                 id: dosen.id,
                 name: dosen.name,
             }, statistik : {
-                currentYear, bimbinganTahunIni, totalBimbingan, statistikPerTahun, statistikPerProgramStudy, laporanPiPerTahun,
+                currentYear, bimbinganTahunIni, totalBimbingan, totalMenguji, statistikPerTahun, pengujiPerTahun, statistikPerProgramStudy, statistikPerProgramStudyPenguji, laporanPiPerTahun,
             }, tugasAkhir,
         });
     } catch (error) {

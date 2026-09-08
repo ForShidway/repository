@@ -19,6 +19,10 @@ export async function GET(){
                 programStudy: true,
                 mahasiswa : { orderBy: { urutan : "asc"}},
                 keywords: true,
+                penguji: {
+                    orderBy: { urutan: "asc" },
+                    include: { dosen: true },
+                }
             }
         })
         return NextResponse.json(tugasAkhir);
@@ -55,7 +59,7 @@ export async function POST(request: Request) {
             } catch (error) {
                 console.error("Mahasiswa error", error);
                 return NextResponse.json (
-                    { messagae: "Format data mahasiswa tidak valid"},
+                    { message: "Format data mahasiswa tidak valid"},
                     { status : 400}
 
                 )
@@ -64,13 +68,13 @@ export async function POST(request: Request) {
         if (mahasiswas.length === 0) {
             return NextResponse.json (
                 { message: "minimal harus ada satu mahasiswa"},
-                { status : 404}
+                { status : 400}
             )
         }
         if (mahasiswas.length > 3) {
             return NextResponse.json (
-                {  messagae : " jumlah maksimal jumlah mahasiswa untuk satu judu TA adalah 3" },
-                { status: 404}
+                {  message : " jumlah maksimal jumlah mahasiswa untuk satu judu TA adalah 3" },
+                { status: 400}
 
             )
         }
@@ -114,16 +118,14 @@ export async function POST(request: Request) {
         if (keywords.length > 5) {
             return NextResponse.json (
                 { message : "maksimal kata kunci yang dimaukkna adalah 5"},
-                { status : 404}
+                { status : 400}
             )
         }
 
 
         const keywordsUnik = Array.from(new Set(keywords));
-
         const tahunMasuk = Number(formData.get("tahunMasuk"));
         const judul = formData.get("judul")?.toString().trim();
-
         const mataKuliahRelevanRaw = formData.get("mataKuliahRelevan")?.toString().trim();
         const mataKuliahRelevan = mataKuliahRelevanRaw ? mataKuliahRelevanRaw : null;
         const ruanganIdRaw = formData.get("ruanganId");
@@ -295,7 +297,7 @@ export async function POST(request: Request) {
                 }
             })
 
-            if (!pembimbing) {
+            if (!pembimbing2) {
                 return NextResponse.json(
                     { message : "Data Pembimbing 2 tidak ditemukan"},
                     { status: 404}

@@ -278,28 +278,18 @@ export default function AdminDashboard() {
                     />
                 </section>
 
-                <section className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900">
-                                    Grafik Tugas Akhir
-                                </h2>
-                                <p className="mt-1 text-sm text-slate-500">
-                                    Jumlah Tugas Akhir per tahun
-                                </p>
-                            </div>
-                            <span className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
-                                Per Tahun
-                            </span>
-                        </div>
-                        <div className="mt-8">
-                            <YearChart 
-                                data={ data.tugasPerTahun }
-                            />
-                        </div>
-                    </div>
+                <StatistikDashboard
+                    programStudyOptions={data.distribusiProgramStudy.map((programStudy) => ({
+                        id: programStudy.id,
+                        name: programStudy.name,
+                        degree: programStudy.degree,
+                    }))}
+                />
 
+
+               
+                    
+                <div className="mt-8 grid gap-6 lg:grid-cols-3">
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">
@@ -314,7 +304,7 @@ export default function AdminDashboard() {
                                 <EmptyState text="Belum ada data program studi." />
                             </div>
                         ) : (
-                            <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="mt-6 flex flex-col items-center gap-5">
                                 <DonutChart
                                     data={data.distribusiProgramStudy.slice(0, 5)}
                                     total={data.summary.totalTugasAkhir}
@@ -326,33 +316,18 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </div>
-                </section>
-
-                <section className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900">Grafik Artikel Jurnal</h2>
-                                <p className="mt-1 text-sm text-slate-500">Jumlah artikel jurnal per tahun</p>
-                            </div>
-                            <span className="rounded-lg bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-700">Per Tahun</span>
-                        </div>
-                        <div className="mt-8">
-                            <YearChart data={data.artikelPerTahun} label="Artikel" color="bg-cyan-500" hoverColor="group-hover:bg-cyan-600" />
-                        </div>
-                    </div>
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">Distribusi Artikel Jurnal</h2>
                             <p className="mt-1 text-sm text-slate-500">Berdasarkan program studi</p>
-                        </div>
+                    </div>
                         {data.distribusiArtikelProgramStudy.length === 0 ? (
                             <div className="mt-6">
                                 <EmptyState text="Belum ada data artikel jurnal." />
                             </div>
                         ) : (
-                            <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="mt-6 flex flex-col items-center gap-5">
                                 <DonutChart
                                     data={data.distribusiArtikelProgramStudy.slice(0, 5)}
                                     total={data.summary.totalArtikelJurnal}
@@ -366,21 +341,6 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </div>
-                </section>
-
-                <section className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900">Grafik Laporan PI</h2>
-                                <p className="mt-1 text-sm text-slate-500">Jumlah laporan PI per tahun mulai</p>
-                            </div>
-                            <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Per Tahun</span>
-                        </div>
-                        <div className="mt-8">
-                            <YearChart data={data.laporanPiPerTahun} label="Laporan PI" color="bg-emerald-500" hoverColor="group-hover:bg-emerald-600" />
-                        </div>
-                    </div>
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
@@ -392,7 +352,7 @@ export default function AdminDashboard() {
                                 <EmptyState text="Belum ada data laporan PI." />
                             </div>
                         ) : (
-                            <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="mt-6 flex flex-col items-center gap-5">
                                 <DonutChart
                                     data={data.laporanPiPerTahun
                                         .filter((item) => item.jumlah > 0)
@@ -420,15 +380,9 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </div>
-                </section>
-
-                <StatistikDashboard
-                    programStudyOptions={data.distribusiProgramStudy.map((programStudy) => ({
-                        id: programStudy.id,
-                        name: programStudy.name,
-                        degree: programStudy.degree,
-                    }))}
-                />
+                </div>
+                                    
+                
 
                 <section className="mt-6">
                     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -858,17 +812,17 @@ function DistributionLegend({
     total: number;
 }) {
     return (
-        <div className="w-full space-y-3 sm:w-auto">
+        <div className="w-full max-w-[260px] space-y-3">
             {data.map((item, index) => {
                 const percentage = total > 0 ? Math.round((item.jumlah / total) * 100) : 0;
                 return (
-                    <div key={item.id} className="flex items-center gap-2 text-sm">
+                    <div key={item.id} className="flex min-w-0 items-center gap-2 text-sm">
                         <span
                             className="h-2.5 w-2.5 shrink-0 rounded-full"
                             style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
                         />
-                        <span className="text-slate-600">{item.name}</span>
-                        <span className="ml-auto font-semibold text-slate-900">
+                        <span className="min-w-0 flex-1 truncate text-slate-600" title={item.name}>{item.name}</span>
+                        <span className="shrink-0 font-semibold text-slate-900">
                             {item.jumlah} ({percentage}%)
                         </span>
                     </div>
