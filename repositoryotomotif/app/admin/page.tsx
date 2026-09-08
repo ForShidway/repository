@@ -15,6 +15,7 @@ type Summary = {
     totalMahasiswa: number;
     totalArtikelJurnal: number;
     totalLaporanPi: number;
+    totalLaporanPlk: number;
 };
 
 type TugasPerTahun = {
@@ -81,6 +82,7 @@ type DashboardData = {
     tugasPerTahun: TugasPerTahun[];
     artikelPerTahun: TahunStat[];
     laporanPiPerTahun: TahunStat[];
+    laporanPlkPerTahun: TahunStat[];
     distribusiProgramStudy: ProgramStudyStat[];
     distribusiArtikelProgramStudy: ProgramStudyStat[];
     tugasAkhirTerbaru: TugasAkhirTerbaru[];
@@ -276,6 +278,13 @@ export default function AdminDashboard() {
                         description="Artikel Tersedia"
                         iconClass="bg-cyan-50 text-cyan-600"
                     />
+                    <StatCard
+                        icon={<Globe2 className="h-5 w-5" />}
+                        label="PLK"
+                        value={data.summary.totalLaporanPlk}
+                        description="Laporan tersedia"
+                        iconClass="bg-amber-50 text-amber-600"
+                    />
                 </section>
 
                 <StatistikDashboard
@@ -289,7 +298,7 @@ export default function AdminDashboard() {
 
                
                     
-                <div className="mt-8 grid gap-6 lg:grid-cols-3">
+                <div className="mt-8 grid gap-6 lg:grid-cols-4">
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">
@@ -376,6 +385,45 @@ export default function AdminDashboard() {
                                             jumlah: item.jumlah,
                                         }))}
                                     total={data.summary.totalLaporanPi}
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div>
+                            <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PLK</h2>
+                            <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai</p>
+                        </div>
+                        {data.laporanPlkPerTahun.every((item) => item.jumlah === 0) ? (
+                            <div className="mt-6">
+                                <EmptyState text="Belum ada data laporan PLK." />
+                            </div>
+                        ) : (
+                            <div className="mt-6 flex flex-col items-center gap-5">
+                                <DonutChart
+                                    data={data.laporanPlkPerTahun
+                                        .filter((item) => item.jumlah > 0)
+                                        .map((item) => ({
+                                            id: item.tahun,
+                                            name: String(item.tahun),
+                                            degree: "Tahun mulai",
+                                            jumlah: item.jumlah,
+                                        }))}
+                                    total={data.summary.totalLaporanPlk}
+                                    itemLabel="Laporan PLK"
+                                    totalLabel="Total Laporan PLK"
+                                />
+                                <DistributionLegend
+                                    data={data.laporanPlkPerTahun
+                                        .filter((item) => item.jumlah > 0)
+                                        .map((item) => ({
+                                            id: item.tahun,
+                                            name: String(item.tahun),
+                                            degree: "Tahun mulai",
+                                            jumlah: item.jumlah,
+                                        }))}
+                                    total={data.summary.totalLaporanPlk}
                                 />
                             </div>
                         )}
@@ -816,13 +864,15 @@ function DistributionLegend({
             {data.map((item, index) => {
                 const percentage = total > 0 ? Math.round((item.jumlah / total) * 100) : 0;
                 return (
-                    <div key={item.id} className="flex min-w-0 items-center gap-2 text-sm">
+                    <div key={item.id} className="flex items-center gap-2 text-sm">
                         <span
                             className="h-2.5 w-2.5 shrink-0 rounded-full"
                             style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
                         />
-                        <span className="min-w-0 flex-1 truncate text-slate-600" title={item.name}>{item.name}</span>
-                        <span className="shrink-0 font-semibold text-slate-900">
+                        <span className="min-w-0 flex-1 break-words whitespace-normal leading-relaxed text-slate-600" title={item.name}>
+                            {item.name}
+                        </span>
+                        <span className="shrink-0 whitespace-nowrap font-semibold text-slate-900">
                             {item.jumlah} ({percentage}%)
                         </span>
                     </div>

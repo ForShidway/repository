@@ -9,32 +9,32 @@ type RouteContext = {
 export async function GET(request: Request, context: RouteContext) {
     try {
         const { id } = await context.params;
-        const laporanPiId = Number(id);
+        const laporanPlkId = Number(id);
 
-        if (Number.isNaN(laporanPiId)) {
+        if (Number.isNaN(laporanPlkId)) {
             return NextResponse.json(
-                { message: "ID laporan PLI tidak valid" },
+                { message: "ID laporan PKL tidak valid" },
                 { status: 400 }
             );
         }
 
-        const laporanPi = await prisma.laporanPi.findUnique({
-            where: { id: laporanPiId },
+        const laporanPlk = await prisma.laporanPLK.findUnique({
+            where: { id: laporanPlkId },
             include: { dosenPembimbing: true },
         });
 
-        if (!laporanPi) {
+        if (!laporanPlk) {
             return NextResponse.json(
                 { message: "Laporan PKL tidak ditemukan" },
                 { status: 404 }
             );
         }
 
-        return NextResponse.json(laporanPi);
+        return NextResponse.json(laporanPlk);
     } catch (error) {
-        console.error("Get Laporan PI Detail Error", error);
+        console.error("Get Laporan PLK Detail Error", error);
         return NextResponse.json(
-            { message: "Gagal mengambil data laporan PI" },
+            { message: "Gagal mengambil data laporan PIK" },
             { status: 500 }
         );
     }
@@ -46,41 +46,41 @@ export async function DELETE(request: Request, context: RouteContext) {
 
         if (!session || session.role !== "ADMIN") {
             return NextResponse.json(
-                { message: "Akses ditolak. Hanya Admin yang dapat menghapus laporan PI." },
+                { message: "Akses ditolak. Hanya Admin yang dapat menghapus laporan PLK." },
                 { status: 403 }
             );
         }
 
         const { id } = await context.params;
-        const laporanPiId = Number(id);
+        const laporanPlkId = Number(id);
 
-        if (Number.isNaN(laporanPiId)) {
+        if (Number.isNaN(laporanPlkId)) {
             return NextResponse.json(
                 { message: "ID laporan PI tidak valid" },
                 { status: 400 }
             );
         }
 
-        const existing = await prisma.laporanPi.findUnique({
-            where: { id: laporanPiId },
+        const existing = await prisma.laporanPLK.findUnique({
+            where: { id: laporanPlkId },
         });
 
         if (!existing) {
             return NextResponse.json(
-                { message: "Laporan PI tidak ditemukan" },
+                { message: "Laporan PLK tidak ditemukan" },
                 { status: 404 }
             );
         }
 
-        await prisma.laporanPi.delete({
-            where: { id: laporanPiId },
+        await prisma.laporanPLK.delete({
+            where: { id: laporanPlkId },
         });
 
-        return NextResponse.json({ message: "Laporan PI berhasil dihapus" });
+        return NextResponse.json({ message: "Laporan PLK berhasil dihapus" });
     } catch (error) {
         console.error("Delete Laporan PI Error", error);
         return NextResponse.json(
-            { message: "Gagal menghapus laporan PI" },
+            { message: "Gagal menghapus laporan PLK" },
             { status: 500 }
         );
     }

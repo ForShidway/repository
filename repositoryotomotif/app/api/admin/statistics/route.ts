@@ -15,6 +15,7 @@ export async function GET() {
             totalProgramStudy,
             totalArtikelJurnal,
             totalLaporanPi,
+            totalLaporanPlk,
         ] = await Promise.all([
             prisma.tugasAkhir.count(),
             prisma.dosen.count(),
@@ -32,6 +33,7 @@ export async function GET() {
             }),
             prisma.artikelJurnal.count(),
             prisma.laporanPi.count(),
+            prisma.laporanPLK.count(),
         ]);
 
         //tugas akhir
@@ -179,6 +181,21 @@ export async function GET() {
             };
         });
 
+        const laporanPlkSemua = await prisma.laporanPLK.findMany({
+            select: {
+                tanggalMulai: true,
+            },
+        });
+        const laporanPlkPerTahun = Array.from({ length: 6 }, (_, index) => {
+            const tahun = startYear + index;
+            return {
+                tahun,
+                jumlah: laporanPlkSemua.filter(
+                    (laporan) => laporan.tanggalMulai.getFullYear() === tahun
+                ).length,
+            };
+        });
+
         return NextResponse.json({
             summary: {
                 totalTugasAkhir,
@@ -190,10 +207,12 @@ export async function GET() {
                 totalMahasiswa: totalTugasAkhir,
                 totalArtikelJurnal,
                 totalLaporanPi,
+                totalLaporanPlk,
             },
             tugasPerTahun,
             artikelPerTahun,
             laporanPiPerTahun,
+            laporanPlkPerTahun,
             distribusiProgramStudy,
             distribusiArtikelProgramStudy: distribusiProgramStudy1,
             tugasAkhirTerbaru,

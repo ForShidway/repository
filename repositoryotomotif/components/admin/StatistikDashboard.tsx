@@ -14,6 +14,7 @@ type StatistikResponse = {
         tugasAkhir: number[];
         artikelJurnal: number[];
         laporanPi: number[];
+        laporanPlk: number[];
     };
     availableYears?: { min: number; max: number };
     lpiTotal?: number;
@@ -24,6 +25,7 @@ const SERIES = [
     { key: "tugasAkhir", label: "Tugas Akhir", bar: "bg-blue-500", dot: "#3b82f6" },
     { key: "artikelJurnal", label: "Artikel Jurnal", bar: "bg-cyan-500", dot: "#06b6d4" },
     { key: "laporanPi", label: "Laporan PI", bar: "bg-emerald-500", dot: "#10b981" },
+    { key: "laporanPlk", label: "Laporan PLK", bar: "bg-amber-500", dot: "#f59e0b" },
 ] as const;
 
 export default function StatistikDashboard({

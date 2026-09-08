@@ -38,6 +38,8 @@ model Dosen {
   dosenPa TugasAkhir[] @relation("DosenPA")
   pengujiTa PengujiTugasAkhir[]
   pembimbingPi LaporanPi[] @relation("PembimbingPI")
+  pembimbingPlk LaporanPLK[] @relation("PembimbingPLK")
+
 }
 
 model ProgramStudy {
@@ -191,6 +193,27 @@ model LaporanPi {
 
   dosenPembimbingId Int
   dosenPembimbing Dosen @relation("PembimbingPI", fields: [dosenPembimbingId], references: [id])
+
+  tanggalMulai DateTime
+  tanggalSelesai DateTime
+
+  fileName String
+  filePath String
+  fileSize Int
+  fileType String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LaporanPLK {
+  id Int @id @default(autoincrement())
+  name String
+  nim String
+  namaInstansi String
+  
+  dosenPembimbingId Int
+  dosenPembimbing Dosen @relation("PembimbingPLK", fields:[dosenPembimbingId], references: [id])
 
   tanggalMulai DateTime
   tanggalSelesai DateTime

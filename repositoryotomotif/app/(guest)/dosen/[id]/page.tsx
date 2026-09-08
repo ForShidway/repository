@@ -71,10 +71,70 @@ type StatistikResponse = {
         statistikPerProgramStudy: StatistikProgramStudy[];
         statistikPerProgramStudyPenguji: StatistikProgramStudy[];
         laporanPiPerTahun: StatistikTahun[];
+        laporanPlkPerTahun: StatistikTahun[];
     };
 
     tugasAkhir: TugasAkhir[];
+    pengujiTugasAkhir?: Array<{
+        tahunMasuk: number;
+        programStudy: ProgramStudy | null;
+    }>;
 };
+
+function ProgramStudyTooltip({
+    active,
+    payload,
+    total,
+}: {
+    active?: boolean;
+    payload?: Array<{ payload: StatistikProgramStudy }>;
+    total: number;
+}) {
+    if (!active || !payload || !payload.length) return null;
+
+    const data = payload[0].payload;
+    const percentage =
+        total > 0 ? Math.round((data.jumlah / total) * 100) : 0;
+
+    return (
+        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-lg">
+            <p className="font-semibold text-slate-800">{data.name}</p>
+            <p className="text-slate-400">{data.degree}</p>
+            <p className="mt-1 text-sm font-bold text-blue-600">
+                {data.jumlah} TA{" "}
+                <span className="font-medium text-slate-500">
+                    ({percentage}%)
+                </span>
+            </p>
+        </div>
+    );
+}
+
+function LaporanTooltip({
+    active,
+    payload,
+    total,
+    label,
+}: {
+    active?: boolean;
+    payload?: Array<{ payload: StatistikLaporanPi }>;
+    total: number;
+    label: string;
+}) {
+    if (!active || !payload || !payload.length) return null;
+
+    const data = payload[0].payload;
+    const percentage = total > 0 ? Math.round((data.jumlah / total) * 100) : 0;
+
+    return (
+        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-lg">
+            <p className="font-semibold text-slate-800">Tahun {data.tahun}</p>
+            <p className="mt-1 text-sm font-bold text-emerald-600">
+                {data.jumlah} {label} <span className="font-medium text-slate-500">({percentage}%)</span>
+            </p>
+        </div>
+    );
+}
 
 export default function StatistikDosenPage() {
     const params = useParams();
@@ -106,58 +166,7 @@ export default function StatistikDosenPage() {
         "#14b8a6",
     ];
 
-    function ProgramStudyTooltip({
-        active,
-        payload,
-        total,
-    }: {
-        active?: boolean;
-        payload?: any[];
-        total: number;
-    }) {
-        if (!active || !payload || !payload.length) return null;
 
-        const data = payload[0].payload as StatistikProgramStudy;
-        const percentage =
-            total > 0 ? Math.round((data.jumlah / total) * 100) : 0;
-
-        return (
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-lg">
-                <p className="font-semibold text-slate-800">{data.name}</p>
-                <p className="text-slate-400">{data.degree}</p>
-                <p className="mt-1 text-sm font-bold text-blue-600">
-                    {data.jumlah} TA{" "}
-                    <span className="font-medium text-slate-500">
-                        ({percentage}%)
-                    </span>
-                </p>
-            </div>
-        );
-    }
-
-    function LaporanPiTooltip({
-        active,
-        payload,
-        total,
-    }: {
-        active?: boolean;
-        payload?: any[];
-        total: number;
-    }) {
-        if (!active || !payload || !payload.length) return null;
-
-        const data = payload[0].payload as StatistikLaporanPi;
-        const percentage = total > 0 ? Math.round((data.jumlah / total) * 100) : 0;
-
-        return (
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-lg">
-                <p className="font-semibold text-slate-800">Tahun {data.tahun}</p>
-                <p className="mt-1 text-sm font-bold text-emerald-600">
-                    {data.jumlah} laporan PI <span className="font-medium text-slate-500">({percentage}%)</span>
-                </p>
-            </div>
-        );
-    }
 
     // ==========================================
     // FETCH DATA
@@ -212,11 +221,15 @@ export default function StatistikDosenPage() {
         const keyword =
             search.toLowerCase().trim();
 
+        const filteredByYear = data.tugasAkhir.filter((ta) => {
+            return ta.tahunMasuk >= startYear && ta.tahunMasuk <= endYear;
+        });
+
         if (!keyword) {
-            return data.tugasAkhir;
+            return filteredByYear;
         }
 
-        return data.tugasAkhir.filter((ta) => {
+        return filteredByYear.filter((ta) => {
             return (
                 ta.judul
                     .toLowerCase()
@@ -239,7 +252,7 @@ export default function StatistikDosenPage() {
                     .includes(keyword)
             );
         });
-    }, [data, search]);
+    }, [data, startYear, endYear, search]);
 
     // ==========================================
     // PAGINATION
@@ -259,15 +272,14 @@ export default function StatistikDosenPage() {
             page * ITEMS_PER_PAGE
         );
 
-    useEffect(() => {
-        setPage(1);
-    }, [search]);
+
 
     const availableYears = useMemo(() => {
         const allYears = [
             ...(data?.statistik.statistikPerTahun.map((item) => item.tahun) ?? []),
             ...(data?.statistik.pengujiPerTahun.map((item) => item.tahun) ?? []),
             ...(data?.statistik.laporanPiPerTahun.map((item) => item.tahun) ?? []),
+            ...(data?.statistik.laporanPlkPerTahun.map((item) => item.tahun) ?? []),
         ];
         if (allYears.length === 0) return { min: currentYear, max: currentYear };
         return { min: Math.min(...allYears), max: Math.max(...allYears) };
@@ -278,6 +290,7 @@ export default function StatistikDosenPage() {
             ...(data?.statistik.statistikPerTahun.map((item) => item.tahun) ?? []),
             ...(data?.statistik.pengujiPerTahun.map((item) => item.tahun) ?? []),
             ...(data?.statistik.laporanPiPerTahun.map((item) => item.tahun) ?? []),
+            ...(data?.statistik.laporanPlkPerTahun.map((item) => item.tahun) ?? []),
         ]);
 
         return Array.from(tahunSet)
@@ -287,14 +300,98 @@ export default function StatistikDosenPage() {
                 const dibimbing = data?.statistik.statistikPerTahun.find((item) => item.tahun === tahun);
                 const diuji = data?.statistik.pengujiPerTahun.find((item) => item.tahun === tahun);
                 const laporanPi = data?.statistik.laporanPiPerTahun.find((item) => item.tahun === tahun);
+                const laporanPlk = data?.statistik.laporanPlkPerTahun.find((item) => item.tahun === tahun);
                 return {
                     tahun,
                     jumlahDibimbing: dibimbing?.jumlah ?? 0,
                     jumlahDiuji: diuji?.jumlah ?? 0,
                     jumlahPi: laporanPi?.jumlah ?? 0,
+                    jumlahPlk: laporanPlk?.jumlah ?? 0,
                 };
             });
     }, [data, startYear, endYear]);
+
+    const filteredPengujiTugasAkhir = useMemo(() => {
+        if (!data?.pengujiTugasAkhir) return [];
+
+        return data.pengujiTugasAkhir.filter(
+            (item) => item.tahunMasuk >= startYear && item.tahunMasuk <= endYear
+        );
+    }, [data, startYear, endYear]);
+
+    const programStudyData = useMemo(() => {
+        if (!data) return [];
+
+        const map = new Map<number, { id: number; name: string; degree: string; jumlah: number }>();
+
+        filteredTugasAkhir.forEach((ta) => {
+            if (!ta.programStudy) return;
+
+            const existing = map.get(ta.programStudy.id);
+            map.set(ta.programStudy.id, {
+                id: ta.programStudy.id,
+                name: ta.programStudy.name,
+                degree: ta.programStudy.degree,
+                jumlah: (existing?.jumlah ?? 0) + 1,
+            });
+        });
+
+        return Array.from(map.values()).sort((a, b) => b.jumlah - a.jumlah);
+    }, [filteredTugasAkhir, data]);
+
+    const totalProgramStudy = programStudyData.reduce(
+        (total, program) => total + program.jumlah,
+        0
+    );
+
+    const programStudyPengujiData = useMemo(() => {
+        const map = new Map<number, { id: number; name: string; degree: string; jumlah: number }>();
+
+        filteredPengujiTugasAkhir.forEach((entry) => {
+            if (!entry.programStudy) return;
+
+            const existing = map.get(entry.programStudy.id);
+            map.set(entry.programStudy.id, {
+                id: entry.programStudy.id,
+                name: entry.programStudy.name,
+                degree: entry.programStudy.degree,
+                jumlah: (existing?.jumlah ?? 0) + 1,
+            });
+        });
+
+        return Array.from(map.values()).sort((a, b) => b.jumlah - a.jumlah);
+    }, [filteredPengujiTugasAkhir]);
+
+    const totalProgramStudyPenguji = programStudyPengujiData.reduce(
+        (total, program) => total + program.jumlah,
+        0
+    );
+
+    const laporanPiData = useMemo(() => {
+        if (!data) return [];
+
+        return data.statistik.laporanPiPerTahun.filter(
+            (laporan) => laporan.tahun >= startYear && laporan.tahun <= endYear && laporan.jumlah > 0
+        );
+    }, [data, startYear, endYear]);
+
+    const totalLaporanPi = laporanPiData.reduce(
+        (total, laporan) => total + laporan.jumlah,
+        0
+    );
+
+    const laporanPlkData = useMemo(() => {
+        if (!data) return [];
+
+        return data.statistik.laporanPlkPerTahun.filter(
+            (laporan) => laporan.tahun >= startYear && laporan.tahun <= endYear && laporan.jumlah > 0
+        );
+    }, [data, startYear, endYear]);
+
+    const totalLaporanPlk = laporanPlkData.reduce(
+        (total, laporan) => total + laporan.jumlah,
+        0
+    );
 
     // ==========================================
     // LOADING
@@ -342,11 +439,7 @@ export default function StatistikDosenPage() {
         );
     }
 
-    const {
-        dosen,
-        statistik,
-        tugasAkhir,
-    } = data;
+    const { dosen, statistik } = data;
 
     const yearOptions = Array.from(
         { length: availableYears.max - availableYears.min + 1 },
@@ -354,38 +447,8 @@ export default function StatistikDosenPage() {
     );
 
     const maxGabungan = Math.max(
-        ...gabunganPerTahun.map((item) => Math.max(item.jumlahDibimbing, item.jumlahDiuji, item.jumlahPi)),
+        ...gabunganPerTahun.map((item) => Math.max(item.jumlahDibimbing, item.jumlahDiuji, item.jumlahPi, item.jumlahPlk)),
         1
-    );
-
-    const maxJumlah =
-        Math.max(
-            ...statistik.statistikPerTahun.map(
-                (item) => item.jumlah
-            ),
-            1
-        );
-
-    const programStudyData = statistik.statistikPerProgramStudy.filter(
-        (program) => program.jumlah > 0
-    );
-    const totalProgramStudy = programStudyData.reduce(
-        (total, program) => total + program.jumlah,
-        0
-    );
-    const programStudyPengujiData = statistik.statistikPerProgramStudyPenguji.filter(
-        (program) => program.jumlah > 0
-    );
-    const totalProgramStudyPenguji = programStudyPengujiData.reduce(
-        (total, program) => total + program.jumlah,
-        0
-    );
-    const laporanPiData = statistik.laporanPiPerTahun.filter(
-        (laporan) => laporan.jumlah > 0
-    );
-    const totalLaporanPi = laporanPiData.reduce(
-        (total, laporan) => total + laporan.jumlah,
-        0
     );
 
     const renderProgramStudyDonut = (
@@ -397,7 +460,7 @@ export default function StatistikDosenPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-6">
                 <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-                <p className="mt-1 text-sm text-slate-500">{description}</p>
+                <p className="mt-1 whitespace-normal break-words text-sm leading-relaxed text-slate-500">{description}</p>
             </div>
 
             {programs.length === 0 ? (
@@ -440,15 +503,17 @@ export default function StatistikDosenPage() {
                             const percentage = Math.round((program.jumlah / total) * 100);
 
                             return (
-                                <div key={program.id} className="flex items-center justify-between gap-3 text-sm">
-                                    <div className="flex min-w-0 items-center gap-2">
+                                <div key={program.id} className="flex items-center gap-3 text-sm">
+                                    <div className="flex min-w-0 flex-1 items-center gap-2">
                                         <span
                                             className="h-2.5 w-2.5 shrink-0 rounded-full"
                                             style={{ backgroundColor: PROGRAM_COLORS[index % PROGRAM_COLORS.length] }}
                                         />
-                                        <span className="truncate font-medium text-slate-700">{program.name}</span>
+                                        <span className="min-w-0 break-words font-medium leading-relaxed text-slate-700">
+                                            {program.name}
+                                        </span>
                                     </div>
-                                    <span className="shrink-0 font-semibold text-slate-600">
+                                    <span className="shrink-0 whitespace-nowrap font-semibold text-slate-600">
                                         {program.jumlah} · {percentage}%
                                     </span>
                                 </div>
@@ -587,10 +652,10 @@ export default function StatistikDosenPage() {
                     <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">
-                                Statistik Bimbingan, Penguji &amp; PI per Tahun
+                                Statistik Gabungan per Tahun
                             </h2>
                             <p className="mt-1 text-sm text-slate-500">
-                                Perbandingan jumlah TA yang dibimbing, diuji, dan laporan PI per tahun.
+                                Perbandingan jumlah TA dibimbing, TA diuji, laporan PI, dan laporan PLK per tahun.
                             </p>
                         </div>
 
@@ -612,20 +677,12 @@ export default function StatistikDosenPage() {
                             </select>
                         </div>
                     </div>
-                    
-                    <div className="mb-4 flex items-center gap-5 text-xs">
-                        <div className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                            <span className="font-medium text-slate-600">Dibimbing</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
-                            <span className="font-medium text-slate-600">Diuji</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                            <span className="font-medium text-slate-600">PLI</span>
-                        </div>
+
+                    <div className="mb-4 flex flex-wrap gap-4 text-xs font-medium text-slate-500">
+                        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500" />Dibimbing</span>
+                        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-violet-500" />Diuji</span>
+                        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-emerald-500" />PI</span>
+                        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-amber-500" />PLK</span>
                     </div>
 
                     {gabunganPerTahun.length === 0 ? (
@@ -635,87 +692,64 @@ export default function StatistikDosenPage() {
                             </p>
                         </div>
                     ) : (
-                        <div className="flex h-80 items-end gap-4 overflow-x-auto overflow-y-visible px-2 pb-8 pt-16">
-                            {gabunganPerTahun.map((item) => {
-                                const heightDibimbing = Math.max(
-                                    (item.jumlahDibimbing / maxGabungan) * 160,
-                                    item.jumlahDibimbing > 0 ? 12 : 0
-                                );
-                                const heightDiuji = Math.max(
-                                    (item.jumlahDiuji / maxGabungan) * 160,
-                                    item.jumlahDiuji > 0 ? 12 : 0
-                                );
-                                const heightPi = Math.max(
-                                    (item.jumlahPi / maxGabungan) * 160,
-                                    item.jumlahPi > 0 ? 12 : 0
-                                );
-
-                                return (
-                                    <div
-                                        key={item.tahun}
-                                        className="group relative flex min-w-[70px] flex-1 flex-col items-center justify-end overflow-visible"
-                                    >
-                                        <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs opacity-0 shadow-lg transition group-hover:opacity-100">
-                                            <p className="font-semibold text-slate-800">
-                                                Tahun {item.tahun}
-                                            </p>
-                                            <p className="mt-0.5 font-bold text-blue-600">
-                                                {item.jumlahDibimbing} TA Dibimbing
-                                            </p>
-                                            <p className="font-bold text-violet-600">
-                                                {item.jumlahDiuji} TA Diuji
-                                            </p>
-                                            <p className="font-bold text-emerald-600">
-                                                {item.jumlahPi} PLI
-                                            </p>
-                                            <div className="absolute left-1/2 top-full h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-white" />
-                                        </div>
-
-                                        <div className="flex items-end gap-1.5">
-                                            <div className="flex flex-col items-center">
-                                                <span className="mb-1 text-xs font-bold text-slate-600">
-                                                    {item.jumlahDibimbing}
-                                                </span>
-                                                <div
-                                                    className="w-6 cursor-pointer rounded-t-lg bg-blue-500 transition hover:bg-blue-600"
-                                                    style={{ height: `${heightDibimbing}px` }}
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-col items-center">
-                                                <span className="mb-1 text-xs font-bold text-slate-600">
-                                                    {item.jumlahDiuji}
-                                                </span>
-                                                <div
-                                                    className="w-6 cursor-pointer rounded-t-lg bg-violet-500 transition hover:bg-violet-600"
-                                                    style={{ height: `${heightDiuji}px` }}
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-col items-center">
-                                                <span className="mb-1 text-xs font-bold text-slate-600">
-                                                    {item.jumlahPi}
-                                                </span>
-                                                <div
-                                                    className="w-6 cursor-pointer rounded-t-lg bg-emerald-500 transition hover:bg-emerald-600"
-                                                    style={{ height: `${heightPi}px` }}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <span className="mt-3 text-xs font-medium text-slate-500">
-                                            {item.tahun}
-                                        </span>
+                        <div className="mt-8 flex h-64 items-end gap-4 overflow-x-auto border-b border-l border-slate-200 px-2 pb-0">
+                            {gabunganPerTahun.map((item, index) => (
+                                <div key={item.tahun} className="group relative flex h-full min-w-[64px] flex-1 flex-col items-center justify-end">
+                                    <div className="pointer-events-none absolute left-1/2 top-2 z-20 w-48 -translate-x-1/2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+                                        <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                                            Tahun {item.tahun}
+                                        </p>
+                                        <p className="flex items-center gap-1.5">
+                                            <span className="h-2 w-2 rounded-sm bg-blue-500" />
+                                            Dibimbing: {item.jumlahDibimbing}
+                                        </p>
+                                        <p className="flex items-center gap-1.5">
+                                            <span className="h-2 w-2 rounded-sm bg-violet-500" />
+                                            Diuji: {item.jumlahDiuji}
+                                        </p>
+                                        <p className="flex items-center gap-1.5">
+                                            <span className="h-2 w-2 rounded-sm bg-emerald-500" />
+                                            PI: {item.jumlahPi}
+                                        </p>
+                                        <p className="flex items-center gap-1.5">
+                                            <span className="h-2 w-2 rounded-sm bg-amber-500" />
+                                            PLK: {item.jumlahPlk}
+                                        </p>
+                                        <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-slate-900" />
                                     </div>
-                                );
-                            })}
+
+                                    <div className="flex h-full w-full items-end justify-center gap-1">
+                                        {[
+                                            { key: 'dibimbing', label: 'Dibimbing', value: item.jumlahDibimbing, color: 'bg-blue-500' },
+                                            { key: 'diuji', label: 'Diuji', value: item.jumlahDiuji, color: 'bg-violet-500' },
+                                            { key: 'pi', label: 'PI', value: item.jumlahPi, color: 'bg-emerald-500' },
+                                            { key: 'plk', label: 'PLK', value: item.jumlahPlk, color: 'bg-amber-500' },
+                                        ].map((series) => {
+                                            const height = Math.max((series.value / maxGabungan) * 100, series.value > 0 ? 6 : 0);
+
+                                            return (
+                                                <div key={series.key} className="flex h-full w-4 items-end">
+                                                    <div
+                                                        className={`${series.color} w-full rounded-t-sm transition-all duration-300`}
+                                                        style={{ height: `${height}%` }}
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <div className="mt-3 line-clamp-1 max-w-[100px] text-center text-[11px] font-medium text-slate-400">
+                                        {item.tahun}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
 
                 {/* PROGRAM STUDY */}
 
-                <div className="mt-8 grid gap-6 lg:grid-cols-3">
+                <div className="mt-8 grid gap-6 lg:grid-cols-4">
                     {renderProgramStudyDonut(
                         "TA Dibimbing per Program Studi",
                         "Sebaran Tugas Akhir yang pernah dibimbing.",
@@ -733,7 +767,7 @@ export default function StatistikDosenPage() {
                         <h2 className="text-lg font-bold text-slate-900">
                             Laporan PI per Tahun
                         </h2>
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 whitespace-normal break-words text-sm leading-relaxed text-slate-500">
                             Distribusi jumlah laporan Praktik Industri berdasarkan tahun mulai.
                         </p>
                     </div>
@@ -765,7 +799,7 @@ export default function StatistikDosenPage() {
                                             ))}
                                         </Pie>
                                         <Tooltip
-                                            content={<LaporanPiTooltip total={totalLaporanPi} />}
+                                            content={<LaporanTooltip total={totalLaporanPi} label="laporan PI" />}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -798,13 +832,84 @@ export default function StatistikDosenPage() {
                         </div>
                     )}
                 </section>
+
+                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="mb-6">
+                        <h2 className="text-lg font-bold text-slate-900">
+                            Laporan PLK per Tahun
+                        </h2>
+                        <p className="mt-1 whitespace-normal break-words text-sm leading-relaxed text-slate-500">
+                            Distribusi jumlah laporan Praktik Lapangan Kerja berdasarkan tahun mulai.
+                        </p>
+                    </div>
+
+                    {laporanPlkData.length === 0 ? (
+                        <div className="flex h-56 items-center justify-center">
+                            <p className="text-sm text-slate-400">Belum ada data laporan PLK.</p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center gap-5">
+                            <div className="relative h-56 w-full max-w-[240px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={laporanPlkData}
+                                            dataKey="jumlah"
+                                            nameKey="tahun"
+                                            innerRadius={55}
+                                            outerRadius={85}
+                                            paddingAngle={laporanPlkData.length > 1 ? 3 : 0}
+                                        >
+                                            {laporanPlkData.map((laporan, index) => (
+                                                <Cell
+                                                    key={laporan.tahun}
+                                                    fill={PROGRAM_COLORS[index % PROGRAM_COLORS.length]}
+                                                    stroke="#fff"
+                                                    strokeWidth={2}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            content={<LaporanTooltip total={totalLaporanPlk} label="laporan PLK" />}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                    <p className="text-2xl font-bold text-slate-900">{totalLaporanPlk}</p>
+                                    <p className="text-xs text-slate-400">Total PLK</p>
+                                </div>
+                            </div>
+
+                            <div className="w-full max-w-[280px] space-y-3">
+                                {laporanPlkData.map((laporan, index) => {
+                                    const percentage = Math.round((laporan.jumlah / totalLaporanPlk) * 100);
+
+                                    return (
+                                        <div key={laporan.tahun} className="flex items-center justify-between gap-3 text-sm">
+                                            <div className="flex items-center gap-2">
+                                                <span
+                                                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                                    style={{ backgroundColor: PROGRAM_COLORS[index % PROGRAM_COLORS.length] }}
+                                                />
+                                                <span className="font-medium text-slate-700">{laporan.tahun}</span>
+                                            </div>
+                                            <span className="font-semibold text-slate-600">
+                                                {laporan.jumlah} · {percentage}%
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </section>
                 </div>
 
                 {/* ==================================
                     DAFTAR TA
                 ================================== */}
 
-                <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <section className="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
 
                     {/* HEADER */}
 
@@ -828,11 +933,10 @@ export default function StatistikDosenPage() {
                                 <input
                                     type="text"
                                     value={search}
-                                    onChange={(e) =>
-                                        setSearch(
-                                            e.target.value
-                                        )
-                                    }
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setPage(1);
+                                    }}
                                     placeholder="Cari judul, nama, atau NIM..."
                                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-10 text-sm outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
                                 />

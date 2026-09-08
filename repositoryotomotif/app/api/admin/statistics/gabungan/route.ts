@@ -50,17 +50,19 @@ export async function GET(request: NextRequest) {
 }
 
 async function getRentangTahunTersedia() {
-    const [minTa, minAj, minLpi] = await Promise.all([
+    const [minTa, minAj, minLpi, minLplk] = await Promise.all([
         prisma.tugasAkhir.aggregate({ _min: { tahunMasuk: true } }),
         prisma.artikelJurnal.aggregate({ _min: { tahun: true } }),
         prisma.laporanPi.aggregate({ _min: { tanggalMulai: true } }),
+        prisma.laporanPLK.aggregate({ _min: { tanggalMulai: true } }),
     ]);
 
     const currentYear = new Date().getFullYear();
     const minYear = Math.min(
         minTa._min.tahunMasuk ?? currentYear,
         minAj._min.tahun ?? currentYear,
-        minLpi._min.tanggalMulai?.getFullYear() ?? currentYear
+        minLpi._min.tanggalMulai?.getFullYear() ?? currentYear,
+        minLplk._min.tanggalMulai?.getFullYear() ?? currentYear
     );
 
     return { min: minYear, max: currentYear };
@@ -77,7 +79,7 @@ async function getStatistikPerTahun(
     );
     const dateRange = getDateRange(startYear, endYear);
 
-    const [taGrouped, ajGrouped, lpiGrouped] = await Promise.all([
+    const [taGrouped, ajGrouped, lpiGrouped, lplkGrouped] = await Promise.all([
         prisma.tugasAkhir.groupBy({
             by: ["tahunMasuk"],
             where: {
@@ -99,15 +101,26 @@ async function getStatistikPerTahun(
             where: { tanggalMulai: dateRange },
             _count: { _all: true },
         }),
+        prisma.laporanPLK.groupBy({
+            by: ["tanggalMulai"],
+            where: { tanggalMulai: dateRange },
+            _count: { _all: true },
+        }),
     ]);
 
     const taMap = new Map(taGrouped.map((item) => [item.tahunMasuk, item._count._all]));
     const ajMap = new Map(ajGrouped.map((item) => [item.tahun, item._count._all]));
     const lpiMap = new Map<number, number>();
+    const lplkMap = new Map<number, number>();
 
     for (const item of lpiGrouped) {
         const year = item.tanggalMulai.getFullYear();
         lpiMap.set(year, (lpiMap.get(year) ?? 0) + item._count._all);
+    }
+
+    for (const item of lplkGrouped) {
+        const year = item.tanggalMulai.getFullYear();
+        lplkMap.set(year, (lplkMap.get(year) ?? 0) + item._count._all);
     }
 
     return {
@@ -116,8 +129,9 @@ async function getStatistikPerTahun(
             tugasAkhir: years.map((year) => taMap.get(year) ?? 0),
             artikelJurnal: years.map((year) => ajMap.get(year) ?? 0),
             laporanPi: years.map((year) => lpiMap.get(year) ?? 0),
+            laporanPlk: years.map((year) => lplkMap.get(year) ?? 0),
         },
-        catatan: "Laporan PI belum terhubung ke program studi pada skema saat ini.",
+        catatan: "Laporan PI dan PLK belum terhubung ke program studi pada skema saat ini.",
     };
 }
 
@@ -137,7 +151,7 @@ async function getStatistikPerProdi(
     const programStudyIds = prodiList.map((programStudy) => programStudy.id);
     const dateRange = getDateRange(startYear, endYear);
 
-    const [taGrouped, ajGrouped, lpiTotal] = await Promise.all([
+    const [taGrouped, ajGrouped, lpiTotal, lplkTotal] = await Promise.all([
         prisma.tugasAkhir.groupBy({
             by: ["ProgramStudyId"],
             where: {
@@ -155,6 +169,7 @@ async function getStatistikPerProdi(
             _count: { _all: true },
         }),
         prisma.laporanPi.count({ where: { tanggalMulai: dateRange } }),
+        prisma.laporanPLK.count({ where: { tanggalMulai: dateRange } }),
     ]);
 
     const taMap = new Map(taGrouped.map((item) => [item.ProgramStudyId, item._count._all]));
@@ -166,8 +181,10 @@ async function getStatistikPerProdi(
             tugasAkhir: prodiList.map((programStudy) => taMap.get(programStudy.id) ?? 0),
             artikelJurnal: prodiList.map((programStudy) => ajMap.get(programStudy.id) ?? 0),
             laporanPi: prodiList.map(() => 0),
+            laporanPlk: prodiList.map(() => 0),
         },
         lpiTotal,
-        catatan: "Laporan PI belum terhubung ke program studi pada skema saat ini, sehingga tidak ditampilkan per prodi.",
+        lplkTotal,
+        catatan: "Laporan PI dan PLK belum terhubung ke program studi pada skema saat ini, sehingga tidak ditampilkan per prodi.",
     };
 }

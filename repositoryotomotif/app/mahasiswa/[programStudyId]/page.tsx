@@ -32,6 +32,11 @@ const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
     label: "Laporan Pi",
     description: "Upload laporan praktik yang relevan dengan program studi.",
   },
+  {
+    id: "laporan-pelatihan-kependidikan",
+    label: "Laporan PLK",
+    description: "Upload laporan praktik yang relevan dengan program studi.",
+  },
 ];
 
 export default function MahasiswaProgramStudyFolderPage() {
@@ -76,6 +81,7 @@ export default function MahasiswaProgramStudyFolderPage() {
     switch (category.id) {
       case "artikel-jurnal": router.push(`/mahasiswa/artikel-jurnal/create/${programStudyId}`); break;
       case "laporan-pelatihan-industri": router.push(`/mahasiswa/laporan-pi/create/${programStudyId}`); break;
+      case "laporan-pelatihan-kependidikan" : router.push(`/mahasiswa/laporan-lpk/create/${programStudyId}`); break;
       case "tugas-akhir":
         default: router.push(`/mahasiswa/tugas-akhir/create/${programStudyId}?category=${encodeURIComponent(category.label)}`); break;
     }

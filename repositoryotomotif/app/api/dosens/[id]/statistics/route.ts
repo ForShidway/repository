@@ -173,13 +173,40 @@ export async function GET(
             []
         ).sort((a, b) => a.tahun - b.tahun);
 
+        const laporanPlk = await prisma.laporanPLK.findMany({
+            where: {
+                dosenPembimbingId: dosenId,
+            },
+            select: {
+                tanggalMulai: true,
+            },
+        });
+        const laporanPlkPerTahun = laporanPlk.reduce<{ tahun: number; jumlah: number }[]>(
+            (result, laporan) => {
+                const tahun = laporan.tanggalMulai.getFullYear();
+                const existing = result.find((item) => item.tahun === tahun);
+                if (existing) {
+                    existing.jumlah += 1;
+                } else {
+                    result.push({ tahun, jumlah: 1 });
+                }
+                return result;
+            },
+            []
+        ).sort((a, b) => a.tahun - b.tahun);
+
+        const pengujiTugasAkhir = pengujiRecords.map((record) => ({
+            tahunMasuk: record.tugasAkhir.tahunMasuk,
+            programStudy: record.tugasAkhir.programStudy,
+        }));
+
         return NextResponse.json ({
             dosen: {
                 id: dosen.id,
                 name: dosen.name,
             }, statistik : {
-                currentYear, bimbinganTahunIni, totalBimbingan, totalMenguji, statistikPerTahun, pengujiPerTahun, statistikPerProgramStudy, statistikPerProgramStudyPenguji, laporanPiPerTahun,
-            }, tugasAkhir,
+                currentYear, bimbinganTahunIni, totalBimbingan, totalMenguji, statistikPerTahun, pengujiPerTahun, statistikPerProgramStudy, statistikPerProgramStudyPenguji, laporanPiPerTahun, laporanPlkPerTahun,
+            }, tugasAkhir, pengujiTugasAkhir,
         });
     } catch (error) {
         console.error("Get Statistik Dosen Errord", error);
