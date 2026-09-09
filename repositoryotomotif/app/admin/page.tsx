@@ -201,8 +201,8 @@ export default function AdminDashboard() {
     };
 
     return (
-        <main className="min-h-screen bg-[#F4F9F9] px-4 py-10 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-7xl p-6 lg:p-8">
+        <main className="min-h-screen bg-[#f8fafc] px-4 py-10 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
 
                 <section className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div>
@@ -217,12 +217,12 @@ export default function AdminDashboard() {
                             aktivitas repository otomotif.
                         </p>
                     </div>
-                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                        <p className="text-xs text-slate-400">
+                    <div className="rounded-xl border border-slate-200 bg-white px-5 py-3.5 shadow-sm">
+                        <p className="text-xs font-semibold text-slate-400">
                             Tahun Akademik
                         </p>
 
-                        <p className="mt-1 text-sm font-semibold text-slate-800">
+                        <p className="mt-1 text-sm font-bold text-slate-800">
                             {new Date().getFullYear()}
                         </p>
                     </div>
@@ -235,6 +235,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalTugasAkhir}
                         description="Total terdaftar"
                         iconClass="bg-blue-50 text-blue-600"
+                        accent="border-l-4 border-blue-500"
                     />
                     <StatCard
                         icon={<GraduationCap className="h-5 w-5" />}
@@ -242,6 +243,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalDosen}
                         description="Total dosen"
                         iconClass="bg-emerald-50 text-emerald-600"
+                        accent="border-l-4 border-emerald-500"
                     />
                     <StatCard
                         icon={<Users className="h-5 w-5" />}
@@ -249,6 +251,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalMahasiswa}
                         description="Memiliki TA"
                         iconClass="bg-violet-50 text-violet-600"
+                        accent="border-l-4 border-violet-500"
                     />
                     <StatCard
                         icon={<Building2 className="h-5 w-5" />}
@@ -256,6 +259,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalRuangan}
                         description="Ruangan terdaftar"
                         iconClass="bg-orange-50 text-orange-600"
+                        accent="border-l-4 border-orange-500"
                     />
                     <StatCard
                         icon={<Globe2 className="h-5 w-5" />}
@@ -263,20 +267,23 @@ export default function AdminDashboard() {
                         value={data.summary.totalSDGs}
                         description="SDGs aktif"
                         iconClass="bg-cyan-50 text-cyan-600"
+                        accent="border-l-4 border-cyan-500"
                     />
                     <StatCard
                         icon={<Globe2 className="h-5 w-5" />}
                         label="Artikel Jurnal"
                         value={data.summary.totalArtikelJurnal}
                         description="Artikel Tersedia"
-                        iconClass="bg-cyan-50 text-cyan-600"
+                        iconClass="bg-indigo-50 text-indigo-600"
+                        accent="border-l-4 border-indigo-500"
                     />
                     <StatCard
                         icon={<Globe2 className="h-5 w-5" />}
                         label="LPI"
                         value={data.summary.totalLaporanPi}
-                        description="Artikel Tersedia"
-                        iconClass="bg-cyan-50 text-cyan-600"
+                        description="Laporan Tersedia"
+                        iconClass="bg-teal-50 text-teal-600"
+                        accent="border-l-4 border-teal-500"
                     />
                     <StatCard
                         icon={<Globe2 className="h-5 w-5" />}
@@ -284,6 +291,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalLaporanPlk}
                         description="Laporan tersedia"
                         iconClass="bg-amber-50 text-amber-600"
+                        accent="border-l-4 border-amber-500"
                     />
                 </section>
 
@@ -302,11 +310,8 @@ export default function AdminDashboard() {
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">
-                                Distribusi Berdasarkan Program Studi
+                                Distribusi Tugas Akhir
                             </h2>
-                            <p className="mt-1 text-sm text-slate-500">
-                                Top Program Studi
-                            </p>
                         </div>
                         {data.distribusiProgramStudy.length === 0 ? (
                             <div className="mt-6">
@@ -329,7 +334,7 @@ export default function AdminDashboard() {
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">Distribusi Artikel Jurnal</h2>
-                            <p className="mt-1 text-sm text-slate-500">Berdasarkan program studi</p>
+                            {/* <p className="mt-1 text-sm text-slate-500">Berdasarkan program studi</p> */}
                     </div>
                         {data.distribusiArtikelProgramStudy.length === 0 ? (
                             <div className="mt-6">
@@ -353,8 +358,8 @@ export default function AdminDashboard() {
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PI</h2>
-                            <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai</p>
+                            <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PLI</h2>
+                            {/* <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai</p> */}
                         </div>
                         {data.laporanPiPerTahun.every((item) => item.jumlah === 0) ? (
                             <div className="mt-6">
@@ -393,7 +398,7 @@ export default function AdminDashboard() {
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900">Distribusi Laporan PLK</h2>
-                            <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai</p>
+                            {/* <p className="mt-1 text-sm text-slate-500">Berdasarkan tahun mulai</p> */}
                         </div>
                         {data.laporanPlkPerTahun.every((item) => item.jumlah === 0) ? (
                             <div className="mt-6">
@@ -673,15 +678,17 @@ function StatCard({
     value,
     description,
     iconClass,
+    accent = "",
 }: {
     icon: ReactNode;
     label: string;
     value: number;
     description: string;
     iconClass: string;
+    accent?: string;
 }) {
     return (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div className={`overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${accent}`}>
             <div className="flex items-center gap-4">
                 <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${iconClass}`}>
                     {icon}
@@ -689,13 +696,12 @@ function StatCard({
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-2xl font-extrabold text-slate-900">
                             {value}
                         </p>
                        
                     </div>
-                     <p className="text-sm font-semibold text-slate-700"> {label}  </p>
-                    {/* <p className="mt-1 text-xs text-slate-400">  {description} </p> */}
+                     <p className="text-sm font-semibold text-slate-600"> {label}  </p>
                 </div>
             </div>
         </div>

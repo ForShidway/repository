@@ -189,11 +189,10 @@ export default function DosenPage() {
                             <button
                                 key={p}
                                 onClick={() => setPage(p)}
-                                className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all ${
-                                    page === p
+                                className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all ${page === p
                                         ? "bg-blue-600 text-white"
                                         : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                                }`}
+                                    }`}
                             >
                                 {p}
                             </button>

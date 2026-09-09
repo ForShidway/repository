@@ -70,18 +70,18 @@ export default function NavbarMahasiswa() {
     const initialLetter = displayName.charAt(0)?.toUpperCase() || "M";
 
     return (
-        <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
-            <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                <Link href="/mahasiswa" className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-100">
+        <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl shadow-sm shadow-slate-900/[0.04]">
+            <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <Link href="/mahasiswa" className="flex items-center gap-3 group">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-[#0B1F3A] text-sm font-extrabold text-white shadow-md shadow-blue-900/20 transition group-hover:shadow-lg">
                         RO
                     </div>
-                    <div className="leading-tight">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-700">
+                    <div className="leading-tight hidden sm:block">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-600">
                             Repository
                         </div>
-                        <div className="text-sm font-bold text-slate-800">
-                            Otomotif
+                        <div className="text-sm font-bold text-slate-900 -mt-0.5">
+                            Otomotif UNP
                         </div>
                     </div>
                 </Link>
@@ -90,9 +90,9 @@ export default function NavbarMahasiswa() {
                     <button
                         type="button"
                         onClick={() => setDropdownOpen((prev) => !prev)}
-                        className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 transition hover:border-blue-200 hover:bg-blue-50"
+                        className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 transition hover:border-blue-200 hover:bg-blue-50 shadow-sm"
                     >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-extrabold text-white">
                             {initialLetter}
                         </div>
                         <div className="hidden text-left sm:block">

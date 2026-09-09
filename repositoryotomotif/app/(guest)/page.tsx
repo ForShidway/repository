@@ -140,16 +140,6 @@ export default function GuestHomePage() {
         );
     }
 
-    if (error) {
-        return (
-            <main className="flex min-h-[calc(100vh-72px)] items-center justify-center px-6">
-                <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-5 text-center">
-                    <p className="font-semibold text-red-700">Gagal memuat data</p>
-                    <p className="mt-1 text-sm text-red-600">{error}</p>
-                </div>
-            </main>
-        );
-    }
 
     const periodeTersedia = "2021 - 2026";
     const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
@@ -161,7 +151,7 @@ export default function GuestHomePage() {
         {
             iconBg: "bg-blue-50",
             iconColor: "text-blue-800",
-            value: data?.statistics.totalTugasAkhir ?? 0,
+            value: data?.statistics?.totalTugasAkhir ?? 0,
             label: "Tugas Akhir",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -175,7 +165,7 @@ export default function GuestHomePage() {
         {
             iconBg: "bg-blue-50",
             iconColor: "text-blue-800",
-            value: data?.statistics.totalDosen ?? 0,
+            value: data?.statistics?.totalDosen ?? 0,
             label: "Dosen Pembimbing",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -189,7 +179,7 @@ export default function GuestHomePage() {
         {
             iconBg: "bg-blue-50",
             iconColor: "text-blue-800",
-            value: data?.statistics.totalSDGs ?? 0,
+            value: data?.statistics?.totalSDGs ?? 0,
             label: "SDGs",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -216,11 +206,16 @@ export default function GuestHomePage() {
 
     return (
         <main>
+            {error && (
+                <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs font-medium text-amber-700">
+                    Perhatian: Data statistik live belum dapat dimuat ({error}). Menampilkan data default.
+                </div>
+            )}
             {/* =========================================
                 HERO — navy gelap agar kontras & terasa lebih "teknik/profesional"
             ========================================= */}
             <section className="relative bg-gradient-to-br from-[#0B1F3A] to-[#132D52]">
-                <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-35 pt-14 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-32 lg:pt-16">
+                <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-36 pt-14 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-32 lg:pt-16">
 
                     <div>
                         <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white ring-1 ring-inset ring-white/15">

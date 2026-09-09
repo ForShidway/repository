@@ -156,34 +156,31 @@ export default function Sidebar() {
     };
 
     return (
-        <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-slate-200 bg-white">
+        <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-white/5 bg-[#0B1F3A]">
 
             {/* Logo */}
-            <div className="flex h-20 items-center border-b border-slate-100 px-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-                    </svg>
+            <div className="flex h-20 items-center border-b border-white/10 px-5">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-sm font-extrabold text-white shadow-lg shadow-blue-900/40">
+                    RO
                 </div>
                 <div className="ml-3">
-                    <h1 className="text-sm font-bold tracking-tight text-slate-900">
+                    <h1 className="text-sm font-bold tracking-tight text-white">
                         Repository Otomotif
                     </h1>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 text-xs text-blue-300/70">
                         Admin Panel
                     </p>
                 </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto px-4 py-5">
+            <nav className="flex-1 overflow-y-auto px-3 py-5">
                 {menuGroups.map((group) => (
                     <div key={group.title} className="mb-6">
-                        <p className="mb-2 px-3 text-[10px] font-bold tracking-[0.15em] text-slate-400">
+                        <p className="mb-2 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-500 uppercase">
                             {group.title}
                         </p>
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                             {group.items.map((item) => {
                                 const active =
                                     pathname === item.href ||
@@ -195,22 +192,22 @@ export default function Sidebar() {
                                         href={item.href}
                                         className={`
                                             group flex items-center rounded-xl px-3 py-2.5
-                                            text-sm font-medium transition-all duration-200
+                                            text-sm font-medium transition-all duration-150
                                             ${
                                                 active
-                                                    ? "bg-blue-50 text-blue-700 shadow-sm"
-                                                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                                    ? "bg-blue-600/20 text-white"
+                                                    : "text-slate-400 hover:bg-white/5 hover:text-white"
                                             }
                                         `}
                                     >
                                         <span
                                             className={`
-                                                flex h-9 w-9 items-center justify-center
-                                                rounded-lg transition
+                                                flex h-8 w-8 items-center justify-center
+                                                rounded-lg transition shrink-0
                                                 ${
                                                     active
-                                                        ? "bg-blue-600 text-white shadow-sm"
-                                                        : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
+                                                        ? "bg-blue-500 text-white shadow-md shadow-blue-900/40"
+                                                        : "text-slate-500 group-hover:text-slate-300"
                                                 }
                                             `}
                                         >
@@ -222,7 +219,7 @@ export default function Sidebar() {
                                         </span>
 
                                         {active && (
-                                            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                                            <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                                         )}
                                     </Link>
                                 );
@@ -233,14 +230,14 @@ export default function Sidebar() {
             </nav>
 
             {/* Admin Profile */}
-            <div className="border-t border-slate-100 p-4">
-                <div className="flex items-center rounded-xl bg-slate-50 p-3">
-                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
+            <div className="border-t border-white/10 p-4">
+                <div className="flex items-center rounded-xl bg-white/5 p-3">
+                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600/30 font-bold text-blue-300">
                         A
-                        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+                        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0B1F3A] bg-emerald-400" />
                     </div>
                     <div className="ml-3 min-w-0">
-                        <p className="truncate text-sm font-semibold text-slate-800">
+                        <p className="truncate text-sm font-semibold text-white">
                             Administrator
                         </p>
                         <p className="truncate text-xs text-slate-500">
@@ -251,7 +248,7 @@ export default function Sidebar() {
 
                 <button
                     type="button" onClick={handleLogout}
-                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-red-900/40 bg-red-900/20 px-3 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-900/30 hover:text-red-300"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
