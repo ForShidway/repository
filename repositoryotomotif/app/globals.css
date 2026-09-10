@@ -74,10 +74,63 @@ body {
 }
 
 body:has(.admin-layout) .site-header,
-body:has(.admin-layout) .site-footer { margin-left: 18rem; }
+body:has(.admin-layout) .site-footer { margin-left: var(--sidebar-width, 272px); transition: margin-left .3s cubic-bezier(.4,0,.2,1); }
 body:has(.admin-layout) .site-header-inner,
 body:has(.admin-layout) .site-footer-inner {
   width: min(1200px, calc(100% - 40px));
+}
+
+/* ============================================================
+   SIDEBAR TOOLTIP (collapsed mode)
+   ============================================================ */
+.sidebar-tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s ease;
+  z-index: 100;
+}
+.sidebar-tooltip-dark {
+  background: #1e293b;
+  color: #f1f5f9;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+.sidebar-tooltip-light {
+  background: #0f172a;
+  color: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+.sidebar-menu-item:hover .sidebar-tooltip {
+  opacity: 1;
+}
+
+/* ============================================================
+   SIDEBAR MOBILE OVERLAY
+   ============================================================ */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(2px);
+  animation: overlayFadeIn .2s ease both;
+}
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (max-width: 767px) {
+  body:has(.admin-layout) .site-header,
+  body:has(.admin-layout) .site-footer { margin-left: 0; }
 }
 
 .brand { display: flex; align-items: center; gap: 11px; color: var(--navy); text-decoration: none; }

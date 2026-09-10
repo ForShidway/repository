@@ -23,6 +23,7 @@ export default function LaporanPLKForm() {
 
     const [name, setName] = useState("");
     const [nim, setNim] = useState("");
+    const [judul, setJudul] = useState("");
     const [namaInstansi, setNamaInstansi] = useState("");
     const [dosenPembimbingId, setDosenPembimbingId] = useState("");
     const [dosens, setDosens] = useState<Dosen[]>([]);
@@ -75,6 +76,7 @@ export default function LaporanPLKForm() {
     const canSubmit =
         name.trim() &&
         nim.trim() &&
+        judul.trim() &&
         namaInstansi.trim() &&
         dosenPembimbingId &&
         tanggalMulai &&
@@ -103,6 +105,7 @@ export default function LaporanPLKForm() {
             const formData = new FormData();
             formData.append("name", name.trim());
             formData.append("nim", nim.trim());
+            formData.append("judul", judul.trim());
             formData.append("namaInstansi", namaInstansi.trim());
             formData.append("dosenPembimbingId", dosenPembimbingId);
             formData.append("tanggalMulai", tanggalMulai);
@@ -123,6 +126,7 @@ export default function LaporanPLKForm() {
             setSuccess(true);
             setName("");
             setNim("");
+            setJudul("");
             setNamaInstansi("");
             setDosenPembimbingId("");
             setTanggalMulai("");
@@ -177,6 +181,13 @@ export default function LaporanPLKForm() {
                                     className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                                 />
                             </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="judul" className="mb-2 block text-sm font-medium text-gray-700">
+                                Judul Laporan
+                            </label>
+                            <textarea name="" id="judul" value={judul} onChange={(e) => setJudul(e.target.value)} rows={3} placeholder="Laporan Pelatihan Industri di Bengkel Resmi" className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"/>
                         </div>
 
                         {/* NAMA INSTANSI */}

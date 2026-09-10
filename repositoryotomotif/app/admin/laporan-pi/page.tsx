@@ -7,6 +7,7 @@ type LaporanPi = {
     id: number;
     name: string;
     nim: string;
+    judul: string;
     namaInstansi: string;
     dosenPembimbing: {id: number, name:string}
 
@@ -17,6 +18,7 @@ export default function LaporanPIPage() {
     const [data, setData] = useState<LaporanPi[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    
 
     useEffect(() => {
         async function fetchData() {

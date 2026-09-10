@@ -9,6 +9,12 @@ type ProgramStudy = {
   degree: string;
 }
 
+type SDGs = {
+    id: number;
+    code : string;
+    title : string;
+}
+
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const MAX_ABSTRACT_WORDS = 350;
 const MAX_KEYWORDS = 10;
@@ -42,6 +48,16 @@ export default function ArtikelJurnalForm() {
   const [keywordInput, setKeywordInput] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordError, setKeywordError] = useState<string | null>(null);
+  const [sdgs, setSdgs] = useState<SDGs[]>([]);
+  const [selectedSDGs, setSelectedSDGs] = useState<number[]>([]);
+  const sortedSdgs = useMemo(() => {
+    return [...sdgs].sort((a, b) => {
+        const numA = parseInt(a.code.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.code.replace(/\D/g, '')) || 0;
+            return numA - numB;
+    });
+  }, [sdgs])
+
 
   const [programStudy, setProgramStudy] = useState<ProgramStudy | null>(null);
     const [loadingProgramStudy, setLoadingProgramStudy] = useState(Boolean(routeProgramStudyId));
@@ -49,13 +65,21 @@ export default function ArtikelJurnalForm() {
     useEffect(() => {
         async function fetchProgramStudy() {
             try {
-                const res = await fetch(`/api/program-studies/${routeProgramStudyId}`);
-                const data = await res.json();
-                if (res.ok) {
-                    setProgramStudy(data);
+                const [programStudyRes, sdgsRes] = await Promise.all([
+                    fetch(`/api/program-studies/${routeProgramStudyId}`),
+                    fetch("/api/sdgs"),
+                ]);
+                const programStudyData = await programStudyRes.json();
+                const sdgsData = await sdgsRes.json();
+
+                if (programStudyRes.ok) {
+                    setProgramStudy(programStudyData);
+                }
+                if (sdgsRes.ok) {
+                    setSdgs(sdgsData);
                 }
             } catch (error) {
-                console.error("Gagal mengambil program studi", error);
+                console.error("Gagal mengambil data", error);
             } finally {
                 setLoadingProgramStudy(false);
             }
@@ -65,6 +89,16 @@ export default function ArtikelJurnalForm() {
             fetchProgramStudy();
         }
     }, [routeProgramStudyId]);
+
+
+    function handleSDGsChange(sdgId: number) {
+        setSelectedSDGs((current) => {
+            if (current.includes(sdgId)) {
+                return current.filter((id) => id !== sdgId);
+            }
+            return [...current, sdgId];
+        });
+    }
 
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -153,6 +187,7 @@ export default function ArtikelJurnalForm() {
     !abstractOverLimit &&
     tahun.trim() &&
     routeProgramStudyId &&
+    selectedSDGs.length > 0 &&
     programStudy &&
     !fileError &&
     submit.status !== "submitting";
@@ -169,6 +204,7 @@ export default function ArtikelJurnalForm() {
     formData.append("tahun", tahun.trim());
     formData.append("judul", judul.trim());
     formData.append("programStudyId", routeProgramStudyId);
+    formData.append("sdgsId", JSON.stringify(selectedSDGs));
     formData.append("abstract", abstract.trim());
     keywords.forEach((k) => formData.append("keywords", k));
     if (file) formData.append("file", file);
@@ -374,6 +410,50 @@ export default function ArtikelJurnalForm() {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                                SDGs yang Relevan
+                            </label>
+                            <div className="rounded-lg border border-slate-200 p-4">
+                                {sortedSdgs.length === 0 ? (
+                                    <p className="text-sm text-slate-500">Belum ada data SDGs</p>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                        {sortedSdgs.map((sdg) => {
+                                            const isSelected = selectedSDGs.includes(sdg.id);
+                                            return (
+                                                <label
+                                                    key={sdg.id}
+                                                    className={`flex cursor-pointer items-start gap-2 rounded-lg border p-3 text-sm transition ${
+                                                        isSelected
+                                                            ? "border-blue-300 bg-blue-50"
+                                                            : "border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/40"
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={() => handleSDGsChange(sdg.id)}
+                                                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <div className="min-w-0">
+                                                        <p className="font-semibold text-slate-800">{sdg.code}</p>
+                                                        <p className="line-clamp-2 text-xs text-slate-500">{sdg.title}</p>
+                                                    </div>
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {selectedSDGs.length > 0 && (
+                                    <p className="mt-3 text-sm font-medium text-blue-600">
+                                        {selectedSDGs.length} SDGs dipilih
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
                         {/* BERKAS */}

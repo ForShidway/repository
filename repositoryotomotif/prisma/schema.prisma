@@ -134,6 +134,7 @@ model SDGs  {
   updatedAt DateTime @updatedAt
 
   tugasAkhirs TugasAkhir[]
+  artikelJurnal ArtikelJurnal[]
 }
 
 model Mahasiswa {
@@ -175,6 +176,8 @@ model ArtikelJurnal {
   fileType String?
 
   keywords JurnalKeyword[]
+  sdgs SDGs[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -195,6 +198,7 @@ model LaporanPi {
   id Int @id @default(autoincrement())
   name String
   nim String
+  judul String @db.Text
   namaInstansi String
 
   dosenPembimbingId Int
@@ -216,6 +220,7 @@ model LaporanPLK {
   id Int @id @default(autoincrement())
   name String
   nim String
+  judul String @db.Text
   namaInstansi String
   
   dosenPembimbingId Int

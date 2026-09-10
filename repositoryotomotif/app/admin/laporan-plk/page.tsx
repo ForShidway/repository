@@ -7,6 +7,7 @@ type LaporanPlk = {
     id: number;
     name: string;
     nim: string;
+    judul: string;
     namaInstansi: string;
     dosenPembimbing: {id: number, name:string}
 

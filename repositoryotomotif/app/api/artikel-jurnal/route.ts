@@ -106,6 +106,73 @@ export async function POST(request: Request) {
             );
         }
 
+        const sdgsRaw = formData.get("sdgsId");
+        let sdgsId: number[] = [];
+        if (sdgsRaw) {
+            try {
+                const parsed = JSON.parse(
+                    sdgsRaw.toString()
+                );
+                if (Array.isArray(parsed)) {
+                    sdgsId = parsed
+                        .map((id) => Number(id))
+                        .filter((id) => !Number.isNaN(id));
+
+                }
+                } catch (error) {
+                    console.error(
+                        "SDGs parsing error:",
+                        error
+                    );
+                    return NextResponse.json(
+                        {
+                            message: "Format SDGs tidak valid",
+                        },
+                        {
+                            status: 400,
+                        }
+                    );
+                }
+            }
+
+            if (sdgsId.length === 0) {
+                return NextResponse.json(
+                    {
+                        message:
+                            "Minimal satu SDGs harus dipilih",
+                    },
+                    {
+                        status: 400,
+                    }
+                );
+            }
+            
+            const sdgs =
+                await prisma.sDGs.findMany({
+                    where: {
+                        id: {
+                            in: sdgsId,
+                        },
+                    },
+                });
+
+
+            if (sdgs.length !== sdgsId.length) {
+                return NextResponse.json(
+                    {
+                        message:
+                            "Salah satu SDGs yang dipilih tidak ditemukan",
+                    },
+                    {
+                        status: 404,
+                    }
+                );
+            }
+
+        
+
+
+
         if (file && file.size > MAX_FILE_SIZE) {
             return NextResponse.json(
                 { message: "Maksimal ukuran file adalah 100 MB" },
@@ -142,6 +209,11 @@ export async function POST(request: Request) {
                 judul,
                 abstract,
                 ProgramStudyId: programStudyId,
+                sdgs: {
+                    connect: sdgsId.map((id) => ({
+                        id
+                    }))
+                },
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,
@@ -150,7 +222,7 @@ export async function POST(request: Request) {
                     create: uniqueKeywords.map((kata) => ({ kata })),
                 },
             },
-            include: { keywords: true },
+            include: { keywords: true, sdgs: true },
         });
 
         return NextResponse.json(artikelJurnal, { status: 201 });
