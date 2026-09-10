@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parse } from "path";
 
 export async function GET() {
     try {
@@ -91,6 +92,26 @@ export async function GET() {
                 mahasiswa: true,
             },
         });
+
+        const sdgsList = await prisma.sDGs.findMany({
+            where : { isActive: true },
+            include : {
+                tugasAkhirs: {
+                    select: { id:true },
+                }
+            }
+        });
+        const distribusiSdgs = sdgsList.map((sdg) => ({
+            id: sdg.id,
+            code: sdg.code,
+            title: sdg.title,
+            jumlah: sdg.tugasAkhirs.length,
+        })) 
+        .sort((a,b) => {
+            const numA = parseInt(a.code.replace(/\D/g, "")) || 0;
+            const numB = parseInt(b.code.replace(/\D/g,"")) || 0;
+            return numA - numB;
+        })
 
         const aktivitasTerbaru = await prisma.tugasAkhir.findMany({
             orderBy: {
@@ -215,6 +236,7 @@ export async function GET() {
             laporanPlkPerTahun,
             distribusiProgramStudy,
             distribusiArtikelProgramStudy: distribusiProgramStudy1,
+            distribusiSdgs,
             tugasAkhirTerbaru,
             artikelJurnalTerbaru,
             aktivitasTerbaru,

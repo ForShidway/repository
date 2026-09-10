@@ -52,11 +52,10 @@ export function Navbar() {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`relative rounded-lg px-3.5 py-2 text-sm font-semibold transition-all duration-150 ${
-                                    isActive
+                                className={`relative rounded-lg px-3.5 py-2 text-sm font-semibold transition-all duration-150 ${isActive
                                         ? "bg-blue-50 text-blue-700"
                                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                }`}
+                                    }`}
                             >
                                 {link.label}
                                 {isActive && (
@@ -125,11 +124,10 @@ export function Navbar() {
                                     key={link.href}
                                     href={link.href}
                                     onClick={() => setMenuOpen(false)}
-                                    className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-                                        isActive
+                                    className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${isActive
                                             ? "bg-blue-50 text-blue-700"
                                             : "text-slate-600 hover:bg-slate-50"
-                                    }`}
+                                        }`}
                                 >
                                     {link.label}
                                 </Link>

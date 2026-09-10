@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { FileText, GraduationCap, Users, Building2, Globe2 } from "lucide-react";
 import StatistikDashboard from "@/components/admin/StatistikDashboard";
+import SdgRadarChart from "@/components/admin/SdgRadarChart";
+
+
 
 type Summary = {
     totalTugasAkhir: number;
@@ -32,6 +35,13 @@ type ProgramStudyStat = {
     id: number;
     name: string;
     degree: string;
+    jumlah: number;
+};
+
+type SdgStat = {
+    id: number;
+    code: string;
+    title: string;
     jumlah: number;
 };
 
@@ -85,6 +95,7 @@ type DashboardData = {
     laporanPlkPerTahun: TahunStat[];
     distribusiProgramStudy: ProgramStudyStat[];
     distribusiArtikelProgramStudy: ProgramStudyStat[];
+    distribusiSdgs: SdgStat[];
     tugasAkhirTerbaru: TugasAkhirTerbaru[];
     artikelJurnalTerbaru: ArtikelJurnalTerbaru[];
     aktivitasTerbaru: Aktivitas[];
@@ -435,7 +446,14 @@ export default function AdminDashboard() {
                     </div>
                 </div>
                                     
-                
+                <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="text-lg font-bold text-slate-900">Beban SDGs pada Tugas Akhir</h2>
+                    <p className="mt-1 text-sm text-slate-500">Sebaran jumlah Tugas Akhir berdasarkan Sustainable Development Goals.</p>
+
+                    <div className="mt-6">
+                        <SdgRadarChart data={data.distribusiSdgs} />
+                    </div>
+                </section>
 
                 <section className="mt-6">
                     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
