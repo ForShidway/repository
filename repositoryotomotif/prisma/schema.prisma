@@ -17,6 +17,11 @@ enum Role {
   MAHASISWA
 }
 
+enum JenisPendidikan {
+  PENDIDIKAN
+  NON_PENDIDIKAN
+}
+
 model User {
   id Int @id @default(autoincrement())
   name String
@@ -69,6 +74,7 @@ model TugasAkhir {
   id Int @id @default(autoincrement())
   tahunMasuk Int
   judul String @db.Text
+  jenisPendidikan JenisPendidikan @default(PENDIDIKAN)
   abstract String?  @db.Text
   mataKuliahRelevan String?
 

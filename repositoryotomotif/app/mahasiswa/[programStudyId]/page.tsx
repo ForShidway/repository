@@ -100,7 +100,7 @@ export default function MahasiswaProgramStudyFolderPage() {
 
    const isD3 = programStudy?.degree?.toUpperCase() === "D3";
     const folderCategories = isD3
-        ? ALL_FOLDER_CATEGORIES.filter((c) => c.id === "tugas-akhir")
+        ? ALL_FOLDER_CATEGORIES.filter((c) => c.id === "tugas-akhir" || c.id === "laporan-pelatihan-industri" )
         : ALL_FOLDER_CATEGORIES;
 
   return (

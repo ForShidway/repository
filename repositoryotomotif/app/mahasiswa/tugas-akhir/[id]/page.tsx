@@ -31,6 +31,7 @@ type TugasAkhir = {
   id: number;
   tahunMasuk: number;
   judul: string;
+  jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN";
   mataKuliahRelevan: string;
   pembimbing: Dosen;
   dosenPa: Dosen;
@@ -142,6 +143,9 @@ export default function DetailTugasAkhirPage() {
           <div className="flex flex-wrap gap-2 mt-6">
             <span className="rounded-lg bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
               {tugasAkhir.programStudy?.degree || 'Program'}
+            </span>
+            <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${tugasAkhir.jenisPendidikan === "NON_PENDIDIKAN" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
+              {tugasAkhir.jenisPendidikan === "NON_PENDIDIKAN" ? "Non Pendidikan" : "Pendidikan"}
             </span>
             {tugasAkhir.mataKuliahRelevan && (
               <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">

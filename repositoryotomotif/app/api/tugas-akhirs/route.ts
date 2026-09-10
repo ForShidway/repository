@@ -126,6 +126,8 @@ export async function POST(request: Request) {
         const keywordsUnik = Array.from(new Set(keywords));
         const tahunMasuk = Number(formData.get("tahunMasuk"));
         const judul = formData.get("judul")?.toString().trim();
+        const jenisPendidikanRaw = formData.get("jenisPendidikan")?.toString().trim();
+        const jenisPendidikan = jenisPendidikanRaw === "NON_PENDIDIKAN" ? "NON_PENDIDIKAN" : "PENDIDIKAN";
         const mataKuliahRelevanRaw = formData.get("mataKuliahRelevan")?.toString().trim();
         const mataKuliahRelevan = mataKuliahRelevanRaw ? mataKuliahRelevanRaw : null;
         const ruanganIdRaw = formData.get("ruanganId");
@@ -204,7 +206,7 @@ export async function POST(request: Request) {
         }
 
         if(
-            !tahunMasuk || !judul || !pembimbingId  || !programStudyId
+            !tahunMasuk || !judul || !pembimbingId  || !programStudyId || !jenisPendidikan
         ) {
             return NextResponse.json(
                 { message : "semua data harus diisi"},
@@ -228,12 +230,6 @@ export async function POST(request: Request) {
         if (new Set(pengujiIds).size !== pengujiIds.length) {
             return NextResponse.json(
                 { message: "Dosen penguji tidak boleh dipilih lebih dari sekali" },
-                { status: 400 },
-            );
-        }
-        if (pengujiIds.some((id) => id === pembimbingId || id === pembimbing2Id || id === dosenPaId)) {
-            return NextResponse.json(
-                { message: "Dosen penguji harus berbeda dari dosen pembimbing dan dosen PA" },
                 { status: 400 },
             );
         }
@@ -408,7 +404,7 @@ export async function POST(request: Request) {
         
         const tugasAkhir = await prisma.tugasAkhir.create ({
             data: {
-                tahunMasuk, judul, abstract, mataKuliahRelevan, ruanganId, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
+                tahunMasuk, judul, jenisPendidikan, abstract, mataKuliahRelevan, ruanganId, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,

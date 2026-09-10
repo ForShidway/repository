@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `tugasakhir` ADD COLUMN `jenisPendidikan` ENUM('PENDIDIKAN', 'NON_PENDIDIKAN') NOT NULL DEFAULT 'PENDIDIKAN';

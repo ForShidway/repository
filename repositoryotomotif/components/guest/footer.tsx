@@ -7,8 +7,8 @@ export function Footer() {
                 <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
                     <div className="lg:col-span-2">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-900/30">
-                                RO
+                            <div className="relative h-11 w-11 shrink-0 transition group-hover:scale-105">
+                                <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                             </div>
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">

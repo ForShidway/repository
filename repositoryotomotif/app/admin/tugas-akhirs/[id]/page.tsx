@@ -41,6 +41,7 @@ type Keyword = {
 type TugasAkhirDetail = {
     id: number;
     judul: string;
+    jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN";
     abstract: string | null;
     tahunMasuk: number;
     mataKuliahRelevan: string;
@@ -199,6 +200,12 @@ export default function DetailTugasAkhirPage({
                                 <p className="text-sm text-slate-500">Program Studi</p>
                                 <p className="mt-1 text-slate-800">
                                     {data.programStudy ? `${data.programStudy.degree} ${data.programStudy.name}` : "-"}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-slate-500">Kategori</p>
+                                <p className={`mt-1 font-medium ${data.jenisPendidikan === "NON_PENDIDIKAN" ? "text-amber-700" : "text-emerald-700"}`}>
+                                    {data.jenisPendidikan === "NON_PENDIDIKAN" ? "Non Pendidikan" : "Pendidikan"}
                                 </p>
                             </div>
                             <div>

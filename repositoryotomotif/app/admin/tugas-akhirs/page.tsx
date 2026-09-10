@@ -14,6 +14,7 @@ type TugasAkhir = {
     id : number,
     tahunMasuk: number,
     judul: string,
+    jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN",
     mataKuliahRelevan:string,
     ruangan: {id: number, name:string}
     pembimbing: {id: number, name: string}
@@ -117,6 +118,7 @@ export default function TugasAkhirPage() {
                                     <th>Nama Mahasiswa</th>
                                     <th>NIM</th>
                                     <th>Judul</th>
+                                    <th>Kategori</th>
                                     <th>Tahun Masuk</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -128,6 +130,11 @@ export default function TugasAkhirPage() {
                                         <td> <strong> {item.mahasiswa?.map((m) => m.name).join(", ") || "-"} </strong> </td>
                                         <td>{item.mahasiswa?.map((m) => m.nim).join(", ") || "-"}</td>
                                         <td>{item.judul}</td>
+                                        <td>
+                                            <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${item.jenisPendidikan === "NON_PENDIDIKAN" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
+                                                {item.jenisPendidikan === "NON_PENDIDIKAN" ? "Non Pendidikan" : "Pendidikan"}
+                                            </span>
+                                        </td>
                                         <td> {item.tahunMasuk} </td>
                                         <td className="action-cell">
                                             <button onClick={() => router.push(`/admin/tugas-akhirs/${item.id}`) }  className="detail-button"  >

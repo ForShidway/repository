@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 
 const links = [
     { label: "Beranda", href: "/" },
@@ -29,8 +30,8 @@ export function Navbar() {
 
                 {/* ── Brand ── */}
                 <Link href="/" className="flex shrink-0 items-center gap-3 group">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-[#0B1F3A] text-sm font-extrabold text-white shadow-md shadow-blue-900/20 transition group-hover:shadow-lg group-hover:shadow-blue-800/25">
-                        RO
+                    <div className="relative h-11 w-11 shrink-0 transition group-hover:scale-105">
+                        <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                     </div>
                     <div className="leading-tight hidden sm:block">
                         <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-600">

@@ -46,6 +46,7 @@ export default function CreateTugasAkhirPage({
     ]);
     const [tahunMasuk, setTahunMasuk] = useState("");
     const [judul, setJudul] = useState("");
+    const [jenisPendidikan, setJenisPendidikan] = useState<"PENDIDIKAN" | "NON_PENDIDIKAN">("PENDIDIKAN");
     const [mataKuliahRelevan, setMataKuliahRelevan] = useState("");
 
     const [ruanganId, setRuanganId] = useState("");
@@ -161,6 +162,7 @@ export default function CreateTugasAkhirPage({
 
             formData.append("tahunMasuk", tahunMasuk);
             formData.append("judul", judul.trim());
+            formData.append("jenisPendidikan", jenisPendidikan);
             // if (abstract.trim()) {
             //     formData.append("abstract", abstract.trim());
             // }
@@ -353,6 +355,36 @@ export default function CreateTugasAkhirPage({
                         </div>
 
                         <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Kategori Tugas Akhir
+                            </label>
+                            <div className="flex flex-wrap gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-blue-300">
+                                    <input
+                                        type="radio"
+                                        name="jenisPendidikan"
+                                        value="PENDIDIKAN"
+                                        checked={jenisPendidikan === "PENDIDIKAN"}
+                                        onChange={(e) => setJenisPendidikan(e.target.value as "PENDIDIKAN" | "NON_PENDIDIKAN")}
+                                        className="h-4 w-4 border-slate-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Pendidikan
+                                </label>
+                                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-blue-300">
+                                    <input
+                                        type="radio"
+                                        name="jenisPendidikan"
+                                        value="NON_PENDIDIKAN"
+                                        checked={jenisPendidikan === "NON_PENDIDIKAN"}
+                                        onChange={(e) => setJenisPendidikan(e.target.value as "PENDIDIKAN" | "NON_PENDIDIKAN")}
+                                        className="h-4 w-4 border-slate-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Non Pendidikan
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
                             <div className="mb-2 flex items-center justify-between">
                                 <label htmlFor="abstrak" className="block text-sm font-medium">
                                     Abstract <span className="font-normal text-slate-400">(opsional, maksimal 350 kata)</span>
@@ -526,8 +558,6 @@ export default function CreateTugasAkhirPage({
                                             <option value="">-- Pilih Dosen {role} --</option>
                                             {dosens
                                                 .filter((dosen) =>
-                                                    String(dosen.id) !== pembimbingId &&
-                                                    String(dosen.id) !== pembimbing2Id &&
                                                     !selectedOtherPengujiIds.includes(String(dosen.id))
                                                 )
                                                 .map((dosen) => (
