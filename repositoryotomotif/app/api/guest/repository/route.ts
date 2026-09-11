@@ -15,7 +15,11 @@ export async function GET() {
             }),
             prisma.artikelJurnal.findMany({
                 orderBy: { createdAt: "desc" },
-                include: { programStudy: true },
+                include: {
+                    programStudy: true,
+                    sdgs: true,
+                    penulis: { orderBy: { urutan: "asc" } },
+                },
             }),
             prisma.laporanPi.findMany({
                 orderBy: { createdAt: "desc" },
@@ -45,14 +49,14 @@ export async function GET() {
                 judul: item.judul,
                 tahun: item.tahun,
                 programStudy: item.programStudy,
-                mahasiswa: [{
-                    id: item.id,
-                    name: item.name,
-                    nim: item.nim,
-                    urutan: 1,
-                }],
+                mahasiswa: item.penulis.map((penulisItem) => ({
+                    id: penulisItem.id,
+                    name: penulisItem.nama,
+                    nim: penulisItem.nim ?? "",
+                    urutan: penulisItem.urutan,
+                })),
                 pembimbing: null,
-                sdgs: [],
+                sdgs: item.sdgs,
                 fileName: item.fileName,
                 filePath: item.filePath,
                 createdAt: item.createdAt,

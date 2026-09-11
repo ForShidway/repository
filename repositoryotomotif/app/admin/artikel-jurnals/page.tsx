@@ -5,32 +5,52 @@ import { useRouter } from "next/navigation";
 
 type ArtikelJurnal = {
     id: number;
-    name: string;
-    nim: string;
     judul: string;
     tahun: number | string;
+    penulis?: Array<{ nama: string; nim: string | null; tipe?: string | null }>;
 }
 
 export default function ArtikelJurnalPage() {
     const router = useRouter();
     const [data, setData] = useState<ArtikelJurnal[]>([]);
+
+    const formatPenulis = (penulis: Array<{ nama: string; nim: string | null; tipe?: string | null }> = []) => {
+        if (!penulis.length) return "-";
+        return penulis
+            .map((item) => {
+                if (item.tipe === "MAHASISWA" && item.nim) {
+                    return `${item.nama} (${item.nim})`;
+                }
+                return item.nama;
+            })
+            .join("  ");
+    };
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     useEffect(() => {
         async function fetchData() {
-            try { 
+            try {
                 const response = await fetch("/api/artikel-jurnal");
-                const result = await response.json();
-                if(!response.ok) {
+                const contentType = response.headers.get("content-type") || "";
+
+                if (!contentType.includes("application/json")) {
+                    const text = await response.text();
                     throw new Error(
-                        result.message || "Gagal mengambil Data"
-                    )
+                        text.includes("<!DOCTYPE")
+                            ? "Endpoint artikel jurnal tidak ditemukan atau server mengembalikan halaman HTML."
+                            : text || "Gagal mengambil Data"
+                    );
+                }
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || "Gagal mengambil Data");
                 }
                 setData(result);
             } catch (error) {
                 console.error(error);
-                setError( error instanceof Error ? error.message : "Terjaddi kesalahan")
+                setError(error instanceof Error ? error.message : "Terjaddi kesalahan");
             } finally {
                 setLoading(false);
             }
@@ -102,7 +122,7 @@ export default function ArtikelJurnalPage() {
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Nama Mahasiswa</th>
+                                    <th>Nama Penulis</th>
                                     <th>NIM</th>
                                     <th>Judul</th>
                                     <th>Tahun Masuk</th>
@@ -113,8 +133,8 @@ export default function ArtikelJurnalPage() {
                                 {data.map((item, index) => (
                                     <tr key={(item.id)}>
                                         <td>{index + 1}</td>
-                                        <td><strong>{item.name || "-"}</strong></td>
-                                        <td>{item.nim || "-"}</td>
+                                        <td><strong>{formatPenulis(item.penulis)}</strong></td>
+                                        <td>{item.penulis?.filter((penulisItem) => penulisItem.tipe === "MAHASISWA").map((penulisItem) => penulisItem.nim || "-").join("  ") || "-"}</td>
                                         <td>{item.judul || "-"}</td>
                                         <td>{item.tahun || "-"}</td>
                                         <td className="action-cell">

@@ -31,7 +31,7 @@ type Mahasiswa = {
 type RepositoryItem = {
   id: string;
   sourceId: number;
-  jenis: "TUGAS AKHIR" | "ARTIKEL JURNAL" | "LAPORAN PI";
+  jenis: "TUGAS AKHIR" | "ARTIKEL JURNAL" | "LAPORAN PI" | "LAPORAN PLK";
   tahun: number;
   judul: string;
   pembimbing: Dosen | null;
@@ -127,7 +127,24 @@ export default function KatalogTugasAkhirPage() {
 
   const getMahasiswaText = (mahasiswa: Mahasiswa[] = []) => {
     if (!mahasiswa.length) return "";
-    return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(" ");
+    return mahasiswa
+      .map((m) => (m.nim ? `${m.name} (${m.nim})` : m.name))
+      .join("  ");
+  };
+
+  const getDetailHref = (item: RepositoryItem): string | null => {
+    switch (item.jenis) {
+      case "TUGAS AKHIR":
+        return `/tugas-akhir/${item.sourceId}`;
+      case "ARTIKEL JURNAL":
+        return `/artikel-jurnal/${item.sourceId}`;
+      case "LAPORAN PI":
+        return `/laporan-pi/${item.sourceId}`;
+      case "LAPORAN PLK":
+        return `/laporan-plk/${item.sourceId}`;
+      default:
+        return null;
+    }
   };
 
   const filtered = useMemo(() => {
@@ -398,10 +415,13 @@ export default function KatalogTugasAkhirPage() {
               </div>
             ) : (
               <div className={view === "grid" ? "grid gap-5 md:grid-cols-2" : "flex flex-col gap-3"}>
-                {paged.map((item) => (
+                {paged.map((item) => {
+                  const detailHref = getDetailHref(item);
+
+                  return (
                   <div
                     key={item.id}
-                    onClick={() => item.jenis === "TUGAS AKHIR" && router.push(`/mahasiswa/tugas-akhir/${item.sourceId}`)}
+                    onClick={() => detailHref && router.push(detailHref)}
                     className="group cursor-pointer text-left"
                   >
                     {view === "grid" ? (
@@ -537,7 +557,7 @@ export default function KatalogTugasAkhirPage() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                item.jenis === "TUGAS AKHIR" && router.push(`/mahasiswa/tugas-akhir/${item.sourceId}`);
+                                if (detailHref) router.push(detailHref);
                               }}
                               className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
                             >
@@ -549,7 +569,8 @@ export default function KatalogTugasAkhirPage() {
                       </div>
                     )}
                   </div>
-                ))}
+                );
+                })}
               </div>
             )}
 

@@ -44,6 +44,7 @@ model Dosen {
   pengujiTa PengujiTugasAkhir[]
   pembimbingPi LaporanPi[] @relation("PembimbingPI")
   pembimbingPlk LaporanPLK[] @relation("PembimbingPLK")
+  penulisArtikel PenulisArtikelJurnal[] @relation("PenulisArtikel")
 
 }
 
@@ -161,8 +162,6 @@ model Keyword {
 
 model ArtikelJurnal {
   id Int @id @default(autoincrement())
-  name String
-  nim String
   tahun Int
   judul String @db.Text
   abstract String @db.Text
@@ -177,10 +176,35 @@ model ArtikelJurnal {
 
   keywords JurnalKeyword[]
   sdgs SDGs[]
+  penulis PenulisArtikelJurnal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+  enum TipePenulis {
+    MAHASISWA
+    DOSEN
+    LAINNYA
+  }
+
+model PenulisArtikelJurnal {
+  id Int @id @default (autoincrement())
+  tipe TipePenulis
+  nama String
+  nim String?
+  urutan Int @default(1)
+
+  dosenId Int?
+  dosen Dosen? @relation("PenulisArtikel", fields: [dosenId], references: [id])
+
+  artikelJurnalId Int
+  artikelJurnal ArtikelJurnal @relation(fields: [artikelJurnalId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+
 
 model JurnalKeyword {
   id Int @id @default(autoincrement())
@@ -237,3 +261,4 @@ model LaporanPLK {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+

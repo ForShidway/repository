@@ -69,7 +69,6 @@ type TugasAkhirTerbaru = {
 
 type ArtikelJurnalTerbaru = {
     id: number;
-    name : string;
     judul: string;
     tahun: number;
     programStudy: {
@@ -206,9 +205,9 @@ export default function AdminDashboard() {
         );
     }
 
-    const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
+    const formatMahasiswa = (mahasiswa: Array<{ name: string; nim?: string | null }> = []) => {
         if (!mahasiswa.length) return "-";
-        return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
+        return mahasiswa.map((m) => `${m.name}${m.nim ? ` (${m.nim})` : ""}`).join(", ");
     };
 
     return (
@@ -613,7 +612,7 @@ export default function AdminDashboard() {
                                                 </p>
                                             </td>
                                             <td className="px-4 py-4 text-sm text-slate-600">
-                                                {aj.name}
+                                                {formatMahasiswa(aj.mahasiswa)}
                                             </td>
                                             <td className="px-4 py-4 text-sm text-slate-600">
                                                 {aj.tahun}

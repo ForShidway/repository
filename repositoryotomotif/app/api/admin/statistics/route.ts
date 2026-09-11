@@ -176,15 +176,28 @@ export async function GET() {
             }))
             .sort((a, b) => b.jumlah - a.jumlah);
 
-        const artikelJurnalTerbaru = await prisma.artikelJurnal.findMany({
+        const artikelJurnalTerbaruRaw = await prisma.artikelJurnal.findMany({
             orderBy: {
                 createdAt: "desc",
             },
             take: 5,
             include: {
                 programStudy: true,
+                penulis: {
+                    orderBy: { urutan: "asc" },
+                },
             },
         });
+
+        const artikelJurnalTerbaru = artikelJurnalTerbaruRaw.map((item) => ({
+            ...item,
+            mahasiswa: item.penulis.map((penulisItem) => ({
+                id: penulisItem.id,
+                name: penulisItem.nama,
+                nim: penulisItem.nim ?? "",
+                urutan: penulisItem.urutan,
+            })),
+        }));
 
         //laporan pi
         const laporanPiSemua = await prisma.laporanPi.findMany({

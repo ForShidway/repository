@@ -15,6 +15,13 @@ type SDGs = {
     title : string;
 }
 
+type Dosen = {
+    id: number;
+    name: string;
+};
+
+
+
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const MAX_ABSTRACT_WORDS = 350;
 const MAX_KEYWORDS = 10;
@@ -39,24 +46,35 @@ export default function ArtikelJurnalForm() {
     const params = useParams<{ programStudyId: string }>();
     const routeProgramStudyId = params.programStudyId;
 
-  const [name, setName] = useState("");
-  const [nim, setNim] = useState("");
-  const [tahun, setTahun] = useState(String(CURRENT_YEAR));
-  const [judul, setJudul] = useState("");
-  const [abstract, setAbstract] = useState("");
+    type TipePenulis = "MAHASISWA" | "DOSEN" | "LAINNYA";
 
-  const [keywordInput, setKeywordInput] = useState("");
-  const [keywords, setKeywords] = useState<string[]>([]);
-  const [keywordError, setKeywordError] = useState<string | null>(null);
-  const [sdgs, setSdgs] = useState<SDGs[]>([]);
-  const [selectedSDGs, setSelectedSDGs] = useState<number[]>([]);
-  const sortedSdgs = useMemo(() => {
-    return [...sdgs].sort((a, b) => {
-        const numA = parseInt(a.code.replace(/\D/g, '')) || 0;
-            const numB = parseInt(b.code.replace(/\D/g, '')) || 0;
-            return numA - numB;
-    });
-  }, [sdgs])
+    type PenulisInput = {
+        tipe: TipePenulis;
+        nama: string;   // dipakai untuk MAHASISWA dan LAINNYA
+        nim: string;    // dipakai untuk MAHASISWA
+        dosenId: string; // dipakai untuk DOSEN
+    };
+    const [penulis, setPenulis] = useState<PenulisInput[]>([
+        { tipe: "MAHASISWA", nama: "", nim: "", dosenId: "" },
+    ]);
+
+    const [dosens, setDosens] = useState<Dosen[]>([]);
+    const [tahun, setTahun] = useState(String(CURRENT_YEAR));
+    const [judul, setJudul] = useState("");
+    const [abstract, setAbstract] = useState("");
+
+    const [keywordInput, setKeywordInput] = useState("");
+    const [keywords, setKeywords] = useState<string[]>([]);
+    const [keywordError, setKeywordError] = useState<string | null>(null);
+    const [sdgs, setSdgs] = useState<SDGs[]>([]);
+    const [selectedSDGs, setSelectedSDGs] = useState<number[]>([]);
+    const sortedSdgs = useMemo(() => {
+        return [...sdgs].sort((a, b) => {
+            const numA = parseInt(a.code.replace(/\D/g, '')) || 0;
+                const numB = parseInt(b.code.replace(/\D/g, '')) || 0;
+                return numA - numB;
+        });
+    }, [sdgs])
 
 
   const [programStudy, setProgramStudy] = useState<ProgramStudy | null>(null);
@@ -65,18 +83,22 @@ export default function ArtikelJurnalForm() {
     useEffect(() => {
         async function fetchProgramStudy() {
             try {
-                const [programStudyRes, sdgsRes] = await Promise.all([
+                const [programStudyRes, sdgsRes, dosensRes] = await Promise.all([
                     fetch(`/api/program-studies/${routeProgramStudyId}`),
-                    fetch("/api/sdgs"),
+                    fetch("/api/sdgs"), fetch("/api/dosens"),
                 ]);
                 const programStudyData = await programStudyRes.json();
                 const sdgsData = await sdgsRes.json();
+                const dosensData = await dosensRes.json();
 
                 if (programStudyRes.ok) {
                     setProgramStudy(programStudyData);
                 }
                 if (sdgsRes.ok) {
                     setSdgs(sdgsData);
+                }
+                    if (dosensRes.ok) {
+                    setDosens(dosensData);
                 }
             } catch (error) {
                 console.error("Gagal mengambil data", error);
@@ -98,6 +120,33 @@ export default function ArtikelJurnalForm() {
             }
             return [...current, sdgId];
         });
+    }
+
+    function updatePenulisField(index: number, field: keyof PenulisInput, value: string) {
+        setPenulis((current) =>
+            current.map((p, i) => (i === index ? { ...p, [field]: value } : p))
+        );
+    }
+
+    function updatePenulisTipe(index: number, tipe: TipePenulis) {
+        setPenulis((current) =>
+            current.map((p, i) =>
+                i === index
+                    ? { tipe, nama: "", nim: "", dosenId: "" }
+                    : p
+            )
+        );
+    }
+
+    function addPenulis() {
+        setPenulis((current) => {
+            if (current.length >= 10) return current;
+            return [...current, { tipe: "MAHASISWA", nama: "", nim: "", dosenId: "" }];
+        });
+    }
+
+    function removePenulis(index: number) {
+        setPenulis((current) => current.filter((_, i) => i !== index));
     }
 
   const [file, setFile] = useState<File | null>(null);
@@ -166,8 +215,7 @@ export default function ArtikelJurnalForm() {
   }
 
   function resetForm() {
-    setName("");
-    setNim("");
+    setPenulis([{ tipe: "MAHASISWA", nama: "", nim: "", dosenId: "" }]);
     setTahun(String(CURRENT_YEAR));
     setJudul("");
     setAbstract("");
@@ -179,9 +227,14 @@ export default function ArtikelJurnalForm() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  const penulisValid = penulis.every((p) => {
+        if (p.tipe === "MAHASISWA") return p.nama.trim() && p.nim.trim();
+        if (p.tipe === "DOSEN") return p.dosenId;
+        return p.nama.trim(); // LAINNYA
+    });
+
   const canSubmit =
-    name.trim() &&
-    nim.trim() &&
+    penulisValid &&
     judul.trim() &&
     abstract.trim() &&
     !abstractOverLimit &&
@@ -199,8 +252,14 @@ export default function ArtikelJurnalForm() {
     setSubmit({ status: "submitting" });
 
     const formData = new FormData();
-    formData.append("name", name.trim());
-    formData.append("nim", nim.trim());
+    formData.append("penulis", JSON.stringify(
+        penulis.map((p) => ({
+            tipe: p.tipe,
+            nama: p.tipe === "MAHASISWA" || p.tipe === "LAINNYA" ? p.nama.trim() : undefined,
+            nim: p.tipe === "MAHASISWA" ? p.nim.trim() : undefined,
+            dosenId: p.tipe === "DOSEN" ? Number(p.dosenId) : undefined,
+        }))
+    ));
     formData.append("tahun", tahun.trim());
     formData.append("judul", judul.trim());
     formData.append("programStudyId", routeProgramStudyId);
@@ -246,33 +305,115 @@ export default function ArtikelJurnalForm() {
                     <form onSubmit={handleSubmit} className="space-y-6">
 
                         {/* PENULIS */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
-                                    Nama Lengkap
-                                </label>
-                                <input
-                                    id="name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Contoh: Siti Aminah"
-                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="nim" className="mb-2 block text-sm font-medium text-gray-700">
-                                    NIM
-                                </label>
-                                <input
-                                    id="nim"
-                                    value={nim}
-                                    onChange={(e) => setNim(e.target.value)}
-                                    placeholder="Contoh: 20210001"
-                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                                    required
-                                />
-                            </div>
+                        <div className="space-y-4">
+                            {penulis.map((p, index) => (
+                                <div key={index} className="rounded-lg border border-slate-200 p-4">
+                                    <div className="mb-3 flex items-center justify-between">
+                                        <p className="text-sm font-semibold text-slate-700">Penulis {index + 1}</p>
+                                        {index > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removePenulis(index)}
+                                                className="text-xs font-semibold text-red-500 hover:text-red-700"
+                                            >
+                                                Hapus
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {/* PILIHAN TIPE */}
+                                    <div className="mb-3 flex gap-4">
+                                        {(["MAHASISWA", "DOSEN", "LAINNYA"] as TipePenulis[]).map((tipeOption) => (
+                                            <label key={tipeOption} className="flex cursor-pointer items-center gap-1.5 text-sm text-slate-700">
+                                                <input
+                                                    type="radio"
+                                                    name={`tipe-penulis-${index}`}
+                                                    checked={p.tipe === tipeOption}
+                                                    onChange={() => updatePenulisTipe(index, tipeOption)}
+                                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                {tipeOption === "MAHASISWA" ? "Mahasiswa" : tipeOption === "DOSEN" ? "Dosen" : "Lainnya"}
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {/* FIELD SESUAI TIPE */}
+                                    {p.tipe === "MAHASISWA" && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label htmlFor={`nama-${index}`} className="mb-2 block text-sm font-medium text-gray-700">
+                                                    Nama Mahasiswa
+                                                </label>
+                                                <input
+                                                    id={`nama-${index}`}
+                                                    value={p.nama}
+                                                    onChange={(e) => updatePenulisField(index, "nama", e.target.value)}
+                                                    placeholder="Contoh: Siti Aminah"
+                                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor={`nim-${index}`} className="mb-2 block text-sm font-medium text-gray-700">
+                                                    NIM
+                                                </label>
+                                                <input
+                                                    id={`nim-${index}`}
+                                                    value={p.nim}
+                                                    onChange={(e) => updatePenulisField(index, "nim", e.target.value)}
+                                                    placeholder="Contoh: 20210001"
+                                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {p.tipe === "DOSEN" && (
+                                        <div>
+                                            <label htmlFor={`dosen-${index}`} className="mb-2 block text-sm font-medium text-gray-700">
+                                                Pilih Dosen
+                                            </label>
+                                            <select
+                                                id={`dosen-${index}`}
+                                                value={p.dosenId}
+                                                onChange={(e) => updatePenulisField(index, "dosenId", e.target.value)}
+                                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                            >
+                                                <option value="">-- Pilih Dosen --</option>
+                                                {dosens.map((d) => (
+                                                    <option key={d.id} value={d.id}>{d.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {p.tipe === "LAINNYA" && (
+                                        <div>
+                                            <label htmlFor={`nama-lainnya-${index}`} className="mb-2 block text-sm font-medium text-gray-700">
+                                                Nama Penulis
+                                            </label>
+                                            <input
+                                                id={`nama-lainnya-${index}`}
+                                                value={p.nama}
+                                                onChange={(e) => updatePenulisField(index, "nama", e.target.value)}
+                                                placeholder="Contoh: Ahmad Fauzi (Praktisi Industri)"
+                                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {index === penulis.length - 1 && penulis.length < 10 && (
+                                        <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+                                            <input
+                                                type="checkbox"
+                                                checked={false}
+                                                onChange={addPenulis}
+                                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            Ada penulis lain yang terlibat
+                                        </label>
+                                    )}
+                                </div>
+                            ))}
                         </div>
 
                         {/* JUDUL + TAHUN */}

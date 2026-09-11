@@ -15,7 +15,7 @@ export async function GET() {
     try {
         const artikelJurnal = await prisma.artikelJurnal.findMany({
             orderBy: { createdAt: "desc" },
-            include: { keywords: true },
+            include: { keywords: true, sdgs: true, penulis: {orderBy: {urutan: "asc"}} },
         });
 
         return NextResponse.json(artikelJurnal);
@@ -33,8 +33,101 @@ export async function POST(request: Request) {
 
     try {
         const formData = await request.formData();
-        const name = formData.get("name")?.toString().trim() ?? "";
-        const nim = formData.get("nim")?.toString().trim() ?? "";
+        
+        const penulisRaw = formData.get("penulis");
+        let penulisInput: { tipe: string; nama: string; nim?: string; dosenId?: number }[] = [];
+        if (penulisRaw) {
+            try {
+                const parsed = JSON.parse(penulisRaw.toString());
+                if (Array.isArray(parsed)) {
+                    penulisInput = parsed.map((p: any) => ({
+                        tipe: String(p.tipe ?? "").toUpperCase(),
+                        nama: String(p.nama ?? "").trim(),
+                        ...(p.nim ? { nim: String(p.nim).trim() } : {}),
+                        ...(p.dosenId ? { dosenId: Number(p.dosenId) } : {}),
+                    }));
+                } else {
+                    return NextResponse.json(
+                        { message: "Format data penulis tidak valid" },
+                        { status: 400 },
+                    );
+                }
+            } catch (error) {
+                console.error("Penulis Parsing Error:", error);
+                return NextResponse.json(
+                    { message: "Format data penulis tidak valid" },
+                    { status: 400 },
+                );
+            }
+        }
+
+        if(penulisInput.length === 0) {
+            return NextResponse.json(
+                {message: "Minimal harus ada 1 Penulis"},
+                { status: 400 }
+            )
+        }
+        if(penulisInput.length > 10) {
+            return NextResponse.json(
+                {message: "Maksimal 10 penulis per artikel"},
+                { status: 400 }
+            )
+        }
+
+        const validTipe= ["MAHASISWA","DOSEN","LAINNYA"];
+        for (const p of penulisInput) {
+            if (!validTipe.includes(p.tipe)) {
+                return NextResponse.json(
+                    { message: "Tipe penulis tidak valid" },
+                    { status: 400 }
+                );
+            }
+            if (p.tipe === "MAHASISWA" && (!p.nama || !p.nim)) {
+                return NextResponse.json(
+                    { message: "Nama dan NIM wajib diisi untuk penulis bertipe Mahasiswa" },
+                    { status: 400 }
+                );
+            }
+            if (p.tipe === "DOSEN" && !p.dosenId) {
+                return NextResponse.json(
+                    { message: "Dosen wajib dipilih untuk penulis bertipe Dosen" },
+                    { status: 400 }
+                );
+            }
+            if (p.tipe === "LAINNYA" && !p.nama) {
+                return NextResponse.json(
+                    { message: "Nama wajib diisi untuk penulis bertipe Lainnya" },
+                    { status: 400 }
+                );
+            }
+        }
+        const dosenIds = penulisInput
+            .filter((p) => p.tipe === "DOSEN")
+            .map((p) => p.dosenId!);
+
+        const dosenList = dosenIds.length > 0
+            ? await prisma.dosen.findMany({ where: { id: { in: dosenIds } } })
+            : [];
+
+        if (dosenList.length !== new Set(dosenIds).size) {
+            return NextResponse.json(
+                { message: "Salah satu dosen yang dipilih tidak ditemukan" },
+                { status: 404 }
+            );
+        }
+
+        const penulisFinal = penulisInput.map((p) => {
+            if (p.tipe === "DOSEN") {
+                const dosen = dosenList.find((d) => d.id === p.dosenId);
+                return { tipe: p.tipe, nama: dosen?.name ?? "", dosenId: p.dosenId, nim: null };
+            }
+            if (p.tipe === "MAHASISWA") {
+                return { tipe: p.tipe, nama: p.nama, nim: p.nim, dosenId: null };
+            }
+            return { tipe: p.tipe, nama: p.nama, nim: null, dosenId: null };
+        });
+
+
         const judul = formData.get("judul")?.toString().trim() ?? "";
         const abstract = formData.get("abstract")?.toString().trim() ?? "";
         const tahunRaw = formData.get("tahun")?.toString().trim() ?? "";
@@ -47,8 +140,6 @@ export async function POST(request: Request) {
             : null;
 
         if (
-            !name ||
-            !nim ||
             !judul ||
             !abstract ||
             !tahunRaw ||
@@ -203,8 +294,6 @@ export async function POST(request: Request) {
 
         const artikelJurnal = await prisma.artikelJurnal.create({
             data: {
-                name,
-                nim,
                 tahun,
                 judul,
                 abstract,
@@ -221,8 +310,19 @@ export async function POST(request: Request) {
                 keywords: {
                     create: uniqueKeywords.map((kata) => ({ kata })),
                 },
+                penulis: {
+                    create: penulisFinal.map((p, index) => ({
+                        tipe: p.tipe as "MAHASISWA" | "DOSEN" | "LAINNYA",
+                        nama: p.nama,
+                        nim: p.nim,
+                        dosenId: p.dosenId,
+                        urutan: index + 1,
+                    })),
+                },
             },
-            include: { keywords: true, sdgs: true },
+            include: { keywords: true, sdgs: true, penulis: {
+                orderBy: { urutan : "asc"}
+            }},
         });
 
         return NextResponse.json(artikelJurnal, { status: 201 });
