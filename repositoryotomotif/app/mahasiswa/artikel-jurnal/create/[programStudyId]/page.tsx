@@ -395,7 +395,7 @@ export default function ArtikelJurnalForm() {
                                                 id={`nama-lainnya-${index}`}
                                                 value={p.nama}
                                                 onChange={(e) => updatePenulisField(index, "nama", e.target.value)}
-                                                placeholder="Contoh: Ahmad Fauzi (Praktisi Industri)"
+                                                placeholder="Contoh: Gamawan Fauzi"
                                                 className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                                             />
                                         </div>

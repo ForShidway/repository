@@ -163,9 +163,9 @@ export default function CreateTugasAkhirPage({
             formData.append("tahunMasuk", tahunMasuk);
             formData.append("judul", judul.trim());
             formData.append("jenisPendidikan", jenisPendidikan);
-            // if (abstract.trim()) {
-            //     formData.append("abstract", abstract.trim());
-            // }
+            if (abstract.trim()) {
+                formData.append("abstract", abstract.trim());
+            }
             
             if (mataKuliahRelevan.trim()) {
                 formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());

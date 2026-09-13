@@ -43,6 +43,8 @@ function LoginForm() {
                 router.push(redirectPath);
             } else if (data.user.role === "ADMIN") {
                 router.push("/admin");
+            } else if (data.user.role === "DOSEN") {
+                router.push("/dosen");
             } else {
                 router.push("/mahasiswa");
             }

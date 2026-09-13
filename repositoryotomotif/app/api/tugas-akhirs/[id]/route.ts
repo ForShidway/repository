@@ -37,6 +37,10 @@ export async function GET(
                     orderBy: { urutan: "asc" }
                 },
                 keywords: true,
+                penguji: {
+                    orderBy: { urutan: "asc" },
+                    include: { dosen: true },
+                },
             }
         });
 

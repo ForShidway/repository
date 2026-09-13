@@ -135,7 +135,7 @@ export default function KatalogTugasAkhirPage() {
   const getDetailHref = (item: RepositoryItem): string | null => {
     switch (item.jenis) {
       case "TUGAS AKHIR":
-        return `/tugas-akhir/${item.sourceId}`;
+        return `/tugas-akhirs/${item.sourceId}`;
       case "ARTIKEL JURNAL":
         return `/artikel-jurnal/${item.sourceId}`;
       case "LAPORAN PI":

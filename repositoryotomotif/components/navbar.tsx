@@ -8,8 +8,9 @@ import Image from "next/image";
 const links = [
     { label: "Beranda", href: "/" },
     { label: "Repository", href: "/jelajahirepository" },
-    { label: "Dosen", href: "/dosen" },
+    { label: "SDGs", href: "/sdgs" },
 ] as const;
+
 
 export function Navbar() {
     const pathname = usePathname();
