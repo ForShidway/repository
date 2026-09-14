@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import SdgsRadarChart from "@/components/guest/SdgsRadarChart";
 
 type SdgItem = {
@@ -46,6 +47,7 @@ export default function GuestSdgsPage() {
     const [sdgs, setSdgs] = useState<SdgItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [selectedSdg, setSelectedSdg] = useState<SdgItem | null>(null);
 
     useEffect(() => {
         async function fetchSdgs() {
@@ -68,7 +70,15 @@ export default function GuestSdgsPage() {
         fetchSdgs();
     }, []);
 
-    const handleCardClick = (sdgId: number) => {
+    const handleCardSelect = (sdg: SdgItem) => {
+        if (selectedSdg?.id === sdg.id) {
+            setSelectedSdg(null);
+        } else {
+            setSelectedSdg(sdg);
+        }
+    };
+
+    const handleExploreRepository = (sdgId: number) => {
         router.push(`/jelajahirepository?sdgId=${sdgId}`);
     };
 
@@ -109,7 +119,7 @@ export default function GuestSdgsPage() {
                     </h1>
                     <p className="mx-auto mt-3 max-w-2xl text-base text-slate-300 sm:text-lg leading-relaxed">
                         Lihat bagaimana Tugas Akhir dan Artikel Jurnal di repository ini berkontribusi 
-                        pada Sustainable Development Goals (SDGs). Klik pada card untuk menjelajahi karya terkait!
+                        pada Sustainable Development Goals (SDGs). Klik pada card untuk melihat deskripsi detail!
                     </p>
 
                     {/* Stats pills */}
@@ -128,7 +138,7 @@ export default function GuestSdgsPage() {
                 </div>
             </section>
 
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
 
                 {/* ── Section Header ── */}
                 <div className="mb-8">
@@ -140,54 +150,130 @@ export default function GuestSdgsPage() {
                     </p>
                 </div>
 
-                <div className="flex justify-center mb-6">
-                    <img src="/images/E_SDG_logo_UN_emblem_horizontal_trans_WEB.png" alt="Logo SDGs Horizontal" className="w-full max-w-2xl h-auto" />
-                </div>
-
                 {sdgs.length === 0 ? (
                     <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
                         <p className="text-slate-400">Belum ada data SDGs.</p>
                     </div>
                 ) : (
-                    /* ── SDGs Grid Cards ── */
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
-                        {sdgs.map((sdg) => {
-                            const goalNum = sdg.code.replace(/\D/g, "");
-                            const color = getSdgColor(sdg.code);
+                    <div className={`transition-all duration-300 ease-in-out ${selectedSdg ? "flex flex-col lg:flex-row items-start gap-6 sm:gap-8" : ""}`}>
+                        {/* Left Side: Logo & SDGs Grid */}
+                        <div className={`transition-all duration-300 ease-in-out ${selectedSdg ? "w-full lg:flex-1 min-w-0" : "w-full"}`}>
+                            <div className="flex justify-center mb-6">
+                                <img
+                                    src="/images/E_SDG_logo_UN_emblem_horizontal_trans_WEB.png"
+                                    alt="Logo SDGs Horizontal"
+                                    className="w-full max-w-2xl h-auto"
+                                />
+                            </div>
 
-                            return (
-                                <div
-                                    key={sdg.id}
-                                    onClick={() => handleCardClick(sdg.id)}
-                                    className="group relative flex aspect-square flex-col justify-between overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl cursor-pointer"
-                                >
-                                    
+                            {/* ── SDGs Grid Cards ── */}
+                            <div className={`grid gap-4 sm:gap-5 transition-all duration-300 ease-in-out ${selectedSdg ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"}`}>
+                                {sdgs.map((sdg) => {
+                                    const color = getSdgColor(sdg.code);
+                                    const isSelected = selectedSdg?.id === sdg.id;
 
-                                    
-
-                                    {/* Center: Image logo (if uploaded by admin) OR Fallback Title */}
-                                    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
-                                        {sdg.imageUrl ? (
-                                            <img
-                                                src={sdg.imageUrl}
-                                                alt={sdg.title}
-                                                className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center rounded-2xl text-center">
-                                                <h3
-                                                    className="line-clamp-3 px-2 text-xs font-black uppercase leading-tight"
-                                                    style={{ color: color }}
-                                                >
-                                                    {sdg.title}
-                                                </h3>
+                                    return (
+                                        <div
+                                            key={sdg.id}
+                                            onClick={() => handleCardSelect(sdg)}
+                                            className={`group relative flex aspect-square flex-col justify-between overflow-hidden rounded-xl border bg-white p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl cursor-pointer ${
+                                                isSelected ? "ring-2 ring-blue-600 border-blue-600 shadow-md" : "border-slate-200"
+                                            }`}
+                                        >
+                                            {/* Center: Image logo (if uploaded by admin) OR Fallback Title */}
+                                            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
+                                                {sdg.imageUrl ? (
+                                                    <img
+                                                        src={sdg.imageUrl}
+                                                        alt={sdg.title}
+                                                        className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full w-full items-center justify-center rounded-2xl text-center">
+                                                        <h3
+                                                            className="line-clamp-3 px-2 text-xs font-black uppercase leading-tight"
+                                                            style={{ color: color }}
+                                                        >
+                                                            {sdg.title}
+                                                        </h3>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Right Side: Description Side Panel */}
+                        {selectedSdg && (
+                            <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 sticky top-24 transition-opacity duration-300 opacity-100">
+                                <div className="relative rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
+                                    {/* Close button X */}
+                                    <button
+                                        onClick={() => setSelectedSdg(null)}
+                                        className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+                                        title="Tutup Deskripsi"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
+
+                                    {/* SDG Image Icon + Title Header */}
+                                    <div className="flex items-start gap-4 pr-6">
+                                        <div className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center">
+                                            {selectedSdg.imageUrl ? (
+                                                <img
+                                                    src={selectedSdg.imageUrl}
+                                                    alt={selectedSdg.title}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <span
+                                                    className="text-xs font-black uppercase leading-tight px-2 text-center"
+                                                    style={{ color: getSdgColor(selectedSdg.code) }}
+                                                >
+                                                    {selectedSdg.title}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0 pt-1">
+                                            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+                                                {selectedSdg.title}
+                                            </h3>
+                                        </div>
                                     </div>
 
+                                    {/* Deskripsi Section (Murni dari Inputan Admin) */}
+                                    <div className="mt-6 border-t border-slate-100 pt-5">
+                                        <h4 className="text-base sm:text-lg font-bold text-slate-900">
+                                            Deskripsi
+                                        </h4>
+                                        <div className="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                                            {selectedSdg.description && selectedSdg.description.trim() !== "" ? (
+                                                selectedSdg.description
+                                            ) : (
+                                                <span className="italic text-slate-400">
+                                                    Belum ada deskripsi yang ditambahkan oleh admin.
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Action button to explore repository */}
+                                    <div className="mt-6 pt-4 border-t border-slate-100">
+                                        <button
+                                            onClick={() => handleExploreRepository(selectedSdg.id)}
+                                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 text-sm font-semibold transition-all duration-200 shadow-sm"
+                                        >
+                                            Jelajahi Karya Terkait ({selectedSdg.jumlahTotal})
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -209,3 +295,4 @@ export default function GuestSdgsPage() {
         </main>
     );
 }
+

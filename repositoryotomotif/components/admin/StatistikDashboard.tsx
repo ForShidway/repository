@@ -1,6 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+import { BarChart3, Filter, Calendar } from "lucide-react";
 
 type ProgramStudyOption = {
     id: number;
@@ -22,11 +31,38 @@ type StatistikResponse = {
 };
 
 const SERIES = [
-    { key: "tugasAkhir", label: "Tugas Akhir", bar: "bg-blue-500", dot: "#3b82f6" },
-    { key: "artikelJurnal", label: "Artikel Jurnal", bar: "bg-cyan-500", dot: "#06b6d4" },
-    { key: "laporanPi", label: "Laporan PI", bar: "bg-emerald-500", dot: "#10b981" },
-    { key: "laporanPlk", label: "Laporan PLK", bar: "bg-amber-500", dot: "#f59e0b" },
+    { key: "tugasAkhir", label: "Tugas Akhir", fill: "#2563EB" },
+    { key: "artikelJurnal", label: "Artikel Jurnal", fill: "#06B6D4" },
+    { key: "laporanPi", label: "Laporan PI", fill: "#10B981" },
+    { key: "laporanPlk", label: "Laporan PLK", fill: "#F59E0B" },
 ] as const;
+
+function CustomBarTooltip({
+    active,
+    payload,
+    label,
+}: {
+    active?: boolean;
+    payload?: Array<{ name: string; value: number; color: string }>;
+    label?: string;
+}) {
+    if (!active || !payload || !payload.length) return null;
+
+    return (
+        <div className="rounded-xl border border-slate-700 bg-slate-900/95 backdrop-blur-md p-3 text-xs text-white shadow-2xl space-y-1.5 min-w-[160px] z-[1000] pointer-events-none">
+            <p className="font-bold text-white border-b border-slate-700 pb-1">{label}</p>
+            {payload.map((entry, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 text-[11px]">
+                    <span className="flex items-center gap-1.5 font-medium text-slate-300">
+                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                        {entry.name}:
+                    </span>
+                    <span className="font-bold text-white">{entry.value}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
 
 export default function StatistikDashboard({
     programStudyOptions,
@@ -75,10 +111,19 @@ export default function StatistikDashboard({
         return () => controller.abort();
     }, [mode, startYear, endYear, programStudyId]);
 
-    const max = useMemo(() => {
-        if (!data) return 1;
-        return Math.max(...SERIES.flatMap(({ key }) => data.series[key]), 1);
-    }, [data]);
+    const formattedData = useMemo(() => {
+        if (!data || !data.labels) return [];
+        return data.labels.map((label, index) => {
+            return {
+                name: mode === "tahun" ? `Tahun ${label}` : label,
+                shortName: label,
+                tugasAkhir: data.series.tugasAkhir[index] ?? 0,
+                artikelJurnal: data.series.artikelJurnal[index] ?? 0,
+                laporanPi: data.series.laporanPi[index] ?? 0,
+                laporanPlk: data.series.laporanPlk[index] ?? 0,
+            };
+        });
+    }, [data, mode]);
 
     const yearOptions = Array.from(
         { length: availableYears.max - availableYears.min + 1 },
@@ -86,81 +131,118 @@ export default function StatistikDashboard({
     );
 
     return (
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-4">
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                 <div>
-                    <h2 className="text-lg font-bold text-slate-900">Statistik Tugas</h2>
-                    <p className="mt-1 text-sm text-slate-500">Tugas Akhir, Artikel Jurnal, dan Laporan PI dalam satu grafik</p>
+                    <div className="flex items-center gap-1.5">
+                        <BarChart3 className="w-4 h-4 text-blue-600" />
+                        <h2 className="text-sm sm:text-base font-bold text-slate-900">Statistik Karya & Laporan Repository</h2>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-slate-500">
+                        Visualisasi gabungan Tugas Akhir, Artikel Jurnal, Laporan PI, dan PLK
+                    </p>
                 </div>
-                <div className="flex overflow-hidden rounded-lg border border-slate-200">
-                    {(["tahun", "prodi"] as const).map((value) => (
-                        <button
-                            key={value}
-                            onClick={() => setMode(value)}
-                            className={`px-3 py-2 text-xs font-semibold transition ${mode === value ? "bg-blue-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}
-                        >
-                            {value === "tahun" ? "Per Tahun" : "Per Program Studi"}
-                        </button>
-                    ))}
-                </div>
-            </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-                <select value={programStudyId} onChange={(event) => setProgramStudyId(event.target.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
-                    <option value="all">Semua Program Studi</option>
-                    {programStudyOptions.map((programStudy) => (
-                        <option key={programStudy.id} value={programStudy.id}>{programStudy.degree} {programStudy.name}</option>
-                    ))}
-                </select>
-                {mode === "tahun" && (
-                    <>
-                        <select value={startYear} onChange={(event) => setStartYear(Number(event.target.value))} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
-                            {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
-                        </select>
-                        <span className="text-sm text-slate-400">sampai</span>
-                        <select value={endYear} onChange={(event) => setEndYear(Number(event.target.value))} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
-                            {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
-                        </select>
-                        <button onClick={() => { setStartYear(availableYears.min); setEndYear(availableYears.max); }} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">Semua Tahun</button>
-                    </>
-                )}
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-4 text-xs font-medium text-slate-500">
-                {SERIES.map((series) => <span key={series.key} className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: series.dot }} />{series.label}</span>)}
-            </div>
-
-            {loading && <div className="mt-8 h-56 animate-pulse rounded-xl bg-slate-100" />}
-            {!loading && error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>}
-            {!loading && !error && data && (
-                <>
-                    <div className="mt-8 flex h-64 items-end gap-4 overflow-x-auto border-b border-l border-slate-200 px-2">
-                        {data.labels.map((label, index) => (
-                            <div key={label} className="group relative flex h-full min-w-[64px] flex-1 flex-col items-center justify-end">
-                                <div className="pointer-events-none absolute left-1/2 top-2 z-20 w-48 -translate-x-1/2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
-                                    <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-slate-300">
-                                        {mode === "tahun" ? `Tahun ${label}` : label}
-                                    </p>
-                                    {SERIES.map((series) => (
-                                        <p key={series.key} className="flex items-center gap-1.5">
-                                            <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: series.dot }} />
-                                            {series.label}: {data.series[series.key][index] ?? 0}
-                                        </p>
-                                    ))}
-                                    <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-slate-900" />
-                                </div>
-                                <div className="flex h-full w-full items-end justify-center gap-1">
-                                    {SERIES.map((series) => {
-                                        const value = data.series[series.key][index] ?? 0;
-                                        const height = (value / max) * 100;
-                                        return <div key={series.key} className="flex h-full w-4 items-end"><div className={`w-full rounded-t-sm ${series.bar} transition-all duration-300`} style={{ height: `${Math.max(height, value > 0 ? 3 : 0)}%` }} /></div>;
-                                    })}
-                                </div>
-                                <div className="mt-3 line-clamp-1 max-w-[100px] text-center text-[11px] font-medium text-slate-400">{label}</div>
-                            </div>
+                <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex overflow-hidden rounded-lg border border-slate-200 p-0.5 bg-slate-50">
+                        {(["tahun", "prodi"] as const).map((value) => (
+                            <button
+                                key={value}
+                                onClick={() => setMode(value)}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                                    mode === value ? "bg-blue-600 text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
+                                }`}
+                            >
+                                {value === "tahun" ? "Per Tahun" : "Per Program Studi"}
+                            </button>
                         ))}
                     </div>
-                    {(data.catatan || data.lpiTotal !== undefined) && <p className="mt-4 text-xs text-slate-400">{mode === "prodi" && data.lpiTotal !== undefined && <span className="mr-2 rounded-md bg-slate-100 px-2 py-1 font-medium text-slate-500">LPI: semua prodi ({data.lpiTotal})</span>}{data.catatan}</p>}
+                </div>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700">
+                        <Filter className="w-3 h-3 text-blue-600" />
+                        <select
+                            value={programStudyId}
+                            onChange={(event) => setProgramStudyId(event.target.value)}
+                            className="bg-transparent font-semibold text-slate-900 outline-none cursor-pointer text-xs"
+                        >
+                            <option value="all">Semua Program Studi</option>
+                            {programStudyOptions.map((ps) => (
+                                <option key={ps.id} value={ps.id}>
+                                    {ps.degree} {ps.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {mode === "tahun" && (
+                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700">
+                            <Calendar className="w-3 h-3 text-slate-400" />
+                            <span className="font-medium">Dari:</span>
+                            <select
+                                value={startYear}
+                                onChange={(event) => setStartYear(Number(event.target.value))}
+                                className="bg-transparent font-bold text-slate-900 outline-none cursor-pointer text-xs"
+                            >
+                                {yearOptions.map((year) => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
+                            </select>
+                            <span className="text-slate-400">s/d</span>
+                            <select
+                                value={endYear}
+                                onChange={(event) => setEndYear(Number(event.target.value))}
+                                className="bg-transparent font-bold text-slate-900 outline-none cursor-pointer text-xs"
+                            >
+                                {yearOptions.map((year) => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-[10px] font-semibold text-slate-600">
+                    {SERIES.map((series) => (
+                        <span key={series.key} className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-50 border border-slate-200">
+                            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: series.fill }} />
+                            {series.label}
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+            {loading && <div className="mt-6 h-56 animate-pulse rounded-xl bg-slate-100" />}
+            {!loading && error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-600">{error}</div>}
+            {!loading && !error && data && (
+                <>
+                    <div className="mt-5 h-60 w-full pt-2">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <XAxis dataKey="shortName" tick={{ fontSize: 11, fill: "#64748B" }} />
+                                <YAxis tick={{ fontSize: 11, fill: "#64748B" }} allowDecimals={false} />
+                                <Tooltip wrapperStyle={{ zIndex: 1000, pointerEvents: "none" }} content={<CustomBarTooltip />} />
+                                <Bar dataKey="tugasAkhir" name="Tugas Akhir" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="artikelJurnal" name="Artikel Jurnal" fill="#06B6D4" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="laporanPi" name="Laporan PI" fill="#10B981" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="laporanPlk" name="Laporan PLK" fill="#F59E0B" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                    {(data.catatan || data.lpiTotal !== undefined) && (
+                        <p className="mt-3 text-[11px] text-slate-400 flex items-center gap-2">
+                            {mode === "prodi" && data.lpiTotal !== undefined && (
+                                <span className="rounded bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
+                                    Total LPI Semua Prodi: {data.lpiTotal}
+                                </span>
+                            )}
+                            {data.catatan}
+                        </p>
+                    )}
                 </>
             )}
         </section>
