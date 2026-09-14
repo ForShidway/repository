@@ -22,6 +22,7 @@ export async function GET() {
                 code: sdg.code,
                 title: sdg.title,
                 description: sdg.description,
+                imageUrl: sdg.imageUrl,
                 jumlahTA: sdg.tugasAkhirs.length,
                 jumlahArtikel: sdg.artikelJurnal.length,
                 jumlahTotal: sdg.tugasAkhirs.length + sdg.artikelJurnal.length,

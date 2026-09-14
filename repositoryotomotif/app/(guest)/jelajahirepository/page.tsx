@@ -57,13 +57,26 @@ export default function KatalogTugasAkhirPage() {
   const [prodi, setProdi] = useState(searchParams.get('prodi') || '');
   const [tahun, setTahun] = useState('');
   const [dosen, setDosen] = useState('');
-  const [sdgsFilter, setSdgsFilter] = useState<number[]>([]);
+  const sdgParam = searchParams.get('sdgId');
+  const [sdgsFilter, setSdgsFilter] = useState<number[]>(
+    sdgParam && !isNaN(parseInt(sdgParam)) ? [parseInt(sdgParam)] : []
+  );
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState('terbaru');
   const [page, setPage] = useState(1);
   const [jenis, setJenis] = useState(searchParams.get('jenis') || '')
   const [previewFile, setPreviewFile] = useState<string | null | undefined>(null);
   const PER_PAGE = 10;
+
+  useEffect(() => {
+    const param = searchParams.get('sdgId');
+    if (param) {
+      const id = parseInt(param);
+      if (!isNaN(id)) {
+        setSdgsFilter([id]);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchData() {
