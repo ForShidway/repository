@@ -29,7 +29,6 @@ export function Navbar() {
         <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl shadow-sm shadow-slate-900/[0.04]">
             <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
 
-                {/* ── Brand ── */}
                 <Link href="/" className="flex shrink-0 items-center gap-3 group">
                     <div className="relative h-11 w-11 shrink-0 transition group-hover:scale-105">
                         <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />

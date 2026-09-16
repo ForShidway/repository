@@ -61,51 +61,10 @@ function LoginForm() {
         <main className="flex min-h-screen bg-[#f8fafc]">
             {/* Left decorative panel */}
             <div className="relative hidden w-[46%] flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#060f1e] via-[#0B1F3A] to-[#132D52] lg:flex">
-                {/* Mesh background */}
-                <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute -left-20 -top-20 h-80 w-80 rounded-full bg-blue-700/15 blur-3xl" />
-                    <div className="absolute -right-10 bottom-10 h-64 w-64 rounded-full bg-indigo-600/15 blur-3xl" />
-                    <div
-                        className="absolute inset-0 opacity-[0.04]"
-                        style={{
-                            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1.5px, transparent 1.5px)",
-                            backgroundSize: "28px 28px",
-                        }}
-                    />
-                </div>
+                
 
-                {/* Content */}
-                <div className="relative z-10 flex max-w-sm flex-col items-center px-10 text-center">
-                    <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-800 text-xl font-extrabold text-white shadow-2xl shadow-blue-900/50">
-                        RO
-                    </div>
-                    <h2 className="text-2xl font-extrabold text-white">Repository Otomotif</h2>
-                    <p className="mt-3 text-sm leading-7 text-slate-400">
-                        Platform repositori digital Jurusan Teknik Otomotif Universitas Negeri Padang.
-                    </p>
-
-                    {/* Stats mini */}
-                    <div className="mt-10 grid w-full grid-cols-2 gap-3">
-                        {[
-                            { label: "Tugas Akhir", icon: "📄" },
-                            { label: "Dosen", icon: "👨‍🏫" },
-                            { label: "Program Studi", icon: "🎓" },
-                            { label: "SDGs Terintegrasi", icon: "🌍" },
-                        ].map((s) => (
-                            <div key={s.label} className="rounded-xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur-sm">
-                                <p className="text-xl">{s.icon}</p>
-                                <p className="mt-1 text-xs font-medium text-slate-400">{s.label}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="mt-8 flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-500/10 px-4 py-2">
-                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-400" />
-                        <span className="text-xs font-semibold text-orange-300">Repository Resmi · UNP</span>
-                    </div>
-                </div>
-            </div>
-
+                
+        </div>
             {/* Right form panel */}
             <div className="flex flex-1 items-center justify-center px-6 py-12 sm:px-12">
                 <div className="w-full max-w-md">
@@ -114,7 +73,7 @@ function LoginForm() {
                     <div className="mb-8 flex justify-center lg:hidden">
                         <Link href="/" className="flex items-center gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-[#0B1F3A] text-sm font-extrabold text-white shadow-md">
-                                RO
+                                 <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                             </div>
                             <div className="leading-tight">
                                 <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-600">Repository</div>

@@ -39,36 +39,6 @@ const icons = {
             <rect x="3" y="16" width="7" height="5" rx="1" />
         </svg>
     ),
-    tugasAkhir: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-    ),
-    artikelJurnal: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-            <path d="M9 7h7M9 11h7M9 15h5" />
-        </svg>
-    ),
-    laporanPi: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 3h7l5 5v13a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z" />
-            <path d="M14 3v5h5" />
-            <path d="M8 13h8M8 17h8" />
-        </svg>
-    ),
-    laporanLpk: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 7h16" />
-            <path d="M7 12h10" />
-            <path d="M10 17h4" />
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-        </svg>
-    ),
 };
 
 const menuGroups: MenuGroup[] = [
@@ -78,15 +48,7 @@ const menuGroups: MenuGroup[] = [
             { label: "Beranda", href: "/mahasiswa", icon: icons.dashboard },
         ],
     },
-    {
-        title: "REPOSITORY",
-        items: [
-            { label: "Tugas Akhir", href: "/mahasiswa/tugas-akhir/view", icon: icons.tugasAkhir },
-            { label: "Artikel Jurnal", href: "/mahasiswa/artikel-jurnal/create", icon: icons.artikelJurnal },
-            { label: "Laporan PI", href: "/mahasiswa/laporan-pi/create", icon: icons.laporanPi },
-            { label: "Laporan LPK", href: "/mahasiswa/laporan-lpk/create", icon: icons.laporanLpk },
-        ],
-    },
+    
 ];
 
 // Toggle icon (chevron left/right)
@@ -182,8 +144,8 @@ export default function SidebarMahasiswa({ collapsed, onToggle, mobileOpen, onMo
                 <div className={`flex h-20 items-center border-b border-slate-100 ${collapsed ? "justify-center px-0" : "px-5"}`}>
                     {!collapsed && (
                         <div className="flex items-center min-w-0 flex-1">
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-[#0B1F3A] text-sm font-extrabold text-white shadow-md shadow-blue-900/20">
-                                RO
+                            <div className="relative h-11 w-11 shrink-0 transition group-hover:scale-105">
+                                <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                             </div>
                             <div className="ml-3 min-w-0">
                                 <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-600">
@@ -198,7 +160,7 @@ export default function SidebarMahasiswa({ collapsed, onToggle, mobileOpen, onMo
 
                     {collapsed && (
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-[#0B1F3A] text-xs font-extrabold text-white shadow-md shadow-blue-900/20">
-                            RO
+                             <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                         </div>
                     )}
 

@@ -216,8 +216,8 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
                 <div className={`flex h-20 items-center border-b border-white/10 ${collapsed ? "justify-center px-0" : "px-5"}`}>
                     {!collapsed && (
                         <div className="flex items-center min-w-0 flex-1">
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-sm font-extrabold text-white shadow-lg shadow-blue-900/40">
-                                RO
+                             <div className="relative h-11 w-11 shrink-0 transition group-hover:scale-105">
+                                <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                             </div>
                             <div className="ml-3 min-w-0">
                                 <h1 className="text-sm font-bold tracking-tight text-white truncate">
@@ -232,7 +232,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
 
                     {collapsed && (
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-xs font-extrabold text-white shadow-lg shadow-blue-900/40">
-                            RO
+                             <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
                         </div>
                     )}
 
