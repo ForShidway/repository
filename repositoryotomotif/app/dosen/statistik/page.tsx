@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     BarChart,
@@ -28,6 +28,9 @@ import {
     ChevronRight,
     SlidersHorizontal,
     PieChart as PieIcon,
+    Search,
+    LayoutGrid,
+    ListFilter,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -45,7 +48,7 @@ type DosenStat = {
     pembimbingPlk: number;
     penulisArtikel: number;
     totalAktivitas: number;
-    workloadStatus: "Kapasitas Tersedia" | "Beban Ideal" | "Beban Tinggi";
+
 };
 
 type SDGItem = {
@@ -104,31 +107,9 @@ type DashboardData = {
     trenTahunan: TrenItem[];
 };
 
-// Warna Resmi 17 SDGs PBB
-const SDG_PALETTE: Record<string, { bg: string; text: string; label: string }> = {
-    "1": { bg: "#E5243B", text: "#FFFFFF", label: "Tanpa Kemiskinan" },
-    "2": { bg: "#DDA63A", text: "#FFFFFF", label: "Tanpa Kelaparan" },
-    "3": { bg: "#4C9F38", text: "#FFFFFF", label: "Kehidupan Sehat & Sejahtera" },
-    "4": { bg: "#C5192D", text: "#FFFFFF", label: "Pendidikan Berkualitas" },
-    "5": { bg: "#FF3A21", text: "#FFFFFF", label: "Kesetaraan Gender" },
-    "6": { bg: "#26BDE2", text: "#FFFFFF", label: "Air Bersih & Sanitasi Layak" },
-    "7": { bg: "#FCC30B", text: "#000000", label: "Energi Bersih & Terjangkau" },
-    "8": { bg: "#A21942", text: "#FFFFFF", label: "Pekerjaan Layak & Pertumbuhan Ekonomi" },
-    "9": { bg: "#FD6925", text: "#FFFFFF", label: "Industri, Inovasi & Infrastruktur" },
-    "10": { bg: "#DD1367", text: "#FFFFFF", label: "Berkurangnya Kesenjangan" },
-    "11": { bg: "#FD9D24", text: "#FFFFFF", label: "Kota & Permukiman Berkelanjutan" },
-    "12": { bg: "#BF8B2E", text: "#FFFFFF", label: "Konsumsi & Produksi Bertanggung Jawab" },
-    "13": { bg: "#3F7E44", text: "#FFFFFF", label: "Penanganan Perubahan Iklim" },
-    "14": { bg: "#0A97D9", text: "#FFFFFF", label: "Ekosistem Lautan" },
-    "15": { bg: "#56C02B", text: "#FFFFFF", label: "Ekosistem Daratan" },
-    "16": { bg: "#00689D", text: "#FFFFFF", label: "Perdamaian, Keadilan & Kelembagaan Kuat" },
-    "17": { bg: "#19486A", text: "#FFFFFF", label: "Kemitraan untuk Mencapai Tujuan" },
-};
 
-function getSdgMeta(code: string) {
-    const num = code.replace(/\D/g, "");
-    return SDG_PALETTE[num] || { bg: "#0D9488", text: "#FFFFFF", label: "SDG Terintegrasi" };
-}
+
+
 
 const PRODI_COLORS = ["#0D9488", "#3B82F6", "#8B5CF6", "#F59E0B", "#EC4899", "#10B981"];
 
@@ -157,6 +138,13 @@ export default function DosenStatistikPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [search, setSearch] = useState("");
+    const [filterStatus, setFilterStatus] = useState<"all" | "Kapasitas Tersedia" | "Beban Ideal" | "Beban Tinggi">("all");
+    const [sortBy, setSortBy] = useState<"totalAktivitas" | "totalBimbingan" | "penguji" | "pembimbingPi" | "penulisArtikel" | "name">("totalAktivitas");
+    const [viewMode, setViewMode] = useState<"grid" | "table">("table");
+    const [page, setPage] = useState(1);
+
+    const PER_PAGE = 10;
 
     useEffect(() => {
         async function fetchData() {
@@ -175,36 +163,36 @@ export default function DosenStatistikPage() {
         fetchData();
     }, []);
 
+    const filteredDosens = useMemo(() => {
+        if (!data?.dosenList) return [];
+
+        let list = [...data.dosenList];
+
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            list = list.filter((d) => d.name.toLowerCase().includes(q));
+        }
+
+        list.sort((a, b) => {
+            if (sortBy === "name") {
+                return a.name.localeCompare(b.name);
+            }
+            return (b[sortBy] ?? 0) - (a[sortBy] ?? 0);
+        });
+
+        return list;
+    }, [data?.dosenList, search, filterStatus, sortBy]);
+
+    const totalPages = Math.ceil(filteredDosens.length / PER_PAGE);
+    const pagedDosens = filteredDosens.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+    const handleDetailClick = (dosenId: number) => {
+        router.push(`/dosen/${dosenId}`);
+    };
+
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
-            {/* Top Bar */}
-            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-6 backdrop-blur-xl shadow-xs">
-                <div className="flex items-center gap-3">
-                    <Link
-                        href="/dosen"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition"
-                        title="Kembali ke Dashboard Utama"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                    </Link>
-                    <div>
-                        <h1 className="text-base font-extrabold text-slate-900 leading-tight">
-                            Grafik & Analisis Data Dosen
-                        </h1>
-                        <p className="text-[11px] text-slate-500 font-medium">
-                            Visualisasi persebaran beban, korelasi SDGs, dan distribusi program studi
-                        </p>
-                    </div>
-                </div>
-
-                <Link
-                    href="/dosen"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal-700 shadow-xs transition"
-                >
-                    <span>Ke Dashboard Terpadu</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
-            </header>
+            
 
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-8">
                 {/* Loading */}
@@ -225,7 +213,7 @@ export default function DosenStatistikPage() {
                 {!loading && data && (
                     <>
                         {/* ── Ringkasan Indikator Sains Data ── */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
                                 <div className="flex items-center justify-between text-slate-500 mb-2">
                                     <span className="text-xs font-semibold">Indeks Pemerataan Beban</span>
@@ -269,6 +257,28 @@ export default function DosenStatistikPage() {
                                     TA, Sidang, PI, PLK, Jurnal
                                 </p>
                             </div>
+
+                            <div className="rounded-2xl border border-indigo-200/80 bg-white p-5 shadow-xs">
+                                <div className="flex items-center justify-between text-slate-500 mb-2">
+                                    <span className="text-xs font-semibold">Laporan PI</span>
+                                    <SlidersHorizontal className="h-4 w-4 text-indigo-600" />
+                                </div>
+                                <p className="text-3xl font-black text-slate-900">{data.summary.totalLaporanPi}</p>
+                                <p className="text-[11px] text-indigo-600 font-medium mt-1">
+                                    Total Laporan Praktik Industri
+                                </p>
+                            </div>
+
+                            <div className="rounded-2xl border border-pink-200/80 bg-white p-5 shadow-xs">
+                                <div className="flex items-center justify-between text-slate-500 mb-2">
+                                    <span className="text-xs font-semibold">Laporan PLK</span>
+                                    <PieIcon className="h-4 w-4 text-pink-600" />
+                                </div>
+                                <p className="text-3xl font-black text-slate-900">{data.summary.totalLaporanPlk}</p>
+                                <p className="text-[11px] text-pink-600 font-medium mt-1">
+                                    Total Laporan Pelatihan Kependidikan
+                                </p>
+                            </div>
                         </div>
 
                         {/* ── Distribusi Bimbingan & Program Studi ── */}
@@ -278,11 +288,9 @@ export default function DosenStatistikPage() {
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
                                     <div>
                                         <h3 className="text-base font-bold text-slate-900">
-                                            Persebaran Bimbingan Dosen Teratas
+                                            Persebaran Tugas Bimbingan Dosen Teratas
                                         </h3>
-                                        <p className="text-xs text-slate-500 mt-0.5">
-                                            Komparasi Bimbingan Utama (Bimb 1), Pendamping (Bimb 2), Penguji, dan Praktik Industri
-                                        </p>
+                                    
                                     </div>
                                 </div>
 
@@ -296,6 +304,7 @@ export default function DosenStatistikPage() {
                                                 "Bimbingan 2": d.pembimbingPendamping,
                                                 Penguji: d.penguji,
                                                 PI: d.pembimbingPi,
+                                                PLK: d.pembimbingPlk,
                                             }))}
                                             margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
                                         >
@@ -305,6 +314,8 @@ export default function DosenStatistikPage() {
                                             <Bar dataKey="Bimbingan 1" stackId="a" fill="#0D9488" />
                                             <Bar dataKey="Bimbingan 2" stackId="a" fill="#3B82F6" />
                                             <Bar dataKey="Penguji" stackId="a" fill="#A855F7" />
+                                            <Bar dataKey="PI" stackId="a" fill="#6366F1" />
+                                            <Bar dataKey="PLK" stackId="a" fill="#EC4899" radius={[4, 4, 0, 0]} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -347,65 +358,202 @@ export default function DosenStatistikPage() {
                             </div>
                         </div>
 
-                        {/* ── Matriks Kontribusi SDGs Resmi PBB ── */}
-                        {data.sdgsList && data.sdgsList.length > 0 && (
-                            <section className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                                                <Globe className="h-4 w-4" />
-                                            </span>
-                                            <h3 className="text-lg font-extrabold text-slate-900">
-                                                Matriks Kontribusi Sustainable Development Goals (SDGs)
-                                            </h3>
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-                                            Pemetaan karya Tugas Akhir dan Artikel Jurnal civitas akademika Jurusan Teknik Otomotif ke 17 Tujuan Pembangunan Berkelanjutan PBB.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {data.sdgsList.map((sdg) => {
-                                        const meta = getSdgMeta(sdg.code);
-                                        return (
-                                            <div
-                                                key={sdg.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
-                                            >
-                                                <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: meta.bg }} />
-                                                <div className="flex items-start gap-2.5 mb-3">
-                                                    <div
-                                                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black shadow-xs"
-                                                        style={{ backgroundColor: meta.bg, color: meta.text }}
-                                                    >
-                                                        {sdg.code.replace(/\D/g, "") || sdg.code}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                            {sdg.code}
-                                                        </p>
-                                                        <p className="text-xs font-extrabold text-slate-800 line-clamp-1">
-                                                            {sdg.title}
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center justify-between text-xs bg-slate-50 rounded-xl p-2 font-semibold">
-                                                    <span className="text-slate-500">TA: {sdg.countTa}</span>
-                                                    <span className="text-slate-500">Jurnal: {sdg.countArtikel}</span>
-                                                    <span className="text-teal-700 font-bold">Total: {sdg.total}</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </section>
-                        )}
+                        
                     </>
+                    
                 )}
             </div>
+
+                <section className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                                            <Users className="h-4 w-4" />
+                                        </span>
+                                        <h3 className="text-lg font-extrabold text-slate-900">
+                                            Direktori Dosen & Rekapitulasi Beban Akademik
+                                        </h3>
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-1">
+                                        Klik pada salah satu dosen untuk melihat data yang lebih lengkap
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            {/* ── Toolbar Pencarian & Filter Cerdas ── */}
+                            <div className="mb-6 flex flex-col md:flex-row gap-3">
+                                {/* Input Cari Nama */}
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) => {
+                                            setSearch(e.target.value);
+                                            setPage(1);
+                                        }}
+                                        placeholder="Cari nama dosen pembimbing / penguji..."
+                                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs font-medium text-slate-800 placeholder-slate-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                                    />
+                                    {search && (
+                                        <button
+                                            onClick={() => {
+                                                setSearch("");
+                                                setPage(1);
+                                            }}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
+                                        >
+                                            Reset
+                                        </button>
+                                    )}
+                                </div>
+
+
+                                {/* Urutkan Berdasarkan */}
+                                <div className="relative shrink-0">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e: any) => setSortBy(e.target.value)}
+                                        className="w-full md:w-auto rounded-xl border border-slate-200 bg-white py-2.5 px-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-teal-500"
+                                    >
+                                        <option value="totalAktivitas">Urutkan: Total Kontribusi</option>
+                                        <option value="totalBimbingan">Urutkan: Bimbingan TA Terbanyak</option>
+                                        <option value="penguji">Urutkan: Penguji Sidang Terbanyak</option>
+                                        <option value="pembimbingPi">Urutkan: Pembimbing PI</option>
+                                        <option value="penulisArtikel">Urutkan: Artikel Jurnal</option>
+                                        <option value="name">Urutkan: Abjad Nama (A - Z)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                           
+
+                            {/* ── Konten Direktori: Table View ── */}
+                            {viewMode === "table" && (
+                                <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                                    <table className="w-full text-left text-xs">
+                                        <thead>
+                                            <tr className="border-b border-slate-200 bg-slate-50 font-bold text-slate-600">
+                                                <th className="px-4 py-3">No</th>
+                                                <th className="px-4 py-3">Nama Dosen</th>
+                                                <th className="px-3 py-3 text-center">Bimb. 1</th>
+                                                <th className="px-3 py-3 text-center">Bimb. 2</th>
+                                                <th className="px-3 py-3 text-center">Total TA</th>
+                                                <th className="px-3 py-3 text-center">Penguji</th>
+                                                <th className="px-3 py-3 text-center">PI</th>
+                                                <th className="px-3 py-3 text-center">PLK</th>
+                                                <th className="px-3 py-3 text-center">Artikel</th>
+                                                <th className="px-4 py-3 text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 font-medium">
+                                            {pagedDosens.map((dosen, index) => (
+                                                <tr
+                                                    key={dosen.id}
+                                                    onClick={() => handleDetailClick(dosen.id)}
+                                                    className="hover:bg-teal-50/40 transition cursor-pointer"
+                                                >
+                                                     <td className="px-4 py-3.5 font-bold text-slate-900">
+                                                        {index+1}
+                                                    </td>
+                                                    <td className="px-4 py-3.5 font-bold text-slate-900">
+                                                        <div className="flex items-center gap-2.5">
+                                                            <span className="line-clamp-1">{dosen.name}</span>
+                                                        </div>
+                                                    </td>
+                                                   
+                                                    <td className="px-3 py-3.5 text-center font-bold text-slate-700">
+                                                        {dosen.pembimbingUtama}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-center font-bold text-slate-700">
+                                                        {dosen.pembimbingPendamping}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-center font-extrabold text-teal-700">
+                                                        {dosen.totalTa}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-center font-bold text-blue-700">
+                                                        {dosen.penguji}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-center text-slate-600">
+                                                        {dosen.pembimbingPi}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-center text-slate-600">
+                                                        {dosen.pembimbingPlk}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-center font-bold text-amber-700">
+                                                        {dosen.penulisArtikel}
+                                                    </td>
+                                                    <td className="px-3 py-3.5 text-right">
+                                                        <span className="inline-flex items-center gap-1 font-bold text-teal-600 hover:text-teal-800">
+                                                            Detail
+                                                            <ChevronRight className="h-3.5 w-3.5" />
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            {/* ── Empty State ── */}
+                            {filteredDosens.length === 0 && (
+                                <div className="py-12 text-center">
+                                    <p className="font-semibold text-slate-700">Tidak ada dosen yang cocok dengan kriteria pencarian.</p>
+                                    <button
+                                        onClick={() => {
+                                            setSearch("");
+                                            setFilterStatus("all");
+                                        }}
+                                        className="mt-2 text-xs font-bold text-teal-600 hover:underline"
+                                    >
+                                        Reset Filter Pencarian
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* ── Pagination ── */}
+                            {totalPages > 1 && (
+                                <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                                    <p className="text-xs text-slate-500">
+                                        Menampilkan {(page - 1) * PER_PAGE + 1} -{" "}
+                                        {Math.min(page * PER_PAGE, filteredDosens.length)} dari {filteredDosens.length} dosen
+                                    </p>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            disabled={page === 1}
+                                            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                                        >
+                                            Sebelumnya
+                                        </button>
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                            <button
+                                                key={p}
+                                                onClick={() => setPage(p)}
+                                                className={`h-8 w-8 rounded-lg text-xs font-bold transition ${
+                                                    page === p
+                                                        ? "bg-teal-600 text-white shadow-xs"
+                                                        : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                                                }`}
+                                            >
+                                                {p}
+                                            </button>
+                                        ))}
+                                        <button
+                                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                            disabled={page === totalPages}
+                                            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                                        >
+                                            Berikutnya
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </section>
+
         </div>
     );
 }

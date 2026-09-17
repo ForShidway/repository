@@ -68,18 +68,7 @@ export function Navbar() {
 
                 {/* ── Search + Login ── */}
                 <div className="hidden items-center gap-2.5 md:flex">
-                    <form onSubmit={handleSearchSubmit} className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 transition-all focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-sm focus-within:shadow-blue-100">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 text-slate-400">
-                            <circle cx="11" cy="11" r="7" />
-                            <path d="m21 21-4.3-4.3" />
-                        </svg>
-                        <input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Cari Tugas Akhir..."
-                            className="w-36 bg-transparent text-sm outline-none placeholder:text-slate-400 text-slate-800"
-                        />
-                    </form>
+                    
 
                     <Link
                         href="/login"

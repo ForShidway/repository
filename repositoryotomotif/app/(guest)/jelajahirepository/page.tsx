@@ -242,15 +242,23 @@ export default function KatalogTugasAkhirPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen bg-[#f8fafc]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0B1F3A] via-[#132D52] to-[#1a3a66] py-14 sm:py-16">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-10 -left-16 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
 
-        {/* Page Header */}
-        <section className="mb-8">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Repositori Otomotif</p>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Jelajahi Repository</h1>
-          <p className="mt-2 max-w-2xl text-slate-500">Temukan Tugas Akhir, Artikel Jurnal, dan Laporan PI dalam satu katalog repository.</p>
-        </section>
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            Jelajahi Repository
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-base text-slate-300 sm:text-lg leading-relaxed">
+            Temukan dan Lihat Tugas Akhir, Artikel Jurnal, Laporan Praktik Industri dan Laporan Pelatihan Kependidikan yang tersedia dalam repository ini
+          </p>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        
 
         {error && (
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4">

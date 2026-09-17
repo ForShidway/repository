@@ -9,6 +9,7 @@ type LaporanPlk = {
     nim: string;
     judul: string;
     namaInstansi: string;
+    alamat: string;
     dosenPembimbing: {id: number, name:string}
 
 }
@@ -107,6 +108,7 @@ export default function LaporanPlkPage() {
                                     <th>Nama Mahasiswa</th>
                                     <th>NIM</th>
                                     <th>Nama Instansi</th>
+                                    <th>Alamat</th>
                                     <th>Dosen Pembimbing </th>
                                     <th>Aksi</th>
                                 </tr>
@@ -118,6 +120,7 @@ export default function LaporanPlkPage() {
                                         <td><strong>{item.name || "-"}</strong></td>
                                         <td>{item.nim || "-"}</td>
                                         <td>{item.namaInstansi || "-"}</td>
+                                        <td>{item.alamat || "-"}</td>
                                         <td>{item.dosenPembimbing?.name || ""}</td>
                                         <td className="action-cell">
                                             <button onClick={() => router.push(`/admin/laporan-plk/${item.id}`) }  className="detail-button"  >

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 type Dosen = {
     id: number;
@@ -239,55 +240,28 @@ export default function GuestHomePage() {
                                 href="/jelajahirepository"
                                 className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-600"
                             >
-                                📖 Jelajahi Repository
+                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                </svg>
+                                Jelajahi Repository
                             </Link>
                             <Link
-                                href="/dosen"
+                                href="/sdgs"
                                 className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                             >
-                                👥 Lihat Dosen
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder-check"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg>
+                                SDGs
                             </Link>
                         </div>
                     </div>
 
-                    {/* Right: illustration placeholder (no photo) */}
-                    <div className="relative">
-                        <div className="absolute -right-6 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-white/5 lg:h-[480px] lg:w-[480px]" />
-
-                        <div className="relative flex h-[320px] w-full items-center justify-center overflow-hidden rounded-[28px] border border-white/10 bg-[#0E2444] shadow-xl sm:h-[400px] lg:h-[460px]">
-                            {/* dekorasi titik-titik */}
-                            <div
-                                className="absolute inset-0 opacity-20"
-                                style={{
-                                    backgroundImage:
-                                        "radial-gradient(circle, rgba(255,255,255,0.5) 1.5px, transparent 1.5px)",
-                                    backgroundSize: "22px 22px",
-                                }}
-                            />
-
-                            {/* ikon mobil sebagai placeholder */}
-                            <svg
-                                width="180"
-                                height="180"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="white"
-                                strokeWidth="1.2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="relative opacity-90"
-                            >
-                                <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 012 2v4h-2" />
-                                <circle cx="7.5" cy="17.5" r="2.5" />
-                                <circle cx="17.5" cy="17.5" r="2.5" />
-                                <path d="M5 12h13" />
-                            </svg>
-
-                            <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-orange-500/15 px-4 py-1.5 text-sm font-medium text-orange-300 ring-1 ring-inset ring-orange-400/20">
-                                Repository Otomotif
-                            </span>
+                        {/* <div className="absolute -right-1 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-white/5 lg:h-[480px] lg:w-[480px]" /> */}
+                
+                        <div className="relative h-[320px] w-full   sm:h-[400px] lg:h-[460px]">
+                            <img  src="/images/guestdashboard.png" alt="Repository Otomotif" className="object-cover" />
                         </div>
-                    </div>
+                  
                 </div>
 
                 {/* Wave divider — transisi lengkung dari navy ke section putih, di belakang stats card */}

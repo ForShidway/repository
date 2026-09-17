@@ -25,6 +25,7 @@ export default function LaporanPLKForm() {
     const [nim, setNim] = useState("");
     const [judul, setJudul] = useState("");
     const [namaInstansi, setNamaInstansi] = useState("");
+    const [alamat, setAlamat] = useState("");
     const [dosenPembimbingId, setDosenPembimbingId] = useState("");
     const [dosens, setDosens] = useState<Dosen[]>([]);
 
@@ -78,6 +79,7 @@ export default function LaporanPLKForm() {
         nim.trim() &&
         judul.trim() &&
         namaInstansi.trim() &&
+        alamat.trim() &&
         dosenPembimbingId &&
         tanggalMulai &&
         tanggalSelesai &&
@@ -107,6 +109,7 @@ export default function LaporanPLKForm() {
             formData.append("nim", nim.trim());
             formData.append("judul", judul.trim());
             formData.append("namaInstansi", namaInstansi.trim());
+            formData.append("alamat", alamat.trim());
             formData.append("dosenPembimbingId", dosenPembimbingId);
             formData.append("tanggalMulai", tanggalMulai);
             formData.append("tanggalSelesai", tanggalSelesai);
@@ -128,6 +131,7 @@ export default function LaporanPLKForm() {
             setNim("");
             setJudul("");
             setNamaInstansi("");
+            setAlamat("");
             setDosenPembimbingId("");
             setTanggalMulai("");
             setTanggalSelesai("");
@@ -200,6 +204,20 @@ export default function LaporanPLKForm() {
                                 value={namaInstansi}
                                 onChange={(e) => setNamaInstansi(e.target.value)}
                                 placeholder="Contoh: PT Astra Otoparts Tbk"
+                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="alamat" className="mb-2 block text-sm font-medium text-gray-700">
+                                Alamat Instansi
+                            </label>
+                            <textarea
+                                id="alamat"
+                                value={alamat}
+                                onChange={(e) => setAlamat(e.target.value)}
+                                rows={3}
+                                placeholder="Contoh: Jl. Industri No. 10, Bandung"
                                 className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                             />
                         </div>

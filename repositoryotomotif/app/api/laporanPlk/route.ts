@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         const nim = formData.get("nim")?.toString().trim() ?? "";
         const judul = formData.get("judul")?.toString().trim() ?? "";
         const namaInstansi = formData.get("namaInstansi")?.toString().trim() ?? "";
+        const alamat = formData.get("alamat")?.toString().trim() ?? "";
         const dosenPembimbingId = Number(formData.get("dosenPembimbingId"));
         const tanggalMulaiRaw = formData.get("tanggalMulai")?.toString();
         const tanggalSelesaiRaw = formData.get("tanggalSelesai")?.toString();
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
         const fileEntry = formData.get("file");
         const file = fileEntry instanceof File && fileEntry.size > 0 ? fileEntry : null;
 
-        if (!name || !nim || !judul || !namaInstansi || !dosenPembimbingId || !tanggalMulaiRaw || !tanggalSelesaiRaw) {
+        if (!name || !nim || !judul || !namaInstansi || !alamat || !dosenPembimbingId || !tanggalMulaiRaw || !tanggalSelesaiRaw) {
             return NextResponse.json(
                 { message: "Silahkan lengkapi data yang wajib di isi" },
                 { status: 400 },
@@ -118,6 +119,7 @@ export async function POST(request: Request) {
                 nim,
                 judul,
                 namaInstansi,
+                alamat,
                 dosenPembimbingId,
                 tanggalMulai,
                 tanggalSelesai,

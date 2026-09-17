@@ -226,6 +226,7 @@ model LaporanPi {
   nim String
   judul String @db.Text
   namaInstansi String
+  alamat String @db.Text
 
   dosenPembimbingId Int
   dosenPembimbing Dosen @relation("PembimbingPI", fields: [dosenPembimbingId], references: [id])
@@ -248,6 +249,7 @@ model LaporanPLK {
   nim String
   judul String @db.Text
   namaInstansi String
+  alamat String @db.Text
   
   dosenPembimbingId Int
   dosenPembimbing Dosen @relation("PembimbingPLK", fields:[dosenPembimbingId], references: [id])

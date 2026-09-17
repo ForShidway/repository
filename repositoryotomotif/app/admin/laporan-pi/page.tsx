@@ -9,6 +9,7 @@ type LaporanPi = {
     nim: string;
     judul: string;
     namaInstansi: string;
+    alamat: string;
     dosenPembimbing: {id: number, name:string}
 
 }
@@ -108,6 +109,7 @@ export default function LaporanPIPage() {
                                     <th>Nama Mahasiswa</th>
                                     <th>NIM</th>
                                     <th>Nama Instansi</th>
+                                    <th>Alamat</th>
                                     <th>Dosen Pembimbing </th>
                                     <th>Aksi</th>
                                 </tr>
@@ -119,6 +121,7 @@ export default function LaporanPIPage() {
                                         <td><strong>{item.name || "-"}</strong></td>
                                         <td>{item.nim || "-"}</td>
                                         <td>{item.namaInstansi || "-"}</td>
+                                        <td>{item.alamat || "-"}</td>
                                         <td>{item.dosenPembimbing?.name || ""}</td>
                                         <td className="action-cell">
                                             <button onClick={() => router.push(`/admin/laporan-pi/${item.id}`) }  className="detail-button"  >
