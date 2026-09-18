@@ -544,24 +544,11 @@ export default function StatistikDosenPage() {
                     <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-emerald-400/10 blur-2xl" />
 
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5">
-                        {/* Profile Info */}
                         <div className="flex items-center gap-4">
-                            <div className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md text-xl sm:text-2xl font-extrabold text-white ring-2 ring-white/20 shadow-md">
-                                {initialName}
-                            </div>
                             <div>
-                                <div className="flex items-center gap-1.5 mb-1">
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-400/20 text-blue-200 text-[10px] font-bold border border-blue-300/20">
-                                        <Sparkles className="w-3 h-3 text-blue-300" /> Dosen Pembimbing & Penguji
-                                    </span>
-                                </div>
                                 <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">
                                     {dosen.name}
                                 </h1>
-                                <p className="mt-0.5 text-xs text-slate-300 flex items-center gap-1.5">
-                                    <BookOpen className="w-3.5 h-3.5 text-blue-300" />
-                                    Fakultas Teknik Otomotif UNP
-                                </p>
                             </div>
                         </div>
 
@@ -985,11 +972,10 @@ export default function StatistikDosenPage() {
                                     <button
                                         key={pageNumber}
                                         onClick={() => setPage(pageNumber)}
-                                        className={`h-7 min-w-7 rounded px-2 text-[11px] font-bold transition ${
-                                            page === pageNumber
+                                        className={`h-7 min-w-7 rounded px-2 text-[11px] font-bold transition ${page === pageNumber
                                                 ? "bg-blue-600 text-white shadow-xs"
                                                 : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                                        }`}
+                                            }`}
                                     >
                                         {pageNumber}
                                     </button>

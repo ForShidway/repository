@@ -222,35 +222,6 @@ export default function DosenDashboardPage() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
-            {/* ── Top Bar ── */}
-            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-6 backdrop-blur-xl shadow-xs">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-emerald-700 text-white shadow-md shadow-teal-700/20">
-                        <Activity className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-base font-extrabold tracking-tight text-slate-900">
-                                Dashboard Eksekutif Dosen
-                            </h1>
-                            <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-teal-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-teal-700 border border-teal-200/60 uppercase">
-                                Repository Otomotif
-                            </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 font-medium">
-                            Jurusan Teknik Otomotif FT Universitas Negeri Padang
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50/80 px-3 py-1 text-xs font-semibold text-teal-800 shadow-xs">
-                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                        Role: Dosen
-                    </span>
-                </div>
-            </header>
-
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* ── Banner Utama & Quick Insight ── */}
                 <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-900 via-emerald-900 to-slate-950 p-6 sm:p-8 text-white shadow-xl shadow-teal-950/15 mb-8">

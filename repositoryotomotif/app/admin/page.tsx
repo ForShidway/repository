@@ -153,10 +153,35 @@ function CustomPieTooltip({
     );
 }
 
+type DonutFilter = {
+    mode: "tahun" | "prodi";
+    startYear: number;
+    endYear: number;
+    programStudyId: string;
+};
+
+type FilteredDistribusi = {
+    distribusiProgramStudy: ProgramStudyStat[];
+    distribusiArtikelProgramStudy: ProgramStudyStat[];
+    laporanPiPerTahun: TahunStat[];
+    laporanPlkPerTahun: TahunStat[];
+};
+
 export default function AdminDashboard() {
+    const currentYear = new Date().getFullYear();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    // Donut filter state — lifted from StatistikDashboard
+    const [donutFilter, setDonutFilter] = useState<DonutFilter>({
+        mode: "tahun",
+        startYear: currentYear - 4,
+        endYear: currentYear,
+        programStudyId: "all",
+    });
+    const [filteredDistribusi, setFilteredDistribusi] = useState<FilteredDistribusi | null>(null);
+    const [donutLoading, setDonutLoading] = useState(false);
 
     const [page, setPage] = useState(1);
     const [articlePage, setArticlePage] = useState(1);
@@ -194,6 +219,75 @@ export default function AdminDashboard() {
 
         fetchDashboard();
     }, []);
+
+    // Re-fetch filtered distribution data when donut filter changes
+    useEffect(() => {
+        const controller = new AbortController();
+
+        async function fetchFiltered() {
+            setDonutLoading(true);
+            try {
+                const params = new URLSearchParams({
+                    groupBy: "prodi",
+                    startYear: String(donutFilter.startYear),
+                    endYear: String(donutFilter.endYear),
+                    programStudyId: donutFilter.programStudyId,
+                });
+                const response = await fetch(`/api/admin/statistics/gabungan?${params}`, {
+                    signal: controller.signal,
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+
+                // Map gabungan per-prodi into donut-ready distribusi
+                const prodiList: ProgramStudyStat[] = (result.labels ?? []).map(
+                    (name: string, i: number) => ({
+                        id: i,
+                        name,
+                        degree: "",
+                        jumlah: result.series.tugasAkhir[i] ?? 0,
+                    })
+                );
+                const artikelList: ProgramStudyStat[] = (result.labels ?? []).map(
+                    (name: string, i: number) => ({
+                        id: i,
+                        name,
+                        degree: "",
+                        jumlah: result.series.artikelJurnal[i] ?? 0,
+                    })
+                );
+                const piList: TahunStat[] = (result.labels ?? []).map(
+                    (name: string, i: number) => ({
+                        tahun: i,
+                        jumlah: result.series.laporanPi[i] ?? 0,
+                        _name: name,
+                    })
+                );
+                const plkList: TahunStat[] = (result.labels ?? []).map(
+                    (name: string, i: number) => ({
+                        tahun: i,
+                        jumlah: result.series.laporanPlk[i] ?? 0,
+                        _name: name,
+                    })
+                );
+
+                setFilteredDistribusi({
+                    distribusiProgramStudy: prodiList,
+                    distribusiArtikelProgramStudy: artikelList,
+                    laporanPiPerTahun: piList,
+                    laporanPlkPerTahun: plkList,
+                });
+            } catch (err) {
+                if (err instanceof DOMException && err.name === "AbortError") return;
+                // Silently fall back — donut charts will use original data
+            } finally {
+                if (!controller.signal.aborted) setDonutLoading(false);
+            }
+        }
+
+        fetchFiltered();
+        return () => controller.abort();
+    }, [donutFilter]);
 
     if (loading) {
         return (
@@ -411,48 +505,65 @@ export default function AdminDashboard() {
                         name: ps.name,
                         degree: ps.degree,
                     }))}
+                    onFilterChange={(f) => setDonutFilter(f)}
                 />
 
-                {/* 4 Donut Analytics Charts Grid */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {renderDonutSection(
-                        "Distribusi Tugas Akhir",
-                        data.distribusiProgramStudy.slice(0, 5),
-                        data.summary.totalTugasAkhir,
-                        "TA"
+                {/* 4 Donut Analytics Charts Grid — synced to bar chart filter */}
+                <div className="relative">
+                    {donutLoading && (
+                        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/70 backdrop-blur-sm">
+                            <div className="h-6 w-6 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+                        </div>
                     )}
-                    {renderDonutSection(
-                        "Distribusi Artikel Jurnal",
-                        data.distribusiArtikelProgramStudy.slice(0, 5),
-                        data.summary.totalArtikelJurnal,
-                        "Artikel"
-                    )}
-                    {renderDonutSection(
-                        "Distribusi Laporan PI",
-                        data.laporanPiPerTahun
-                            .filter((item) => item.jumlah > 0)
-                            .map((item) => ({
-                                id: item.tahun,
-                                name: `Tahun ${item.tahun}`,
-                                degree: "Tahun Mulai",
-                                jumlah: item.jumlah,
-                            })),
-                        data.summary.totalLaporanPi,
-                        "PI"
-                    )}
-                    {renderDonutSection(
-                        "Distribusi Laporan PLK",
-                        data.laporanPlkPerTahun
-                            .filter((item) => item.jumlah > 0)
-                            .map((item) => ({
-                                id: item.tahun,
-                                name: `Tahun ${item.tahun}`,
-                                degree: "Tahun Mulai",
-                                jumlah: item.jumlah,
-                            })),
-                        data.summary.totalLaporanPlk,
-                        "PLK"
-                    )}
+                    {donutFilter.startYear !== new Date().getFullYear() - 4 ||
+                     donutFilter.endYear !== new Date().getFullYear() ||
+                     donutFilter.programStudyId !== "all" ? (
+                        <p className="mb-2 text-[11px] font-semibold text-blue-700 flex items-center gap-1">
+                            <span className="inline-block h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                            Donut chart difilter: {donutFilter.startYear}–{donutFilter.endYear}
+                            {donutFilter.programStudyId !== "all" && " · Prodi terpilih"}
+                        </p>
+                    ) : null}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {renderDonutSection(
+                            "Distribusi Tugas Akhir",
+                            (filteredDistribusi?.distribusiProgramStudy ?? data.distribusiProgramStudy).slice(0, 6),
+                            (filteredDistribusi?.distribusiProgramStudy ?? data.distribusiProgramStudy).reduce((s, x) => s + x.jumlah, 0) || data.summary.totalTugasAkhir,
+                            "TA"
+                        )}
+                        {renderDonutSection(
+                            "Distribusi Artikel Jurnal",
+                            (filteredDistribusi?.distribusiArtikelProgramStudy ?? data.distribusiArtikelProgramStudy).slice(0, 6),
+                            (filteredDistribusi?.distribusiArtikelProgramStudy ?? data.distribusiArtikelProgramStudy).reduce((s, x) => s + x.jumlah, 0) || data.summary.totalArtikelJurnal,
+                            "Artikel"
+                        )}
+                        {renderDonutSection(
+                            "Distribusi Laporan PI",
+                            (filteredDistribusi?.laporanPiPerTahun ?? data.laporanPiPerTahun)
+                                .filter((item) => item.jumlah > 0)
+                                .map((item, i) => ({
+                                    id: (item as { _name?: string; tahun: number })._name ? i : item.tahun,
+                                    name: (item as { _name?: string; tahun: number })._name ?? `Tahun ${item.tahun}`,
+                                    degree: "",
+                                    jumlah: item.jumlah,
+                                })),
+                            (filteredDistribusi?.laporanPiPerTahun ?? data.laporanPiPerTahun).reduce((s, x) => s + x.jumlah, 0) || data.summary.totalLaporanPi,
+                            "PI"
+                        )}
+                        {renderDonutSection(
+                            "Distribusi Laporan PLK",
+                            (filteredDistribusi?.laporanPlkPerTahun ?? data.laporanPlkPerTahun)
+                                .filter((item) => item.jumlah > 0)
+                                .map((item, i) => ({
+                                    id: (item as { _name?: string; tahun: number })._name ? i : item.tahun,
+                                    name: (item as { _name?: string; tahun: number })._name ?? `Tahun ${item.tahun}`,
+                                    degree: "",
+                                    jumlah: item.jumlah,
+                                })),
+                            (filteredDistribusi?.laporanPlkPerTahun ?? data.laporanPlkPerTahun).reduce((s, x) => s + x.jumlah, 0) || data.summary.totalLaporanPlk,
+                            "PLK"
+                        )}
+                    </div>
                 </div>
 
                 {/* SDGs Radar Chart */}

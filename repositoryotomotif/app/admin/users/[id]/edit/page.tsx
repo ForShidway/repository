@@ -9,6 +9,7 @@ export default function EditUserPage() {
     const id =  params.id;
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [role, setRole] = useState<"ADMIN" | "MAHASISWA" | "DOSEN">("MAHASISWA");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
@@ -61,6 +62,7 @@ export default function EditUserPage() {
             if (!cancelled) {
                 setName(data.name);
                 setEmail(data.email);
+                setRole(data.role || "MAHASISWA");
             }
         } catch (error) {
             console.error(error);
@@ -105,6 +107,7 @@ export default function EditUserPage() {
                 body: JSON.stringify ({
                     name: name.trim(),
                     email: email.trim(),
+                    role,
                 }),
             });
 
@@ -181,6 +184,21 @@ export default function EditUserPage() {
                             placeholder="Masukkan email"
                             className="w-full rounded-lg border px-4 py-3"
                         />
+                    </div>
+                    <div>
+                        <label htmlFor="role" className="mb-2 block text-sm font-medium">
+                            Role
+                        </label>
+                        <select
+                            id="role"
+                            value={role}
+                            onChange={(event) => setRole(event.target.value as "ADMIN" | "MAHASISWA" | "DOSEN")}
+                            className="w-full rounded-lg border px-4 py-3"
+                        >
+                            <option value="MAHASISWA">Mahasiswa</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="DOSEN">Dosen</option>
+                        </select>
                     </div>
                     {error && (
                         <div className="rounded-lg bg-red-50 p-4">

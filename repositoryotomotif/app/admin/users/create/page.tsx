@@ -97,11 +97,12 @@ export default function CreateUserPage() {
                             <select
                                 id="role"
                                 value={role}
-                                onChange={(event) => setRole(event.target.value as "MAHASISWA" | "ADMIN")}
+                                onChange={(event) => setRole(event.target.value as "MAHASISWA" | "ADMIN" | "DOSEN")}
                                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             >
                                 <option value="MAHASISWA">Mahasiswa</option>
                                 <option value="ADMIN">Admin</option>
+                                <option value="DOSEN">Dosen</option>
                             </select>
                         </div>
 

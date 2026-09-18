@@ -76,6 +76,7 @@ export async function PUT(
         const body = await request.json();
         const name =  body.name?.trim();
         const email = body.email?.trim();
+        const role = body.role;
 
 
         if (!name || !email) {
@@ -84,6 +85,7 @@ export async function PUT(
                 { status: 400 }
             )
         }
+
         const existingUser = await prisma.user.findUnique(
             {
                 where: {
@@ -100,6 +102,9 @@ export async function PUT(
                 { status: 404}
             )
         }
+
+        const allowedRoles = ["ADMIN", "MAHASISWA", "DOSEN"];
+        const finalRole = allowedRoles.includes(role) ? role : existingUser.role;
 
         const emailOwner = await prisma.user.findUnique({
             where : {
@@ -120,7 +125,7 @@ export async function PUT(
         const updatedUser = await prisma.user.update({
             where: {
                 id: userId,
-            }, data: { name, email,}
+            }, data: { name, email, role: finalRole }
         });
         return NextResponse.json(updatedUser)
     } catch (error) {

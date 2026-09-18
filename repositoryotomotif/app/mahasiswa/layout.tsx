@@ -26,10 +26,18 @@ export default function MahasiswaLayout({
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const mainMargin = collapsed ? "md:ml-[72px]" : "md:ml-[272px]";
+    // Set CSS variable for sidebar width
+    useEffect(() => {
+        document.documentElement.style.setProperty(
+            "--sidebar-width",
+            collapsed ? "76px" : "268px"
+        );
+    }, [collapsed]);
+
+    const mainMargin = collapsed ? "md:ml-[76px]" : "md:ml-[268px]";
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="admin-layout min-h-screen bg-slate-100">
             <SidebarMahasiswa
                 collapsed={collapsed}
                 onToggle={() => setCollapsed((prev) => !prev)}
@@ -41,7 +49,7 @@ export default function MahasiswaLayout({
             <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="fixed left-4 top-5 z-40 flex md:hidden h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-md shadow-slate-200/60 border border-slate-200"
+                className="fixed left-4 top-5 z-40 flex md:hidden h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-900/20"
                 aria-label="Open menu"
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,8 +59,10 @@ export default function MahasiswaLayout({
                 </svg>
             </button>
 
-            <main className={`min-h-screen min-w-0 transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)] ${mainMargin}`}>
-                {children}
+            <main className={`min-h-screen min-w-0 p-4 transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)] ${mainMargin}`}>
+                <div className="min-h-[calc(100vh-2rem)] overflow-hidden rounded-2xl bg-[#F4F9F9] shadow-sm">
+                    {children}
+                </div>
             </main>
         </div>
     );

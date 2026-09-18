@@ -17,6 +17,13 @@ type ProgramStudyOption = {
     degree: string;
 };
 
+type FilterState = {
+    mode: "tahun" | "prodi";
+    startYear: number;
+    endYear: number;
+    programStudyId: string;
+};
+
 type StatistikResponse = {
     labels: string[];
     series: {
@@ -66,8 +73,10 @@ function CustomBarTooltip({
 
 export default function StatistikDashboard({
     programStudyOptions,
+    onFilterChange,
 }: {
     programStudyOptions: ProgramStudyOption[];
+    onFilterChange?: (filter: FilterState) => void;
 }) {
     const currentYear = new Date().getFullYear();
     const [mode, setMode] = useState<"tahun" | "prodi">("tahun");
@@ -110,6 +119,11 @@ export default function StatistikDashboard({
         fetchData();
         return () => controller.abort();
     }, [mode, startYear, endYear, programStudyId]);
+
+    // Notify parent when filter changes so donut charts can be synced
+    useEffect(() => {
+        onFilterChange?.({ mode, startYear, endYear, programStudyId });
+    }, [mode, startYear, endYear, programStudyId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const formattedData = useMemo(() => {
         if (!data || !data.labels) return [];

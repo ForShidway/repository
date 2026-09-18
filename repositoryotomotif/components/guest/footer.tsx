@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { TfiWorld } from "react-icons/tfi";
+import { MdOutlineMail } from "react-icons/md";
 
 export function Footer() {
     return (
@@ -43,8 +46,8 @@ export function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/dosen" className="transition hover:text-white">
-                                    Dosen
+                                <Link href="/sdgs" className="transition hover:text-white">
+                                    SDGs
                                 </Link>
                             </li>
                             <li>
@@ -59,17 +62,31 @@ export function Footer() {
                         <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
                             Kontak
                         </h3>
-                        <ul className="mt-4 space-y-3 text-sm text-slate-300">
-                            <li>Jurusan Teknik Otomotif</li>
-                            <li>Universitas Negeri Padang</li>
-                            <li>repository.otomotif@unp.ac.id</li>
-                            <li>+62 812-3456-7890</li>
+                        <ul className="mt-4 space-y-2 text-sm text-slate-300">
+                            <li>Jurusan Teknik Otomotif Fakultas Teknik Universitas Negeri Padang</li>
+                            <li>Kampus UNP Air Tawar Jl. Prof. Dr. Hamka, Padang</li>
                         </ul>
+                        <div className="pt-4 flex items-center gap-4">
+                            <a href="https://www.facebook.com/JurusanTeknikOtomotifUnp">
+                                <FaFacebook size={24} />
+                            </a>
+                            <a href="https://www.instagram.com/otomotif_ftunp/">
+                                <FaInstagram size={24} />
+                            </a>
+                            <a href="https://otomotif.ft.unp.ac.id/">
+                                <TfiWorld size={24}/>
+                            </a>
+                            <a href="https://mailto:otomotif@ft.unp.ac.id">
+                                <MdOutlineMail size={24}/>
+                            </a>
+                        </div>
+
+
                     </div>
                 </div>
 
-                <div className="mt-10 border-t border-slate-700 pt-6 text-sm text-slate-400">
-                    © 2026 Repository Otomotif. Semua hak dilindungi.
+                <div className="mt-10 border-t border-slate-700 pt-6 text-sm text-slate-400 text-center">
+                    © {new Date().getFullYear()} Repository Jurusan Teknik Otomotif Fakultas Teknik Universitas Negeri Padang
                 </div>
             </div>
         </footer>

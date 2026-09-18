@@ -60,7 +60,7 @@ export async function POST (request: Request) {
             );
         }
 
-        const allowedRoles = ["ADMIN", "MAHASISWA"];
+        const allowedRoles = ["ADMIN", "MAHASISWA", "DOSEN"];
         const finalRole = allowedRoles.includes(role) ? role : "MAHASISWA";
 
         const existingUser = await prisma.user.findUnique({

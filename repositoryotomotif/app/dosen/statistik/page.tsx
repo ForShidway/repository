@@ -212,75 +212,6 @@ export default function DosenStatistikPage() {
 
                 {!loading && data && (
                     <>
-                        {/* ── Ringkasan Indikator Sains Data ── */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-                                <div className="flex items-center justify-between text-slate-500 mb-2">
-                                    <span className="text-xs font-semibold">Indeks Pemerataan Beban</span>
-                                    <ShieldCheck className="h-4 w-4 text-teal-600" />
-                                </div>
-                                <p className="text-3xl font-black text-slate-900">{data.summary.fairnessIndex}%</p>
-                                <p className="text-[11px] text-emerald-600 font-medium mt-1">
-                                    Gini Balance Coefficient
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-                                <div className="flex items-center justify-between text-slate-500 mb-2">
-                                    <span className="text-xs font-semibold">Rata-rata Bimbingan</span>
-                                    <GraduationCap className="h-4 w-4 text-blue-600" />
-                                </div>
-                                <p className="text-3xl font-black text-slate-900">{data.summary.meanBimbingan}</p>
-                                <p className="text-[11px] text-slate-500 font-medium mt-1">
-                                    Mahasiswa per Dosen (Mean)
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-                                <div className="flex items-center justify-between text-slate-500 mb-2">
-                                    <span className="text-xs font-semibold">Dispersi Beban (Std Dev)</span>
-                                    <Activity className="h-4 w-4 text-purple-600" />
-                                </div>
-                                <p className="text-3xl font-black text-slate-900">± {data.summary.stdDevBimbingan}</p>
-                                <p className="text-[11px] text-slate-500 font-medium mt-1">
-                                    Variasi Beban antar Dosen
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-                                <div className="flex items-center justify-between text-slate-500 mb-2">
-                                    <span className="text-xs font-semibold">Total Kontribusi Repository</span>
-                                    <TrendingUp className="h-4 w-4 text-amber-600" />
-                                </div>
-                                <p className="text-3xl font-black text-slate-900">{data.summary.totalAktivitasSemua}</p>
-                                <p className="text-[11px] text-amber-600 font-medium mt-1">
-                                    TA, Sidang, PI, PLK, Jurnal
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-indigo-200/80 bg-white p-5 shadow-xs">
-                                <div className="flex items-center justify-between text-slate-500 mb-2">
-                                    <span className="text-xs font-semibold">Laporan PI</span>
-                                    <SlidersHorizontal className="h-4 w-4 text-indigo-600" />
-                                </div>
-                                <p className="text-3xl font-black text-slate-900">{data.summary.totalLaporanPi}</p>
-                                <p className="text-[11px] text-indigo-600 font-medium mt-1">
-                                    Total Laporan Praktik Industri
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-pink-200/80 bg-white p-5 shadow-xs">
-                                <div className="flex items-center justify-between text-slate-500 mb-2">
-                                    <span className="text-xs font-semibold">Laporan PLK</span>
-                                    <PieIcon className="h-4 w-4 text-pink-600" />
-                                </div>
-                                <p className="text-3xl font-black text-slate-900">{data.summary.totalLaporanPlk}</p>
-                                <p className="text-[11px] text-pink-600 font-medium mt-1">
-                                    Total Laporan Pelatihan Kependidikan
-                                </p>
-                            </div>
-                        </div>
-
                         {/* ── Distribusi Bimbingan & Program Studi ── */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             {/* Stacked Chart Top Dosen */}
@@ -438,8 +369,8 @@ export default function DosenStatistikPage() {
                                             <tr className="border-b border-slate-200 bg-slate-50 font-bold text-slate-600">
                                                 <th className="px-4 py-3">No</th>
                                                 <th className="px-4 py-3">Nama Dosen</th>
-                                                <th className="px-3 py-3 text-center">Bimb. 1</th>
-                                                <th className="px-3 py-3 text-center">Bimb. 2</th>
+                                                <th className="px-3 py-3 text-center">Pembimbing 1</th>
+                                                <th className="px-3 py-3 text-center">Pembimbing 2</th>
                                                 <th className="px-3 py-3 text-center">Total TA</th>
                                                 <th className="px-3 py-3 text-center">Penguji</th>
                                                 <th className="px-3 py-3 text-center">PI</th>

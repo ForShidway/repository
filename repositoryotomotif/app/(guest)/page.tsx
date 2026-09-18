@@ -42,6 +42,7 @@ type HomeData = {
         totalRuangan: number;
         totalSDGs: number;
     };
+    periodeTersedia: string;
     tugasAkhirTerbaru: TugasAkhir[];
 };
 
@@ -142,7 +143,7 @@ export default function GuestHomePage() {
     }
 
 
-    const periodeTersedia = "2021 - 2026";
+    const periodeTersedia = data?.periodeTersedia ?? "Belum ada data";
     const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
         if (!mahasiswa.length) return "-";
         return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
@@ -220,7 +221,7 @@ export default function GuestHomePage() {
 
                     <div>
                         <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white ring-1 ring-inset ring-white/15">
-                            <span className="h-2 w-2 rounded-full bg-orange-400" />Selamat Datang di Repository Jurusan Teknik Otomotif</span>
+                            <span className="" />Selamat Datang di Repository Jurusan Teknik Otomotif</span>
 
                         <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
                             Pusat Pengetahuan
@@ -231,8 +232,8 @@ export default function GuestHomePage() {
 
                         <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">
                             Jelajahi koleksi Tugas Akhir mahasiswa D3 dan D4 Teknologi
-                            Otomotif Universitas Negeri Padang. Temukan inovasi, penelitian,
-                            dan solusi teknologi untuk masa depan otomotif.
+                            Otomotif Universitas Negeri Padang. Temukan histori inovasi, penelitian,
+                            dan solusi teknologi otomotif.
                         </p>
 
                         <div className="mt-8 flex flex-wrap gap-3">

@@ -108,7 +108,7 @@ export default function RegisterPage() {
                     {/* Nama Lengkap */}
                     <div>
                         <label htmlFor="name" className="mb-1.5 block text-xs font-bold text-slate-700">
-                            Nama Lengkap <span className="text-red-500">*</span>
+                            Nama Lengkap 
                         </label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -133,7 +133,7 @@ export default function RegisterPage() {
                     {/* Email */}
                     <div>
                         <label htmlFor="email" className="mb-1.5 block text-xs font-bold text-slate-700">
-                            Email Mahasiswa <span className="text-red-500">*</span>
+                            Email Mahasiswa
                         </label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -149,7 +149,7 @@ export default function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition duration-150 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10"
-                                placeholder="nama@email.com / student.unp.ac.id"
+                                placeholder="nama@email.com"
                                 autoComplete="email"
                             />
                         </div>
@@ -159,7 +159,7 @@ export default function RegisterPage() {
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
                             <label htmlFor="password" className="block text-xs font-bold text-slate-700">
-                                Password <span className="text-red-500">*</span>
+                                Password 
                             </label>
                             {password.length > 0 && (
                                 <span className={`text-[11px] font-semibold transition-colors ${isPasswordLengthValid ? "text-emerald-600" : "text-amber-600"}`}>
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
                             <label htmlFor="confirmPassword" className="block text-xs font-bold text-slate-700">
-                                Konfirmasi Password <span className="text-red-500">*</span>
+                                Konfirmasi Password
                             </label>
                             {confirmPassword.length > 0 && (
                                 <span className={`text-[11px] font-semibold transition-colors ${isPasswordMatch ? "text-emerald-600" : "text-amber-600"}`}>
@@ -315,13 +315,6 @@ export default function RegisterPage() {
                         </svg>
                         Kembali ke Beranda
                     </Link>
-                    <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
-                            <rect x="3" y="11" width="18" height="11" rx="2" />
-                            <path d="M7 11V7a5 5 0 0110 0v4" />
-                        </svg>
-                        <span>Data terenkripsi & tersimpan aman di server UNP</span>
-                    </div>
                 </div>
             </div>
         </main>

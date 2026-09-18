@@ -3,11 +3,26 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+    LayoutDashboard,
+    BarChart2,
+    ChevronLeft,
+    ChevronRight,
+    LogOut,
+    Sun,
+    Moon,
+    X,
+    type LucideIcon,
+} from "lucide-react";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 type MenuItem = {
     label: string;
     href: string;
-    icon: React.ReactNode;
+    icon: LucideIcon;
+    exact?: boolean;
 };
 
 type MenuGroup = {
@@ -28,102 +43,70 @@ type SidebarProps = {
     onMobileClose: () => void;
 };
 
-const icons = {
-    dashboard: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="7" height="9" rx="1" />
-            <rect x="14" y="3" width="7" height="5" rx="1" />
-            <rect x="14" y="12" width="7" height="9" rx="1" />
-            <rect x="3" y="16" width="7" height="5" rx="1" />
-        </svg>
-    ),
-    dosen: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 00-3-3.87" />
-            <path d="M16 3.13a4 4 0 010 7.75" />
-        </svg>
-    ),
-    statistik: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10" />
-            <line x1="12" y1="20" x2="12" y2="4" />
-            <line x1="6" y1="20" x2="6" y2="14" />
-        </svg>
-    ),
-    tugasAkhir: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-    ),
-    grafik: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-    ),
-};
-
+// ---------------------------------------------------------------------------
+// Menu data — teal accent untuk dosen
+// ---------------------------------------------------------------------------
 const menuGroups: MenuGroup[] = [
     {
         title: "MAIN",
         items: [
-            { label: "Dashboard", href: "/dosen", icon: icons.dashboard },
+            { label: "Dashboard", href: "/dosen", icon: LayoutDashboard, exact: true },
         ],
     },
     {
         title: "STATISTIK DOSEN",
         items: [
-            { label: "Grafik & Analisis", href: "/dosen/statistik", icon: icons.grafik },
+            { label: "Grafik & Analisis", href: "/dosen/statistik", icon: BarChart2 },
         ],
     },
 ];
 
-const ToggleIcon = ({ collapsed }: { collapsed: boolean }) => (
-    <svg
-        width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-        className={`transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
-    >
-        <polyline points="15 18 9 12 15 6" />
-    </svg>
-);
-
-const LogoutIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-);
-
-export default function SidebarDosen({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
-    const router = useRouter();
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+export default function SidebarDosen({
+    collapsed,
+    onToggle,
+    mobileOpen,
+    onMobileClose,
+}: SidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
+    const [theme, setTheme] = useState<"dark" | "light">("dark");
+    const [mounted, setMounted] = useState(false);
 
+    // Fetch user session
     useEffect(() => {
         async function fetchUser() {
             try {
-                const response = await fetch("/api/auth/session", { cache: "no-store" });
-                if (!response.ok) { setUser(null); return; }
-                const data = await response.json();
+                const res = await fetch("/api/auth/session", { cache: "no-store" });
+                if (!res.ok) { setUser(null); return; }
+                const data = await res.json();
                 setUser(data.user ?? null);
-            } catch (error) {
-                console.error("Gagal mengambil user session:", error);
+            } catch {
                 setUser(null);
             }
         }
         fetchUser();
     }, []);
 
+    // Persist theme
+    useEffect(() => {
+        const savedTheme = localStorage.getItem("sidebar-theme-dosen") as "dark" | "light" | null;
+        if (savedTheme) setTheme(savedTheme);
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
+        localStorage.setItem("sidebar-theme-dosen", theme);
+        document.documentElement.classList.toggle("dark", theme === "dark");
+    }, [theme, mounted]);
+
     const handleLogout = async () => {
         try {
             await fetch("/api/auth/logout", { method: "POST" });
-            setUser(null);
             router.push("/login");
             router.refresh();
         } catch (error) {
@@ -137,26 +120,17 @@ export default function SidebarDosen({ collapsed, onToggle, mobileOpen, onMobile
         }
     };
 
+    const sidebarWidth = collapsed ? "w-[76px]" : "w-[268px]";
     const displayName = user?.name || "Dosen";
     const displayEmail = user?.email || "-";
-    const initialLetter = displayName.charAt(0)?.toUpperCase() || "D";
-
-    const sidebarWidth = collapsed ? "w-[72px]" : "w-[272px]";
-
-    // accent color: teal/green untuk membedakan dari sidebar lain
-    const accentFrom = "from-teal-600";
-    const accentTo = "to-[#0B3A3A]";
-    const accentText = "text-teal-600";
-    const accentBg = "bg-teal-50";
-    const accentIcon = "bg-teal-100 text-teal-600";
-    const accentAvatar = "bg-teal-600";
+    const initialLetter = displayName.charAt(0).toUpperCase();
 
     return (
         <>
             {/* Mobile overlay */}
             {mobileOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+                    className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm md:hidden"
                     onClick={onMobileClose}
                 />
             )}
@@ -164,83 +138,97 @@ export default function SidebarDosen({ collapsed, onToggle, mobileOpen, onMobile
             <aside
                 className={`
                     fixed left-0 top-0 z-50 flex h-screen flex-col
-                    border-r border-slate-200/80 bg-white
-                    transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]
+                    border-r border-slate-200 bg-white
+                    dark:border-white/10 dark:bg-[#0B1220]
+                    transition-all duration-300 ease-in-out
                     ${sidebarWidth}
                     ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
                     md:translate-x-0
                 `}
             >
-                {/* Logo + Toggle */}
-                <div className={`flex h-20 items-center border-b border-slate-100 ${collapsed ? "justify-center px-0" : "px-5"}`}>
+                {/* Header: logo + collapse toggle */}
+                <div
+                    className={`flex h-20 items-center border-b border-slate-200 dark:border-white/10 ${
+                        collapsed ? "justify-center px-0" : "justify-between px-5"
+                    }`}
+                >
                     {!collapsed && (
-                        <div className="flex items-center min-w-0 flex-1">
-                            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${accentFrom} ${accentTo} text-sm font-extrabold text-white shadow-md`}>
-                                 <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-sm font-extrabold text-white shadow-lg shadow-teal-600/30">
+                                <img src="/images/logo-otomotif.png" alt="" />
                             </div>
-                            <div className="ml-3 min-w-0">
-                                <div className={`text-[10px] font-bold uppercase tracking-[0.22em] ${accentText}`}>
+                            <div className="min-w-0">
+                                <h1 className="truncate text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                                    Repository Otomotif
+                                </h1>
+                                <p className="mt-0.5 truncate text-xs font-medium text-teal-600 dark:text-teal-400">
                                     Portal Dosen
-                                </div>
-                                <div className="text-sm font-bold text-slate-900 -mt-0.5">
-                                    Otomotif UNP
-                                </div>
+                                </p>
                             </div>
                         </div>
                     )}
 
                     {collapsed && (
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${accentFrom} ${accentTo} text-xs font-extrabold text-white shadow-md`}>
-                             <img src="/images/logo-otomotif.png" alt="Logo Jurusan Otomotif" />
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-sm font-extrabold text-white shadow-lg shadow-teal-600/30">
+                            <img src="/images/logo-otomotif.png" alt="" />
                         </div>
                     )}
 
+                    {/* Mobile close */}
+                    <button
+                        type="button"
+                        onClick={onMobileClose}
+                        className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 md:hidden dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
+                        aria-label="Tutup menu"
+                    >
+                        <X size={18} />
+                    </button>
+
+                    {/* Desktop collapse toggle */}
                     {!collapsed && (
                         <button
                             type="button"
                             onClick={onToggle}
-                            className="ml-2 hidden md:flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-                            aria-label="Toggle sidebar"
+                            className="ml-2 hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-all duration-300 ease-in-out hover:bg-slate-100 hover:text-slate-900 md:flex dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
+                            aria-label="Lipat sidebar"
                         >
-                            <ToggleIcon collapsed={collapsed} />
+                            <ChevronLeft size={18} />
                         </button>
                     )}
                 </div>
 
-                {/* Collapsed toggle button */}
+                {/* Collapsed toggle */}
                 {collapsed && (
-                    <div className="hidden md:flex justify-center py-3 border-b border-slate-100">
+                    <div className="hidden justify-center border-b border-slate-200 py-3 md:flex dark:border-white/10">
                         <button
                             type="button"
                             onClick={onToggle}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-                            aria-label="Toggle sidebar"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-all duration-300 ease-in-out hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
+                            aria-label="Lebarkan sidebar"
                         >
-                            <ToggleIcon collapsed={collapsed} />
+                            <ChevronRight size={18} />
                         </button>
                     </div>
                 )}
 
-                            {/* Navigation */}
-                <nav className={`flex-1 overflow-y-auto py-4 ${collapsed ? "px-2" : "px-3"}`}>
+                {/* Navigation */}
+                <nav className={`flex-1 overflow-y-auto overflow-x-hidden py-5 ${collapsed ? "px-2" : "px-3"}`}>
                     {menuGroups.map((group) => (
-                        <div key={group.title} className="mb-5">
-                            {!collapsed && (
-                                <p className="mb-2 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-400 uppercase">
+                        <div key={group.title} className="mb-6">
+                            {!collapsed ? (
+                                <p className="mb-2 px-3 text-[11px] font-bold tracking-[0.14em] text-slate-400 dark:text-slate-500">
                                     {group.title}
                                 </p>
-                            )}
-                            {collapsed && (
-                                <div className="mb-2 mx-auto w-6 border-t border-slate-200" />
+                            ) : (
+                                <div className="mx-auto mb-2 w-6 border-t border-slate-200 dark:border-white/10" />
                             )}
 
-                            <div className="space-y-0.5">
+                            <div className="space-y-1">
                                 {group.items.map((item) => {
-                                    // Dashboard aktif hanya di /dosen exact, item lain pakai startsWith
-                                    const active =
-                                        item.href === "/dosen"
-                                            ? pathname === "/dosen"
-                                            : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                                    const active = item.exact
+                                        ? pathname === item.href
+                                        : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                                    const Icon = item.icon;
 
                                     return (
                                         <Link
@@ -249,40 +237,33 @@ export default function SidebarDosen({ collapsed, onToggle, mobileOpen, onMobile
                                             onClick={handleMenuClick}
                                             className={`
                                                 group relative flex items-center rounded-xl
-                                                text-sm font-medium transition-all duration-150
+                                                text-sm font-semibold
+                                                transition-all duration-300 ease-in-out
                                                 ${collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"}
-                                                ${active
-                                                    ? `${accentBg} ${accentText}`
-                                                    : "text-slate-500 hover:bg-slate-50 hover:text-teal-600"
+                                                ${
+                                                    active
+                                                        ? "bg-teal-600 text-white shadow-md shadow-teal-600/30"
+                                                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
                                                 }
                                             `}
                                         >
                                             <span
-                                                className={`
-                                                    flex h-8 w-8 items-center justify-center
-                                                    rounded-lg transition shrink-0
-                                                    ${active
-                                                        ? accentIcon
-                                                        : "text-slate-400 group-hover:text-teal-500"
-                                                    }
-                                                `}
+                                                className={`flex h-8 w-8 shrink-0 items-center justify-center ${
+                                                    active ? "text-white" : "text-slate-500 dark:text-slate-400"
+                                                }`}
                                             >
-                                                {item.icon}
+                                                <Icon size={18} strokeWidth={2} />
                                             </span>
 
-                                            {!collapsed && (
-                                                <span className="ml-3 flex-1 truncate">
-                                                    {item.label}
-                                                </span>
-                                            )}
+                                            {!collapsed && <span className="ml-1 flex-1 truncate">{item.label}</span>}
 
                                             {!collapsed && active && (
-                                                <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+                                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
                                             )}
 
-                                            {/* Tooltip for collapsed */}
+                                            {/* Tooltip when collapsed */}
                                             {collapsed && (
-                                                <span className="sidebar-tooltip sidebar-tooltip-light">
+                                                <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 dark:bg-slate-800">
                                                     {item.label}
                                                 </span>
                                             )}
@@ -294,48 +275,94 @@ export default function SidebarDosen({ collapsed, onToggle, mobileOpen, onMobile
                     ))}
                 </nav>
 
-                {/* User Profile */}
-                <div className={`border-t border-slate-100 ${collapsed ? "p-2" : "p-4"}`}>
+                {/* Footer: theme toggle + profile + logout */}
+                <div className={`border-t border-slate-200 dark:border-white/10 ${collapsed ? "p-2" : "p-4"}`}>
+                    {/* Theme toggle */}
+                    <button
+                        type="button"
+                        onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+                        className={`
+                            group relative mb-3 flex items-center rounded-xl
+                            border border-slate-200 bg-slate-50 text-sm font-semibold text-slate-700
+                            transition-all duration-300 ease-in-out hover:bg-slate-100
+                            dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10
+                            ${collapsed ? "h-10 w-10 justify-center self-center" : "w-full justify-between px-3 py-2.5"}
+                        `}
+                        aria-label="Ganti tema"
+                    >
+                        {!collapsed && (
+                            <span className="flex items-center gap-2">
+                                {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
+                                {theme === "dark" ? "Mode Gelap" : "Mode Terang"}
+                            </span>
+                        )}
+
+                        {collapsed ? (
+                            theme === "dark" ? <Moon size={18} /> : <Sun size={18} />
+                        ) : (
+                            <span
+                                className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ease-in-out ${
+                                    theme === "dark" ? "bg-teal-600" : "bg-slate-300"
+                                }`}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-300 ease-in-out ${
+                                        theme === "dark" ? "translate-x-4" : "translate-x-0.5"
+                                    }`}
+                                />
+                            </span>
+                        )}
+
+                        {collapsed && (
+                            <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 dark:bg-slate-800">
+                                Ganti tema
+                            </span>
+                        )}
+                    </button>
+
                     {!collapsed ? (
                         <>
-                            <div className="flex items-center rounded-xl bg-slate-50 p-3">
-                                <div className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${accentAvatar} text-sm font-extrabold text-white`}>
+                            <div className="flex items-center rounded-xl bg-slate-50 p-3 dark:bg-white/5">
+                                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-600 font-bold text-white">
                                     {initialLetter}
-                                    <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400" />
+                                    <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0B1220]" />
                                 </div>
                                 <div className="ml-3 min-w-0">
-                                    <p className="truncate text-sm font-semibold text-slate-800">
+                                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                                         {displayName}
                                     </p>
-                                    <p className="truncate text-xs text-slate-400">
-                                        {displayEmail}
-                                    </p>
+                                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</p>
                                 </div>
                             </div>
 
                             <button
-                                type="button" onClick={handleLogout}
-                                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-500 transition hover:bg-red-100 hover:text-red-600"
+                                type="button"
+                                onClick={handleLogout}
+                                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60"
                             >
-                                <LogoutIcon />
+                                <LogOut size={16} />
                                 Keluar
                             </button>
                         </>
                     ) : (
                         <div className="flex flex-col items-center gap-2">
-                            <div className={`sidebar-menu-item relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${accentAvatar} text-sm font-extrabold text-white`}>
+                            <div className="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-600 font-bold text-white">
                                 {initialLetter}
-                                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400" />
-                                <span className="sidebar-tooltip sidebar-tooltip-light">{displayName}</span>
+                                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-[#0B1220]" />
+                                <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 dark:bg-slate-800">
+                                    {displayName}
+                                </span>
                             </div>
                             <button
                                 type="button"
                                 onClick={handleLogout}
-                                className="sidebar-menu-item relative flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-500 transition hover:bg-red-100 hover:text-red-600"
+                                className="group relative flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60"
                                 aria-label="Keluar"
                             >
-                                <LogoutIcon />
-                                <span className="sidebar-tooltip sidebar-tooltip-light">Keluar</span>
+                                <LogOut size={16} />
+                                <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 dark:bg-slate-800">
+                                    Keluar
+                                </span>
                             </button>
                         </div>
                     )}

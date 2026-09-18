@@ -26,10 +26,18 @@ export default function DosenLayout({
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const mainMargin = collapsed ? "md:ml-[72px]" : "md:ml-[272px]";
+    // Set CSS variable for sidebar width
+    useEffect(() => {
+        document.documentElement.style.setProperty(
+            "--sidebar-width",
+            collapsed ? "76px" : "268px"
+        );
+    }, [collapsed]);
+
+    const mainMargin = collapsed ? "md:ml-[76px]" : "md:ml-[268px]";
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="admin-layout min-h-screen bg-slate-100">
             <SidebarDosen
                 collapsed={collapsed}
                 onToggle={() => setCollapsed((prev) => !prev)}
@@ -51,8 +59,10 @@ export default function DosenLayout({
                 </svg>
             </button>
 
-            <main className={`min-h-screen min-w-0 transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)] ${mainMargin}`}>
-                {children}
+            <main className={`min-h-screen min-w-0 p-4 transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)] ${mainMargin}`}>
+                <div className="min-h-[calc(100vh-2rem)] overflow-hidden rounded-2xl bg-[#F4F9F9] shadow-sm">
+                    {children}
+                </div>
             </main>
         </div>
     );
