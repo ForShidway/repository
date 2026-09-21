@@ -5,6 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
     LayoutDashboard,
+    Search,
+    FolderCheck,
+    Compass,
     ChevronLeft,
     ChevronRight,
     LogOut,
@@ -50,6 +53,8 @@ const menuGroups: MenuGroup[] = [
         title: "MAIN",
         items: [
             { label: "Beranda", href: "/mahasiswa", icon: LayoutDashboard, exact: true },
+            { label: "Pencarian Tugas", href: "/mahasiswa/pencarian", icon: Search },
+            { label: "Tugas Saya", href: "/mahasiswa/tugas-saya", icon: FolderCheck },
         ],
     },
 ];
@@ -271,7 +276,7 @@ export default function SidebarMahasiswa({
                 {/* Footer: theme toggle + profile + logout */}
                 <div className={`border-t border-slate-200 dark:border-white/10 ${collapsed ? "p-2" : "p-4"}`}>
                     {/* Theme toggle */}
-                    <button
+                    {/* <button
                         type="button"
                         onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
                         className={`
@@ -282,15 +287,15 @@ export default function SidebarMahasiswa({
                             ${collapsed ? "h-10 w-10 justify-center self-center" : "w-full justify-between px-3 py-2.5"}
                         `}
                         aria-label="Ganti tema"
-                    >
-                        {!collapsed && (
+                    > */}
+                        {/* {!collapsed && (
                             <span className="flex items-center gap-2">
                                 {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
                                 {theme === "dark" ? "Mode Gelap" : "Mode Terang"}
                             </span>
-                        )}
+                        )} */}
 
-                        {collapsed ? (
+                        {/* {collapsed ? (
                             theme === "dark" ? <Moon size={18} /> : <Sun size={18} />
                         ) : (
                             <span
@@ -304,14 +309,14 @@ export default function SidebarMahasiswa({
                                     }`}
                                 />
                             </span>
-                        )}
+                        )} */}
 
-                        {collapsed && (
+                        {/* {collapsed && (
                             <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 dark:bg-slate-800">
                                 Ganti tema
                             </span>
                         )}
-                    </button>
+                    </button> */}
 
                     {!collapsed ? (
                         <>

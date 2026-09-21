@@ -13,6 +13,7 @@ export async function GET() {
             where: { id: Number(session.userId) || 0 },
             select: {
                 id: true,
+                name: true,
                 email: true,
                 role: true,
                 createdAt: true,
@@ -34,7 +35,7 @@ export async function GET() {
             user: {
                 id: user.id,
                 email: user.email,
-                name: user.email.split("@")[0],
+                name: user.name || user.email.split("@")[0],
                 role: user.role,
             },
         });

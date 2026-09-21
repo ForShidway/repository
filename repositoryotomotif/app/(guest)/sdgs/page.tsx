@@ -48,6 +48,7 @@ export default function GuestSdgsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedSdg, setSelectedSdg] = useState<SdgItem | null>(null);
+    const [isDetailClosing, setIsDetailClosing] = useState(false);
 
     useEffect(() => {
         async function fetchSdgs() {
@@ -70,12 +71,23 @@ export default function GuestSdgsPage() {
         fetchSdgs();
     }, []);
 
+    const closeDetail = () => {
+        if (!selectedSdg) return;
+        setIsDetailClosing(true);
+        window.setTimeout(() => {
+            setSelectedSdg(null);
+            setIsDetailClosing(false);
+        }, 260);
+    };
+
     const handleCardSelect = (sdg: SdgItem) => {
         if (selectedSdg?.id === sdg.id) {
-            setSelectedSdg(null);
-        } else {
-            setSelectedSdg(sdg);
+            closeDetail();
+            return;
         }
+
+        setIsDetailClosing(false);
+        setSelectedSdg(sdg);
     };
 
     const handleExploreRepository = (sdgId: number) => {
@@ -207,11 +219,26 @@ export default function GuestSdgsPage() {
 
                         {/* Right Side: Description Side Panel */}
                         {selectedSdg && (
-                            <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 sticky top-24 transition-opacity duration-300 opacity-100">
-                                <div className="relative rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
+                            <div
+                                className="w-full lg:w-[380px] xl:w-[420px] shrink-0 sticky top-24"
+                                style={{
+                                    opacity: isDetailClosing ? 0 : 1,
+                                    transform: isDetailClosing ? "translateY(10px) scale(0.99)" : "translateY(0) scale(1)",
+                                    transition: "opacity 260ms ease, transform 260ms ease",
+                                    willChange: "opacity, transform",
+                                }}
+                            >
+                                <div
+                                    className="relative rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm"
+                                    style={{
+                                        animation: isDetailClosing ? "sdgPanelOut 260ms ease-in forwards" : "sdgPanelIn 260ms ease-out forwards",
+                                        transformOrigin: "top center",
+                                        willChange: "opacity, transform",
+                                    }}
+                                >
                                     {/* Close button X */}
                                     <button
-                                        onClick={() => setSelectedSdg(null)}
+                                        onClick={closeDetail}
                                         className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"
                                         title="Tutup Deskripsi"
                                     >
@@ -295,4 +322,28 @@ export default function GuestSdgsPage() {
         </main>
     );
 }
+
+<style jsx>{`
+  @keyframes sdgPanelIn {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.985);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes sdgPanelOut {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.985);
+    }
+  }
+`}</style>
 

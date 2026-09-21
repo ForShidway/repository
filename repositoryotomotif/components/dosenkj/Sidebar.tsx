@@ -278,7 +278,7 @@ export default function SidebarDosen({
                 {/* Footer: theme toggle + profile + logout */}
                 <div className={`border-t border-slate-200 dark:border-white/10 ${collapsed ? "p-2" : "p-4"}`}>
                     {/* Theme toggle */}
-                    <button
+                    {/* <button
                         type="button"
                         onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
                         className={`
@@ -318,7 +318,7 @@ export default function SidebarDosen({
                                 Ganti tema
                             </span>
                         )}
-                    </button>
+                    </button> */}
 
                     {!collapsed ? (
                         <>

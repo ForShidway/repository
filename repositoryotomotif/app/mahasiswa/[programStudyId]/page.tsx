@@ -237,7 +237,7 @@ export default function MahasiswaProgramStudyFolderPage() {
                         </div>
                         <div>
                           <span className={`inline-block rounded-lg px-2.5 py-1 text-[11px] font-extrabold tracking-wide uppercase ${category.badge}`}>
-                            Folder Karya
+                            {category.label}
                           </span>
                         </div>
                       </div>
@@ -247,11 +247,6 @@ export default function MahasiswaProgramStudyFolderPage() {
                       </span>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-lg sm:text-xl font-black leading-snug text-slate-900 transition-colors duration-200 group-hover:text-blue-600">
-                      {category.label}
-                    </h3>
-
                     {/* Description */}
                     <p className="mt-2 text-xs leading-relaxed text-slate-500 line-clamp-2">
                       {category.description}
@@ -259,10 +254,6 @@ export default function MahasiswaProgramStudyFolderPage() {
 
                     {/* Footer CTA */}
                     <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
-                      <span className="inline-flex items-center gap-1.5 font-semibold text-slate-500">
-                        <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                        Formulir Siap
-                      </span>
                       <span className="inline-flex items-center gap-1 font-bold text-blue-600 transition-all duration-300 group-hover:translate-x-1 group-hover:text-blue-700">
                         <span>Buka & Isi Formulir</span>
                         <ChevronRight className="h-3.5 w-3.5" />

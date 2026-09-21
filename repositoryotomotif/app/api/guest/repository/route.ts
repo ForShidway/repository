@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     try {
-        const [tugasAkhir, artikelJurnal, laporanPi] = await Promise.all([
+        const [tugasAkhir, artikelJurnal, laporanPi, laporanPlk] = await Promise.all([
             prisma.tugasAkhir.findMany({
                 orderBy: { createdAt: "desc" },
                 include: {
@@ -22,6 +22,10 @@ export async function GET() {
                 },
             }),
             prisma.laporanPi.findMany({
+                orderBy: { createdAt: "desc" },
+                include: { dosenPembimbing: true },
+            }),
+            prisma.laporanPLK.findMany({
                 orderBy: { createdAt: "desc" },
                 include: { dosenPembimbing: true },
             }),
@@ -65,8 +69,27 @@ export async function GET() {
                 id: `laporan-pi-${item.id}`,
                 sourceId: item.id,
                 jenis: "LAPORAN PI" as const,
-                judul: `Laporan PI - ${item.name}`,
-                tahun: item.tanggalMulai.getFullYear(),
+                judul: item.judul || `Laporan PI - ${item.name}`,
+                tahun: item.tanggalMulai ? new Date(item.tanggalMulai).getFullYear() : new Date().getFullYear(),
+                programStudy: null,
+                mahasiswa: [{
+                    id: item.id,
+                    name: item.name,
+                    nim: item.nim,
+                    urutan: 1,
+                }],
+                pembimbing: item.dosenPembimbing,
+                sdgs: [],
+                fileName: item.fileName,
+                filePath: item.filePath,
+                createdAt: item.createdAt,
+            })),
+            ...laporanPlk.map((item) => ({
+                id: `laporan-plk-${item.id}`,
+                sourceId: item.id,
+                jenis: "LAPORAN PLK" as const,
+                judul: item.judul || `Laporan PLK - ${item.name}`,
+                tahun: item.tanggalMulai ? new Date(item.tanggalMulai).getFullYear() : new Date().getFullYear(),
                 programStudy: null,
                 mahasiswa: [{
                     id: item.id,

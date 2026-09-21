@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // --- TYPE DEFINITIONS ---
@@ -45,11 +45,33 @@ type RepositoryItem = {
   fileType?: string | null;
 };
 
+function getProgramStudyKey(programStudy: ProgramStudy | null | undefined) {
+  return programStudy ? `${programStudy.degree} ${programStudy.name}`.trim().toLowerCase() : '';
+}
+
 export default function KatalogTugasAkhirPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#f8fafc] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl animate-pulse space-y-6">
+          <div className="h-14 w-full rounded-2xl bg-slate-200" />
+          <div className="grid gap-6 md:grid-cols-2">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-44 rounded-2xl bg-slate-200" />)}
+          </div>
+        </div>
+      </main>
+    }>
+      <KatalogTugasAkhirContent />
+    </Suspense>
+  );
+}
+
+function KatalogTugasAkhirContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [repositoryItems, setRepositoryItems] = useState<RepositoryItem[]>([]);
   const [dosens, setDosens] = useState<Dosen[]>([]);
+  const [programStudy, setProgramStudy] = useState<ProgramStudy[]>([]);
   const [sdgs, setSdgs] = useState<SDGs[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -61,7 +83,7 @@ export default function KatalogTugasAkhirPage() {
   const [sdgsFilter, setSdgsFilter] = useState<number[]>(
     sdgParam && !isNaN(parseInt(sdgParam)) ? [parseInt(sdgParam)] : []
   );
-  const [view, setView] = useState<"grid" | "list">("grid");
+  const [view, setView] = useState<"grid" | "list">("list");
   const [sort, setSort] = useState('terbaru');
   const [page, setPage] = useState(1);
   const [jenis, setJenis] = useState(searchParams.get('jenis') || '')
@@ -82,15 +104,17 @@ export default function KatalogTugasAkhirPage() {
     async function fetchData() {
       try {
         setError("");
-        const [repositoryResponse, dosenResponse, sdgsResponse] = await Promise.all([
+        const [repositoryResponse, dosenResponse, sdgsResponse, programStudyResponse] = await Promise.all([
           fetch("/api/guest/repository"),
           fetch("/api/dosens"),
-          fetch("/api/sdgs")
+          fetch("/api/sdgs"),
+          fetch("/api/program-studies")
         ]);
 
         const repositoryData = await repositoryResponse.json();
         const dosenData = await dosenResponse.json();
         const sdgsData = await sdgsResponse.json();
+        const programStudyData = await programStudyResponse.json();
 
         if (!repositoryResponse.ok) {
           throw new Error(
@@ -109,10 +133,12 @@ export default function KatalogTugasAkhirPage() {
             sdgsData.message || "Gagal mengambil data SDGS"
           )
         }
+        
 
         setRepositoryItems(repositoryData);
         setDosens(dosenData);
         setSdgs(sdgsData);
+        setProgramStudy(programStudyData)
 
       } catch (error) {
         console.error(error);
@@ -176,7 +202,7 @@ export default function KatalogTugasAkhirPage() {
 
     if (prodi) {
       result = result.filter(
-        t => t.programStudy?.degree?.toLowerCase() === prodi.toLowerCase()
+        t => getProgramStudyKey(t.programStudy) === prodi.toLowerCase()
       );
     }
     if (tahun) {
@@ -269,7 +295,7 @@ export default function KatalogTugasAkhirPage() {
 
         {/* Search + Sort + View toolbar */}
         <div className="sticky top-[68px] z-30 mb-6 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-md shadow-slate-900/5 backdrop-blur-md">
-          <div className="flex flex-col gap-2 md:flex-row">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
             <div className="relative flex-1">
               <svg
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -287,35 +313,38 @@ export default function KatalogTugasAkhirPage() {
               />
             </div>
 
-            {/* SORT */}
-            <select
-              value={sort}
-              onChange={(e) => { setSort(e.target.value); setPage(1); }}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 cursor-pointer"
-            >
-              <option value="terbaru">Terbaru</option>
-              <option value="terlama">Terlama</option>
-              <option value="az">A–Z</option>
-            </select>
+            {/* Sort + View Mode combined side-by-side in 1 row on mobile */}
+            <div className="flex items-center gap-2">
+              {/* SORT */}
+              <select
+                value={sort}
+                onChange={(e) => { setSort(e.target.value); setPage(1); }}
+                className="flex-1 md:flex-initial rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 cursor-pointer"
+              >
+                <option value="terbaru">Terbaru</option>
+                <option value="terlama">Terlama</option>
+                <option value="az">A–Z</option>
+              </select>
 
-            {/* VIEW TOGGLE */}
-            <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-white">
-              <button
-                type="button"
-                onClick={() => setView("grid")}
-                title="Grid view"
-                className={`flex items-center justify-center px-4 py-2.5 transition ${view === "grid" ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"}`}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => setView("list")}
-                title="List view"
-                className={`flex items-center justify-center px-4 py-2.5 transition ${view === "list" ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"}`}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
-              </button>
+              {/* VIEW TOGGLE */}
+              <div className="flex shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <button
+                  type="button"
+                  onClick={() => setView("grid")}
+                  title="Grid view"
+                  className={`flex items-center justify-center px-4 py-2.5 transition ${view === "grid" ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"}`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setView("list")}
+                  title="List view"
+                  className={`flex items-center justify-center px-4 py-2.5 transition ${view === "list" ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"}`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -347,6 +376,7 @@ export default function KatalogTugasAkhirPage() {
                     <option value="TUGAS AKHIR">Tugas Akhir</option>
                     <option value="ARTIKEL JURNAL">Artikel Jurnal</option>
                     <option value="LAPORAN PI">Laporan PI</option>
+                    <option value="LAPORAN PLK">Laporan PLK</option>
                   </select>
                 </div>
 
@@ -355,8 +385,10 @@ export default function KatalogTugasAkhirPage() {
                   <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Program Studi</label>
                   <select value={prodi} onChange={e => { setProdi(e.target.value); setPage(1); }} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
                     <option value="">Semua Program Studi</option>
-                    <option value="s1">S1 Pend. Teknik Otomotif</option>
-                    <option value="d3">D3 Teknik Otomotif</option>
+                    {programStudy.map(ps => {
+                      const programStudyLabel = `${ps.degree} ${ps.name}`.trim();
+                      return <option key={ps.id} value={programStudyLabel.toLowerCase()}>{programStudyLabel}</option>;
+                    })}
                   </select>
                 </div>
 
@@ -520,17 +552,19 @@ export default function KatalogTugasAkhirPage() {
 
                       </div>
                     ) : (
-                      <div className="flex gap-5 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md">
-                        <div className="flex w-16 shrink-0 items-center justify-center self-center">
+                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-slate-200 bg-white p-4 sm:px-5 sm:py-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md w-full">
+                        {/* KOLOM 1: ICON (Disembunyikan pada mobile/HP, tampil di tablet & desktop) */}
+                        <div className="hidden sm:flex w-14 shrink-0 items-center justify-center self-center">
                           <ItemIcon jenis={item.jenis} small />
                         </div>
 
-                        {/* KOLOM 2: KONTEN */}
-                        <div className="flex flex-1 min-w-0 items-center justify-between gap-4">
-                          <div className="min-w-0 flex-1">
+                        {/* KOLOM 2: KONTEN & AKSI */}
+                        <div className="flex flex-col sm:flex-row flex-1 min-w-0 items-start sm:items-center justify-between gap-3 sm:gap-4">
+                          <div className="min-w-0 flex-1 w-full">
                             <div className="mb-2 flex flex-wrap items-center gap-1.5">
                               <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${item.jenis === "TUGAS AKHIR" ? "bg-blue-50 text-blue-700"
                                 : item.jenis === "ARTIKEL JURNAL" ? "bg-emerald-50 text-emerald-700"
+                                  : item.jenis === "LAPORAN PI" ? "bg-amber-50 text-amber-700"
                                   : "bg-orange-50 text-orange-700"
                                 }`}>{item.jenis}</span>
                               {item.programStudy && (
@@ -541,7 +575,7 @@ export default function KatalogTugasAkhirPage() {
                               <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{item.tahun}</span>
                             </div>
 
-                            <h2 className="mb-1.5 text-sm font-bold leading-snug text-slate-900 line-clamp-2">{item.judul}</h2>
+                            <h2 className="mb-1.5 text-sm sm:text-base font-bold leading-snug text-slate-900 line-clamp-2">{item.judul}</h2>
 
                             {getMahasiswaText(item.mahasiswa) && (
                               <p className="mb-1 text-xs text-slate-500">
@@ -560,19 +594,19 @@ export default function KatalogTugasAkhirPage() {
                             )}
                           </div>
 
-                          {/* KANAN: aksi — eye/download di atas, Lihat Detail di bawah/tengah */}
-                          <div className="flex shrink-0 flex-col items-end gap-2">
+                          {/* KOLOM 3: Aksi — Pada mobile full width di bawah; pada desktop di samping kanan */}
+                          <div className="flex w-full sm:w-auto shrink-0 items-center justify-between sm:flex-col sm:items-end gap-2 border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0">
                             {item.filePath ? (
-                              <div className="flex items-center gap-2">
-                                <button onClick={(e) => { e.stopPropagation(); setPreviewFile(item.filePath); }} title="Lihat" className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-blue-300 hover:text-blue-600">
+                              <div className="flex items-center gap-1.5">
+                                <button onClick={(e) => { e.stopPropagation(); setPreviewFile(item.filePath); }} title="Lihat" className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
                                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                                 </button>
-                                <a href={item.filePath} download={item.fileName ?? true} onClick={(e) => e.stopPropagation()} title="Unduh" className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-blue-300 hover:text-blue-600">
+                                <a href={item.filePath} download={item.fileName ?? true} onClick={(e) => e.stopPropagation()} title="Unduh" className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
                                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                                 </a>
                               </div>
                             ) : (
-                              <span className="text-xs text-slate-300">Belum ada file</span>
+                              <span className="text-xs text-slate-400">Belum ada file</span>
                             )}
 
                             <button
