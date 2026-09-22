@@ -80,7 +80,7 @@ export default function TugasAkhirPage() {
     }
     return (
         <main className="page-shell">
-            <section className="page-heading">
+            <section className="page-heading ">
                 <div>
                     <p className="eyebrow">
                         Repository Jurusan
@@ -92,6 +92,10 @@ export default function TugasAkhirPage() {
                         Kelola data tugas Akhir mahasiswa
                     </p>
                 </div>
+                    <a href="/api/admin/export?type=tugas-akhir" download className="primary-button">
+                        Unduh Excel
+                    </a>
+                
             </section>
             {error && (
                 <div className="error-banner">
@@ -105,7 +109,9 @@ export default function TugasAkhirPage() {
                         <p className="eyebrow">Daftar TA</p>
                         <h2>Tugas Akhir Mahasiswa</h2>
                     </div>
-                    <span className="count-pill">{data.length} TA</span>
+                    <div className="flex items-center gap-2">
+                        <span className="count-pill">{data.length} TA</span>
+                    </div>
                 </div>
                 {data.length === 0 ? (
                     <p className="empty-state">Belum ada Data TA</p>

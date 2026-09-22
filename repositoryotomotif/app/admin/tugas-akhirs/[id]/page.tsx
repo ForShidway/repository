@@ -149,18 +149,6 @@ export default function DetailTugasAkhirPage({
     return (
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-5xl">
-                <nav className="mb-4 flex items-center gap-2 text-sm text-slate-500">
-                    <button onClick={() => router.push("/")} className="hover:text-blue-600">
-                        Beranda
-                    </button>
-                    <span>{'>'}</span>
-                    <button onClick={() => router.push("/admin/tugas-akhirs")} className="hover:text-blue-600">
-                        Tugas Akhir
-                    </button>
-                    <span>{'>'}</span>
-                    <span className="text-slate-700">Detail Tugas Akhir</span>
-                </nav>
-
                 <div className="mb-6 flex items-start justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Detail Tugas Akhir</h1>

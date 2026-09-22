@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 
 type Dosen = { id: number; name: string };
 type SDGs = { id: number; code: string; title: string };
@@ -147,15 +146,6 @@ export default function TugasAkhirDetailPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl space-y-5">
-
-        {/* ── Breadcrumb ── */}
-        <nav className="flex items-center gap-2 text-xs text-slate-400">
-          <Link href="/" className="transition hover:text-blue-600">Beranda</Link>
-          <span>/</span>
-          <Link href="/jelajahirepository" className="transition hover:text-blue-600">Repository</Link>
-          <span>/</span>
-          <span className="font-medium text-slate-600">Detail Tugas Akhir</span>
-        </nav>
 
         {/* ── Tombol Kembali ── */}
         <button

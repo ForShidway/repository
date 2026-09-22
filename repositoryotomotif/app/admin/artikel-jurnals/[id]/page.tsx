@@ -1,5 +1,5 @@
 import ArtikelJurnalDetailPage from "@/components/repository/ArtikelJurnalDetailPage";
 
-export default function GuestArtikelJurnalDetailPage() {
+export default function AdminArtikelJurnalDetailPage() {
     return <ArtikelJurnalDetailPage />;
 }

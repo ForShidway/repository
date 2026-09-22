@@ -83,6 +83,9 @@ export default function LaporanPIPage() {
                         Kelola Data Laporan Pelatihan Industri Mahasiswa
                     </p>
                 </div>
+                <a href="/api/admin/export?type=laporan-pi" download className="primary-button">
+                    Unduh Excel
+                </a>
             </section>
             {error && (
                 <div className="error-banner">
@@ -96,7 +99,10 @@ export default function LaporanPIPage() {
                         <p className="eyebrow">Daftar LPI</p>
                         <h2>Laporan Pelatihan Industri Mahasiswa</h2>
                     </div>
-                    <span className="count-pill">{data.length} Laporan Pelatihan Industri</span>
+                    <div className="flex items-center gap-2">
+                        
+                        <span className="count-pill">{data.length} Laporan Pelatihan Industri</span>
+                    </div>
                 </div>
                 {data.length === 0 ? (
                     <p className="empty-state">Belum ada Data Lapoarn Pelatihan Industi</p>

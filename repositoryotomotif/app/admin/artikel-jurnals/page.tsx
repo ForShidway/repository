@@ -87,7 +87,7 @@ export default function ArtikelJurnalPage() {
 
      return (
         <main className="page-shell">
-            <section className="page-heading">
+            <section className="page-heading justify-between">
                 <div>
                     <p className="eyebrow">
                         Repository Jurusan
@@ -99,6 +99,9 @@ export default function ArtikelJurnalPage() {
                         Kelola data Artikel Jurnal Mahasiswa
                     </p>
                 </div>
+                <a href="/api/admin/export?type=artikel-jurnal" download className="primary-button">
+                    Unduh Excel
+                </a>
             </section>
             {error && (
                 <div className="error-banner">
@@ -112,7 +115,10 @@ export default function ArtikelJurnalPage() {
                         <p className="eyebrow">Daftar TA</p>
                         <h2>Artikel Jurnal Mahasiswa</h2>
                     </div>
-                    <span className="count-pill">{data.length} Artikel Jurnal</span>
+                    <div className="flex items-center gap-2">
+                        
+                        <span className="count-pill">{data.length} Artikel Jurnal</span>
+                    </div>
                 </div>
                 {data.length === 0 ? (
                     <p className="empty-state">Belum ada Data Artikel Jurnal</p>

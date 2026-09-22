@@ -82,6 +82,9 @@ export default function LaporanPlkPage() {
                         Kelola Data Laporan Pelatihan Lapangan Kependidikan
                     </p>
                 </div>
+                <a href="/api/admin/export?type=laporan-plk" download className="primary-button">
+                    Unduh Excel
+                </a>
             </section>
             {error && (
                 <div className="error-banner">
@@ -95,7 +98,10 @@ export default function LaporanPlkPage() {
                         <p className="eyebrow">Daftar LPK</p>
                         <h2>Laporan Pelatihan Kependidikan Mahasiswa</h2>
                     </div>
-                    <span className="count-pill">{data.length} Laporan Pelatihan Kependidikan</span>
+                    <div className="flex items-center gap-2">
+                        
+                        <span className="count-pill">{data.length} Laporan Pelatihan Kependidikan</span>
+                    </div>
                 </div>
                 {data.length === 0 ? (
                     <p className="empty-state">Belum ada Data Laporan Pelatihan Kependidikan</p>
