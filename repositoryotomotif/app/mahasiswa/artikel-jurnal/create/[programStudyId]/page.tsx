@@ -291,6 +291,23 @@ export default function ArtikelJurnalForm() {
       });
     }
   }
+
+  useEffect(() => {
+    console.log({
+        penulisValid,
+        judulOK: Boolean(judul.trim()),
+        abstractOK: Boolean(abstract.trim()),
+        abstractOverLimit,
+        tahunOK: Boolean(tahun.trim()),
+        routeProgramStudyId,
+        selectedSDGsCount: selectedSDGs.length,
+        programStudy,
+        fileError,
+        submitStatus: submit.status,
+    });
+}, [penulisValid, judul, abstract, abstractOverLimit, tahun, routeProgramStudyId, selectedSDGs, programStudy, fileError, submit.status]);
+
+
    return (
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-2xl">

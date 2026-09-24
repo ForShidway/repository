@@ -115,7 +115,14 @@ export default function ArtikelJurnalDetailPage() {
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"><span className="text-xs font-bold">{formatFileType(data.fileType) || "FILE"}</span></div>
                                 <div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-800">{data.fileName}</p><div className="flex items-center gap-2 text-xs text-slate-400">{data.fileSize != null && <span>{formatBytes(data.fileSize)}</span>}{data.fileType && <span className="rounded bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-500">{formatFileType(data.fileType)}</span>}</div></div>
                             </div>
-                            <a href={data.filePath} download={data.fileName} className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Unduh Berkas</a>
+                            <div className="flex gap-2">
+                                <a href={data.filePath}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 whitespace-nowrap"> Lihat Berkas</a>
+                                <a href={data.filePath} download={data.fileName} className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Unduh Berkas</a>
+                            </div>
+                            
                         </> : <p className="text-sm text-slate-400">Tidak ada berkas</p>}
                     </div>
                 </div>

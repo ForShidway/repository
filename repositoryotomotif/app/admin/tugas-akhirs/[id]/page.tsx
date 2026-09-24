@@ -38,6 +38,15 @@ type Keyword = {
     kata: string;
 };
 
+type Penguji = {
+    id?: number;
+    peran?: string;
+    dosen?: {
+        nama?: string;
+        name?: string;
+    };
+};
+
 type TugasAkhirDetail = {
     id: number;
     judul: string;
@@ -57,6 +66,7 @@ type TugasAkhirDetail = {
     sdgs: SDGs[];
     mahasiswa: Mahasiswa[];
     keywords: Keyword[];
+    penguji?: Penguji[];
 };
 
 function formatFileSize(bytes: number | null) {
@@ -161,12 +171,6 @@ export default function DetailTugasAkhirPage({
                         >
                             &larr; Kembali
                         </button>
-                        <button
-                            onClick={() => router.push(`/admin/tugas-akhirs/${data.id}/edit`)}
-                            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
-                        >
-                            Edit Data
-                        </button>
                     </div>
                 </div>
 
@@ -183,13 +187,6 @@ export default function DetailTugasAkhirPage({
                                 <p className="text-sm text-slate-500">Judul Tugas Akhir</p>
                                 <p className="mt-1 font-semibold text-slate-900">{data.judul}</p>
                             </div>
-                        
-                            <div>
-                                <p className="text-sm text-slate-500">Program Studi</p>
-                                <p className="mt-1 text-slate-800">
-                                    {data.programStudy ? `${data.programStudy.degree} ${data.programStudy.name}` : "-"}
-                                </p>
-                            </div>
                             <div>
                                 <p className="text-sm text-slate-500">Kategori</p>
                                 <p className={`mt-1 font-medium ${data.jenisPendidikan === "NON_PENDIDIKAN" ? "text-amber-700" : "text-emerald-700"}`}>
@@ -200,11 +197,7 @@ export default function DetailTugasAkhirPage({
                                 <p className="text-sm text-slate-500">Mata Kuliah Relevan</p>
                                 <p className="mt-1 text-slate-800">{data.mataKuliahRelevan}</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4 border-slate-100 md:border-l md:pl-6">
-                        <div>
+                            <div>
                             <p className="mb-1 flex items-center gap-2 text-sm text-slate-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M15 9h.01M15 13h.01" />
@@ -213,51 +206,18 @@ export default function DetailTugasAkhirPage({
                             </p>
                             <p className="text-slate-800">{data.ruangan?.name || "Tidak ada ruangan terkait"}</p>
                         </div>
-
-                        {data.fileName && (
-                            <div>
-                                <p className="mb-1 flex items-center gap-2 text-sm text-slate-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-9 5h12a2 2 0 002-2V7.5L14.5 3H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                    </svg>
-                                    File Proposal
-                                </p>
-                                <div className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5">
-                                    <div className="flex items-center gap-3">
-                                        <span className="flex h-8 w-8 items-center justify-center rounded bg-red-50 text-xs font-bold text-red-500">
-                                            PDF
-                                        </span>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-800">{data.fileName}</p>
-                                            <p className="text-xs text-slate-400">{formatFileSize(data.fileSize)}</p>
-                                        </div>
-                                    </div>
-                                    {data.filePath && (
-                                        <a
-                                            href={data.filePath}
-                                            download
-                                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14" />
-                                            </svg>
-                                        </a>
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        </div>
                     </div>
-                </div>
 
-                {/* Mahasiswa, Dosen, SDGs */}
-                <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-                    <div className="rounded-xl border bg-white p-5 shadow-sm">
-                        <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-3a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
-                            </svg>
-                            Mahasiswa
-                        </h2>
+                    <div className="space-y-4 border-slate-100 md:border-l md:pl-6">
+                        
+                        
+                            <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-3a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
+                                </svg>
+                                Mahasiswa
+                            </h2>
                         <div className="space-y-4">
                             {data.mahasiswa.map((m) => (
                                 <div key={m.id}>
@@ -267,9 +227,19 @@ export default function DetailTugasAkhirPage({
                                     <p className="font-medium text-slate-800">{m.nim}</p>
                                 </div>
                             ))}
+                             <div>
+                                <p className="text-sm text-slate-500">Program Studi</p>
+                                <p className="mt-1 text-slate-800">
+                                    {data.programStudy ? `${data.programStudy.degree} ${data.programStudy.name}` : "-"}
+                                </p>
+                            </div>
                         </div>
+                                           
                     </div>
+                </div>
 
+                {/* Mahasiswa, Dosen, SDGs */}
+                <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                     <div className="rounded-xl border bg-white p-5 shadow-sm">
                         <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
@@ -290,6 +260,31 @@ export default function DetailTugasAkhirPage({
                                 <p className="text-sm text-slate-500">Dosen PA</p>
                                 <p className="font-medium text-slate-800">{data.dosenPa?.name}</p>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div className="rounded-xl border bg-white p-5 shadow-sm">
+                        <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-3a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
+                            </svg>
+                            Dosen Penguji
+                        </h2>
+                        <div className="space-y-4">
+                            {data.penguji && data.penguji.length > 0 ? (
+                                data.penguji.map((p, index) => (
+                                    <div key={p.id || index}>
+                                        <p className="text-sm text-slate-500">
+                                            Penguji {index + 1} {p.peran ? `(${p.peran})` : ""}
+                                        </p>
+                                        <p className="font-medium text-slate-800">
+                                            {p.dosen?.nama ?? p.dosen?.name ?? "-"}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-slate-500">Belum ada dosen penguji.</p>
+                            )}
                         </div>
                     </div>
 
@@ -364,12 +359,28 @@ export default function DetailTugasAkhirPage({
                 {data.fileName && (
                     <div className="rounded-xl border bg-white p-5 shadow-sm">
                         <div className="flex items-center justify-between">
-                            <h2 className="flex items-center gap-2 font-semibold text-slate-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-9 5h12a2 2 0 002-2V7.5L14.5 3H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                                File Proposal
-                            </h2>
+                            {data.fileName && (
+                                <div>
+                                    <p className="mb-1 flex items-center gap-2 text-sm text-slate-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-9 5h12a2 2 0 002-2V7.5L14.5 3H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                        File Proposal
+                                    </p>
+                                    <div className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex h-8 w-8 items-center justify-center rounded bg-red-50 text-xs font-bold text-red-500">
+                                                PDF
+                                            </span>
+                                            <div>
+                                                <p className="text-sm font-medium text-slate-800">{data.fileName}</p>
+                                                <p className="text-xs text-slate-400">{formatFileSize(data.fileSize)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
                             <div className="flex gap-3">
                                 {data.filePath && (
                                     <a

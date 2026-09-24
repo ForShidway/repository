@@ -706,7 +706,7 @@ export default function AdminDashboard() {
                                 <tr className="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                                     <th className="px-4 py-2.5 w-12">No.</th>
                                     <th className="px-4 py-2.5">Judul Artikel</th>
-                                    <th className="px-4 py-2.5">Penulis / Mahasiswa</th>
+                                    <th className="px-4 py-2.5">Penulis</th>
                                     <th className="px-4 py-2.5">Tahun</th>
                                     <th className="px-4 py-2.5">Program Studi</th>
                                 </tr>
