@@ -150,9 +150,10 @@ export default function LaporanPklForm() {
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Laporan PI Baru</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Laporan PL
+                        I Baru</h1>
                     <p className="mt-2 text-gray-600">
-                        Lengkapi data di bawah untuk mengunggah laporan PI.
+                        Lengkapi data di bawah untuk mengunggah laporan PLI.
                     </p>
                 </div>
 

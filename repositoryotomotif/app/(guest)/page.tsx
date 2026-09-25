@@ -168,7 +168,7 @@ export default function GuestHomePage() {
             iconBg: "bg-blue-50",
             iconColor: "text-blue-800",
             value: data?.statistics?.totalDosen ?? 0,
-            label: "Dosen Pembimbing",
+            label: "Dosen",
             icon: (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -292,10 +292,37 @@ export default function GuestHomePage() {
                                     </div>
                                     <div>
                                         <p className="text-2xl font-bold leading-tight text-slate-900">
-                                            {s.value}
+                                            {s.label === "Periode" ? (
+                                                <>
+                                                    {/* Mobile */}
+                                                    <span className="sm:hidden">
+                                                        <span className="text-sm font-medium text-slate-500">
+                                                            Sejak
+                                                        </span>{" "}
+                                                        <span className="text-2xl font-bold text-slate-900">
+                                                            {String(s.value).split("-")[0].trim()}
+                                                        </span>
+                                                    </span>
+
+                                                    {/* Desktop */}
+                                                    <span className="hidden sm:inline">
+                                                        {s.value}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                s.value
+                                            )}
                                         </p>
+                
                                         <p className="text-sm font-medium leading-tight text-slate-700">
-                                            {s.label}
+                                            {s.label === "Tugas Akhir" ? (
+                                                <>
+                                                    <span className="sm:hidden">TA</span>
+                                                    <span className="hidden sm:inline">Tugas Akhir</span>
+                                                </>
+                                            ) : (
+                                                s.label
+                                            )}
                                         </p>
                                     </div>
                                 </div>

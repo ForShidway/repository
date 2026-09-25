@@ -38,7 +38,7 @@ const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
   {
     id: "tugas-akhir",
     label: "Tugas Akhir",
-    description: "Unggah dokumen, metadata, pembimbing, dan berkas lengkap Tugas Akhir / Skripsi.",
+    description: "Unggah dokumen Tugas Akhir / Skripsi.",
     iconBg: "bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-blue-500/25",
     gradient: "from-blue-600 to-indigo-600",
     borderHover: "hover:border-blue-400 hover:shadow-blue-500/10",
@@ -49,7 +49,7 @@ const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
   {
     id: "artikel-jurnal",
     label: "Artikel Jurnal",
-    description: "Unggah publikasi naskah artikel jurnal karya mahasiswa beserta metadata.",
+    description: "Unggah artikel jurnal.",
     iconBg: "bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-emerald-500/25",
     gradient: "from-emerald-600 to-teal-600",
     borderHover: "hover:border-emerald-400 hover:shadow-emerald-500/10",
@@ -59,8 +59,8 @@ const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
   },
   {
     id: "laporan-pelatihan-industri",
-    label: "Laporan PI",
-    description: "Upload laporan Praktik Industri (PI) yang relevan dengan bidang keahlian.",
+    label: "Laporan PLI",
+    description: "Upload laporan Pengalaman Lapangan Industri(PLI).",
     iconBg: "bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/25",
     gradient: "from-amber-500 to-orange-600",
     borderHover: "hover:border-amber-400 hover:shadow-amber-500/10",
@@ -71,7 +71,7 @@ const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
   {
     id: "laporan-pelatihan-kependidikan",
     label: "Laporan PLK",
-    description: "Upload laporan Pengalaman Lapangan Kependidikan (PLK) untuk prodi kependidikan.",
+    description: "Upload laporan Praktik Lapangan Kependidikan (PLK).",
     iconBg: "bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-violet-500/25",
     gradient: "from-violet-600 to-purple-600",
     borderHover: "hover:border-violet-400 hover:shadow-violet-500/10",
@@ -191,7 +191,7 @@ export default function MahasiswaProgramStudyFolderPage() {
             {programStudy ? `${programStudy.degree} ${programStudy.name}` : "Program Studi"}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 max-w-2xl">
-            Pilih jenis folder kategori karya mahasiswa di bawah ini untuk memulai pengisian metadata dan penyerahan berkas.
+            Pilih jenis Form Unggahan Tugas mahasiswa.
           </p>
         </header>
 
@@ -204,11 +204,7 @@ export default function MahasiswaProgramStudyFolderPage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-extrabold text-slate-900">Pilih Folder Karya</h2>
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold text-blue-700 ring-1 ring-blue-200">
-                <MousePointerClick className="h-3 w-3" />
-                Klik untuk membuka
-              </span>
+              <h2 className="text-lg font-extrabold text-slate-900">Pilih Form Tugas</h2>
             </div>
           </div>
 
