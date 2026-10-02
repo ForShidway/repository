@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 type ProgramStudy = {
   id: number;
@@ -44,7 +44,16 @@ function formatBytes(bytes: number) {
 
 export default function ArtikelJurnalForm() {
     const params = useParams<{ programStudyId: string }>();
+    const router = useRouter();
     const routeProgramStudyId = params.programStudyId;
+
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push(`/mahasiswa/${routeProgramStudyId}`);
+        }
+    };
 
     type TipePenulis = "MAHASISWA" | "DOSEN" | "LAINNYA";
 
@@ -311,6 +320,16 @@ export default function ArtikelJurnalForm() {
    return (
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-2xl">
+                <div className="mb-6">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Artikel Jurnal Baru</h1>
                     <p className="mt-2 text-gray-600">
@@ -687,6 +706,13 @@ export default function ArtikelJurnalForm() {
                         )}
 
                         <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+                            >
+                                Batal
+                            </button>
                             <button
                                 type="submit"
                                 disabled={!canSubmit}

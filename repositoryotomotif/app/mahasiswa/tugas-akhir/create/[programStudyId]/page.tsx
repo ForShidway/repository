@@ -278,9 +278,27 @@ export default function CreateTugasAkhirPage({
         return text.trim().split(/\s+/).filter(Boolean).length;
     }
 
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push(`/mahasiswa/${programStudyId}`);
+        }
+    };
+
     return (
         <main className="min-h-screen bg-[#F4F9F9] p-8" >
             <div className="mx-auto max-w-2xl">
+                <div className="mb-6">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Tambah {selectedCategory}</h1>
                     <p className="mt-2 text-gray-600">Tambah data {selectedCategory.toLowerCase()} mahasiswa untuk program studi ini.</p>
@@ -666,7 +684,11 @@ export default function CreateTugasAkhirPage({
                         )}
 
                         <div className="flex gap-3">
-                            <button type="button" onClick={() => router.push(`/mahasiswa/${programStudyId}`)}>
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+                            >
                                 Batal
                             </button>
                             <button type="submit" disabled={loading} className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">

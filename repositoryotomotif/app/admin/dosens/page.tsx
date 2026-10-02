@@ -208,9 +208,7 @@ export default function DosensPage() {
                                                 <strong>{dosen.name}</strong>
                                             </td>
                                             <td className="user-date">
-                                                {new Date(dosen.createdAt).toLocaleDateString(
-                                                    "id-ID"
-                                                )}
+                                                {dosen.createdAt}
                                             </td>
                                             <td>
                                                 <button onClick={() => router.push(`/admin/dosens/${dosen.id}/edit`)} className="edit-button">Edit</button>

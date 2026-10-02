@@ -124,6 +124,14 @@ export default function DetailTugasAkhirPage({
         fetchDetail();
     }, [id]);
 
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push("/jelajahirepository");
+        }
+    };
+
     if (loading) {
         return (
             <main className="min-h-screen bg-gray-50 p-8">
@@ -141,7 +149,13 @@ export default function DetailTugasAkhirPage({
                     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
                         <p className="text-sm text-red-600">{error || "Data tidak ditemukan"}</p>
                     </div>
-                    
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        &larr; Kembali
+                    </button>
                 </div>
             </main>
         );
@@ -154,18 +168,20 @@ export default function DetailTugasAkhirPage({
     return (
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-5xl">
+                <div className="mb-4">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        &larr; Kembali
+                    </button>
+                </div>
+
                 <div className="mb-6 flex items-start justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Detail Tugas Akhir</h1>
                         <p className="mt-2 text-gray-600">Informasi lengkap data Tugas Akhir</p>
-                    </div>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => router.push("/admin/tugas-akhirs")}
-                            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
-                        >
-                            &larr; Kembali
-                        </button>
                     </div>
                 </div>
 

@@ -46,7 +46,7 @@ type HomeData = {
     tugasAkhirTerbaru: TugasAkhir[];
 };
 
-// Skema warna baru:
+// Skema warna:
 // - Navy (#0B1F3A -> #132D52) sebagai warna utama/hero, kesan teknik & profesional
 // - Biru (blue-700/800) sebagai warna aksi/brand di area terang
 // - Oranye (orange-500) sebagai SATU-SATUNYA warna aksen, dipakai konsisten untuk CTA utama & highlight
@@ -104,6 +104,188 @@ const features = [
     },
 ];
 
+/* =========================================================================
+   KOMPONEN STATISTIK (Animasi counter sinkron serentak mulai dari 1 ke target)
+========================================================================= */
+function HomeStatsCard({
+    statistics,
+    periodeTersedia = "Belum ada data",
+}: {
+    statistics?: HomeData["statistics"];
+    periodeTersedia?: string;
+}) {
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        let startTime: number | null = null;
+        let animationFrameId: number;
+        const duration = 2000; // 2 detik
+
+        const animate = (currentTime: number) => {
+            if (!startTime) startTime = currentTime;
+            const elapsed = currentTime - startTime;
+            const linearProgress = Math.min(elapsed / duration, 1);
+
+            // Easing cubic easeOut: cepat di awal, melambat mulus menuju akhir dan berhenti serentak
+            const easedProgress = 1 - Math.pow(1 - linearProgress, 3);
+            setProgress(easedProgress);
+
+            if (linearProgress < 1) {
+                animationFrameId = requestAnimationFrame(animate);
+            } else {
+                setProgress(1);
+            }
+        };
+
+        animationFrameId = requestAnimationFrame(animate);
+
+        return () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
+    }, []);
+
+    const formatCount = (target: number | null) => {
+        if (target === null || target === undefined) return null;
+        if (target <= 1) return target;
+        // Dimulai dari 1, perlahan naik, dan berhenti serentak di angka target
+        return Math.round(1 + (target - 1) * progress);
+    };
+
+    const yearsMatch = periodeTersedia.match(/\d{4}/g);
+    const startYear = yearsMatch && yearsMatch[0] ? parseInt(yearsMatch[0], 10) : null;
+    const endYear = yearsMatch && yearsMatch[1] ? parseInt(yearsMatch[1], 10) : startYear;
+
+    const countTA = formatCount(statistics?.totalTugasAkhir ?? 0);
+    const countDosen = formatCount(statistics?.totalDosen ?? 0);
+    const countSDGs = formatCount(statistics?.totalSDGs ?? 0);
+    const countStartYear = formatCount(startYear);
+    const countEndYear = formatCount(endYear);
+
+    const stats = [
+        {
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-800",
+            value: countTA ?? 0,
+            label: "Tugas Akhir",
+            labelDisplay: (
+                <>
+                    <span className="sm:hidden">TA</span>
+                    <span className="hidden sm:inline">Tugas Akhir</span>
+                </>
+            ),
+            isPeriod: false,
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+            ),
+        },
+        {
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-800",
+            value: countDosen ?? 0,
+            label: "Dosen",
+            labelDisplay: "Dosen",
+            isPeriod: false,
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+            ),
+        },
+        {
+            iconBg: "bg-blue-50",
+            iconColor: "text-blue-800",
+            value: countSDGs ?? 0,
+            label: "SDGs",
+            labelDisplay: "SDGs",
+            isPeriod: false,
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+            ),
+        },
+        {
+            iconBg: "bg-orange-50",
+            iconColor: "text-orange-600",
+            value: null,
+            label: "Periode",
+            labelDisplay: "Periode",
+            isPeriod: true,
+            icon: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+            ),
+        },
+    ];
+
+    return (
+        <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2 px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200/90 bg-white px-4 py-5 shadow-xl shadow-slate-900/10 sm:px-6 sm:py-6 md:px-8 md:py-7">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6">
+                    {stats.map((s) => (
+                        <div key={s.label} className="flex min-w-0 items-center gap-2.5 sm:gap-3.5">
+                            <div
+                                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12 ${s.iconBg} ${s.iconColor}`}
+                            >
+                                {s.icon}
+                            </div>
+                            <div className="min-w-0 flex-1 overflow-hidden">
+                                <p className="font-bold leading-tight tracking-tight text-slate-900 tabular-nums truncate">
+                                    {s.isPeriod ? (
+                                        startYear !== null ? (
+                                            startYear === endYear ? (
+                                                <span className="text-xl sm:text-2xl lg:text-3xl">
+                                                    {countStartYear}
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <span className="sm:hidden text-sm sm:text-base">
+                                                        {countStartYear}–{countEndYear}
+                                                    </span>
+                                                    <span className="hidden sm:inline text-lg md:text-xl lg:text-2xl">
+                                                        {countStartYear} – {countEndYear}
+                                                    </span>
+                                                </>
+                                            )
+                                        ) : (
+                                            <span className="text-sm sm:text-base lg:text-lg">
+                                                {periodeTersedia}
+                                            </span>
+                                        )
+                                    ) : (
+                                        <span className="text-xl sm:text-2xl lg:text-3xl">
+                                            {s.value}
+                                        </span>
+                                    )}
+                                </p>
+
+                                <p className="mt-0.5 text-xs font-medium leading-tight text-slate-600 truncate sm:text-sm">
+                                    {s.labelDisplay}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function GuestHomePage() {
     const [data, setData] = useState<HomeData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -142,69 +324,10 @@ export default function GuestHomePage() {
         );
     }
 
-
-    const periodeTersedia = data?.periodeTersedia ?? "Belum ada data";
     const formatMahasiswa = (mahasiswa: Mahasiswa[] = []) => {
         if (!mahasiswa.length) return "-";
         return mahasiswa.map((m) => `${m.name} (${m.nim})`).join(", ");
     };
-
-    const stats = [
-        {
-            iconBg: "bg-blue-50",
-            iconColor: "text-blue-800",
-            value: data?.statistics?.totalTugasAkhir ?? 0,
-            label: "Tugas Akhir",
-            icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <line x1="16" y1="13" x2="8" y2="13" />
-                    <line x1="16" y1="17" x2="8" y2="17" />
-                </svg>
-            ),
-        },
-        {
-            iconBg: "bg-blue-50",
-            iconColor: "text-blue-800",
-            value: data?.statistics?.totalDosen ?? 0,
-            label: "Dosen",
-            icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
-                    <path d="M16 3.13a4 4 0 010 7.75" />
-                </svg>
-            ),
-        },
-        {
-            iconBg: "bg-blue-50",
-            iconColor: "text-blue-800",
-            value: data?.statistics?.totalSDGs ?? 0,
-            label: "SDGs",
-            icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                </svg>
-            ),
-        },
-        {
-            iconBg: "bg-orange-50",
-            iconColor: "text-orange-600",
-            value: periodeTersedia,
-            label: "Periode",
-            icon: (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-            ),
-        },
-    ];
 
     return (
         <main>
@@ -273,67 +396,21 @@ export default function GuestHomePage() {
                         className="h-[56px] w-full sm:h-[90px]"
                     >
                         <path
-                            d="M0,50 C240,100 480,0 720,35 C960,70 1200,10 1440,55 L1440,110 L0,110 Z"
+                            d="M0,50 C240,100 480,0 720,35 C960,70 1200,10 1440,55 L1440,110 Z"
                             fill="#FFFFFF"
                         />
                     </svg>
                 </div>
 
                 {/* Stats card — overlaps bottom edge of hero */}
-                <div className="absolute inset-x-0 bottom-0 z-10 translate-y-1/2 px-6 lg:px-8">
-                    <div className="mx-auto max-w-6xl rounded-2xl border border-slate-300 bg-white px-6 py-7 shadow-xl shadow-slate-900/10 sm:px-10">
-                        <div className="grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:gap-6">
-                            {stats.map((s) => (
-                                <div key={s.label} className="flex items-center gap-3">
-                                    <div
-                                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${s.iconBg} ${s.iconColor}`}
-                                    >
-                                        {s.icon}
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold leading-tight text-slate-900">
-                                            {s.label === "Periode" ? (
-                                                <>
-                                                    {/* Mobile */}
-                                                    <span className="sm:hidden">
-                                                        <span className="text-sm font-medium text-slate-500">
-                                                            Sejak
-                                                        </span>{" "}
-                                                        <span className="text-2xl font-bold text-slate-900">
-                                                            {String(s.value).split("-")[0].trim()}
-                                                        </span>
-                                                    </span>
-
-                                                    {/* Desktop */}
-                                                    <span className="hidden sm:inline">
-                                                        {s.value}
-                                                    </span>
-                                                </>
-                                            ) : (
-                                                s.value
-                                            )}
-                                        </p>
-                
-                                        <p className="text-sm font-medium leading-tight text-slate-700">
-                                            {s.label === "Tugas Akhir" ? (
-                                                <>
-                                                    <span className="sm:hidden">TA</span>
-                                                    <span className="hidden sm:inline">Tugas Akhir</span>
-                                                </>
-                                            ) : (
-                                                s.label
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                <HomeStatsCard
+                    statistics={data?.statistics}
+                    periodeTersedia={data?.periodeTersedia}
+                />
             </section>
 
             {/* Spacer to compensate for the overlapping stats card */}
-            <div className="h-20 bg-white sm:h-16" />
+            <div className="h-24 bg-white sm:h-20 md:h-16" />
 
             <section className="bg-white">
                 <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">

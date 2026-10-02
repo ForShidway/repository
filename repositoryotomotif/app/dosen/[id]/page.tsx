@@ -514,77 +514,130 @@ export default function StatistikDosenPage() {
         <main className="min-h-screen bg-slate-50/60 pb-12">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 space-y-6">
                 {/* ── Hero Profile Card (Compact & Balanced) ── */}
-                <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0B1F3A] via-[#132D52] to-[#1e40af] p-4 sm:p-6 shadow-md text-white">
-                    <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-400/10 blur-2xl" />
-                    <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-emerald-400/10 blur-2xl" />
+                <section className="">
+                    <div className="mb-4">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (typeof window !== "undefined" && window.history.length > 1) {
+                                    router.back();
+                                } else {
+                                    router.push("/dosen");
+                                }
+                            }}
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            <span>Kembali</span>
+                        </button>
+                    </div>
 
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5">
                         <div className="flex items-center gap-4">
                             <div>
-                                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-black">
                                     {dosen.name}
                                 </h1>
                             </div>
                         </div>
 
-                        {/* Top KPI Metrics Row (Compact) */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 md:w-[480px] shrink-0">
-                            <div className="rounded-xl bg-white/10 backdrop-blur-md p-2.5 border border-white/15 text-center">
-                                <div className="flex items-center justify-center mb-0.5 text-blue-300">
-                                    <GraduationCap className="w-4 h-4" />
-                                </div>
-                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                                    TA Dibimbing
-                                </p>
-                                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5 leading-none">
-                                    {statistik.totalBimbingan}
-                                </p>
-                                <p className="text-[9px] text-blue-200 mt-1 font-medium">
-                                    {statistik.bimbinganTahunIni} di {statistik.currentYear}
-                                </p>
-                            </div>
-
-                            <div className="rounded-xl bg-white/10 backdrop-blur-md p-2.5 border border-white/15 text-center">
-                                <div className="flex items-center justify-center mb-0.5 text-purple-300">
-                                    <Award className="w-4 h-4" />
-                                </div>
-                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                                    TA Diuji
-                                </p>
-                                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5 leading-none">
-                                    {statistik.totalMenguji}
-                                </p>
-                                <p className="text-[9px] text-purple-200 mt-1 font-medium">Penguji TA</p>
-                            </div>
-
-                            <div className="rounded-xl bg-white/10 backdrop-blur-md p-2.5 border border-white/15 text-center">
-                                <div className="flex items-center justify-center mb-0.5 text-emerald-300">
-                                    <Briefcase className="w-4 h-4" />
-                                </div>
-                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                                    PI & PLK
-                                </p>
-                                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5 leading-none">
-                                    {totalLaporanPi + totalLaporanPlk}
-                                </p>
-                                <p className="text-[9px] text-emerald-200 mt-1 font-medium">Laporan Lapangan</p>
-                            </div>
-
-                            <div className="rounded-xl bg-white/10 backdrop-blur-md p-2.5 border border-white/15 text-center">
-                                <div className="flex items-center justify-center mb-0.5 text-amber-300">
-                                    <Target className="w-4 h-4" />
-                                </div>
-                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                                    SDGs
-                                </p>
-                                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5 leading-none">
-                                    {sdgsSummary.length}
-                                </p>
-                                <p className="text-[9px] text-amber-200 mt-1 font-medium">Goal SDGs</p>
-                            </div>
-                        </div>
                     </div>
                 </section>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {/* Card 1: TA Dibimbing */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-teal-300 transition group flex items-center gap-3">
+                        <div className="shrink-0">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition">
+                                <Users className="h-4 w-4" />
+                            </span>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-black">
+                                TA Dibimbing
+                            </p>
+                            <p className="text-lg sm:text-xl font-extrabold text-black mt-0.5 leading-none">
+                                {statistik.totalBimbingan}
+                            </p>
+                            <p className="text-[9px] text-black mt-1 font-medium">
+                                {statistik.bimbinganTahunIni} di {statistik.currentYear}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Card 2: TA Diuji */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-blue-300 transition group flex items-center gap-3">
+                        <div className="shrink-0">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
+                                <GraduationCap className="h-4 w-4" />
+                            </span>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-black">
+                                TA Diuji
+                            </p>
+                            <p className="text-lg sm:text-xl font-extrabold text-black mt-0.5 leading-none">
+                                {statistik.totalMenguji}
+                            </p>
+                            <p className="text-[9px] text-black mt-1 font-medium">Penguji TA</p>
+                        </div>
+                    </div>
+
+                    {/* Card 3: PI */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-indigo-300 transition group flex items-center gap-3">
+                        <div className="shrink-0">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition">
+                                <Briefcase className="h-4 w-4" />
+                            </span>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-black">
+                                PI 
+                            </p>
+                            <p className="text-lg sm:text-xl font-extrabold text-black mt-0.5 leading-none">
+                                {totalLaporanPi}
+                            </p>
+                            <p className="text-[9px] text-black mt-1 font-medium">Laporan Lapangan</p>
+                        </div>
+                    </div>
+
+                    {/* Card 4: PLK */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-pink-300 transition group flex items-center gap-3">
+                        <div className="shrink-0">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition">
+                                <FileText className="h-4 w-4" />
+                            </span>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-black">
+                                PLK
+                            </p>
+                            <p className="text-lg sm:text-xl font-extrabold text-black mt-0.5 leading-none">
+                                {totalLaporanPlk}
+                            </p>
+                            <p className="text-[9px] text-black mt-1 font-medium">Laporan Lapangan</p>
+                        </div>
+                    </div>
+
+                    {/* Card 5: SDGs */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-amber-300 transition group flex items-center gap-3">
+                        <div className="shrink-0">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition">
+                                <BookOpen className="h-4 w-4" />
+                            </span>
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-black">
+                                SDGs
+                            </p>
+                            <p className="text-lg sm:text-xl font-extrabold text-black mt-0.5 leading-none">
+                                {sdgsSummary.length}
+                            </p>
+                            <p className="text-[9px] text-black mt-1 font-medium">Goal SDGs</p>
+                        </div>
+                    </div>
+                </div>
+
 
                 {/* ── Global Filter Bar ── */}
                 <section className="rounded-xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">

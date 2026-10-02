@@ -49,7 +49,7 @@ export default function MahasiswaLayout({
             <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="fixed left-4 top-5 z-40 flex md:hidden h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                className="fixed left-4 top-5 z-40 flex md:hidden h-10 w-10 items-center justify-center rounded-xl bg-[#0D1C42] text-white shadow-lg shadow-[#0D1C42]/20"
                 aria-label="Open menu"
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -155,14 +155,32 @@ export default function CreateTugasAkhirPage() {
     }
 
 
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push("/admin/tugas-akhirs");
+        }
+    };
+
     return (
         <main className="min-h-screen bg-gray-50 p-8" >
             <div className="mx-auto max-w-2xl">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold txt-gray-900"> Tambah Tugas Akhir</h1>
-                    <p className="mt-2 text-gray-600"> Tambahkan data Tugas Akhir mahasiswa</p>
+                <div className="mb-6">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
                 </div>
-                <div className="rounded-xl border bg-whte p-6 shadow-sm">
+
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Tambah Tugas Akhir</h1>
+                    <p className="mt-2 text-gray-600">Tambahkan data Tugas Akhir mahasiswa</p>
+                </div>
+                <div className="rounded-xl border bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label  htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700"> 
@@ -309,7 +327,11 @@ export default function CreateTugasAkhirPage() {
                         )}
 
                         <div className="flex gap-3">
-                            <button type="button" onClick={() => router.push("/admin/tugas-akhirs")}>
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+                            >
                                 Batal
                             </button>
                             <button type="submit" disabled={loading} className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">

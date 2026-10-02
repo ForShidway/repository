@@ -31,6 +31,7 @@ import {
     ShieldCheck,
     Globe,
 } from "lucide-react";
+import Link from "next/link";
 
 // --- Tipe Data ---
 type DosenStat = {
@@ -168,6 +169,8 @@ export default function DosenDashboardPage() {
     const [sortBy, setSortBy] = useState<"totalAktivitas" | "totalBimbingan" | "penguji" | "pembimbingPi" | "penulisArtikel" | "name">("totalAktivitas");
     const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
     const [page, setPage] = useState(1);
+    const [chartPageIndex, setChartPageIndex] = useState(0);
+    const Chart_items_per_page = 5;
 
     useEffect(() => {
         async function fetchDashboard() {
@@ -220,23 +223,38 @@ export default function DosenDashboardPage() {
         router.push(`/dosen/${dosenId}`);
     };
 
+    const chartDataFull = useMemo(() => {
+        if (!data?.dosenList) return [];
+        // difilter dari yang terbesar
+        return [...data.dosenList].sort((a,b) => b.totalAktivitas - a.totalAktivitas);
+    }, [data?.dosenList]);
+
+    useEffect(() => {
+        if (chartDataFull.length === 0) return;
+        const maxPages = Math.ceil(chartDataFull.length / Chart_items_per_page);
+        const interaval = setInterval (() => {
+            setChartPageIndex((prevIndex) => {
+                // / Jika sudah mencapai kelompok terakhir , kembali ke kelompok pertama (index 0)
+                if (prevIndex +1 >= maxPages) {
+                    return 0;
+                } return prevIndex +1;
+            })
+        }, 5000); //jeda 5 detik 
+        return () => clearInterval(interaval);
+    }, [chartDataFull.length]);
+
+    const currentChartData = chartDataFull.slice(
+        chartPageIndex * Chart_items_per_page,
+        (chartPageIndex + 1) * Chart_items_per_page
+    );
+
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                {/* ── Banner Utama & Quick Insight ── */}
-                <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-900 via-emerald-900 to-slate-950 p-6 sm:p-8 text-white shadow-xl shadow-teal-950/15 mb-8">
-                    <div className="absolute right-0 top-0 -mt-12 -mr-12 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-                    <div className="absolute left-1/3 bottom-0 -mb-12 h-48 w-48 rounded-full bg-teal-400/10 blur-2xl pointer-events-none" />
-
-                    <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                        <div className="max-w-2xl">
-                            
-                            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                                Ringkasan Akademik & Manajemen Beban Dosen
-                            </h2>
-                        </div>
-                    </div>
-                </section>
+                           
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black leading-tight pb-6">
+                    Dashbaord Dosen Jurusan Teknik Otomotif UNP.
+                </h2>
 
                 {/* ── Navigation Tabs ── */}
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
@@ -306,9 +324,6 @@ export default function DosenDashboardPage() {
 
                 {!loading && data && (
                     <div className="space-y-8">
-                        {/* ========================================================================= */}
-                        {/* TAB 1: OVERVIEW & RINGKASAN EKSEKUTIF                                     */}
-                        {/* ========================================================================= */}
                         {(activeTab === "overview" || activeTab === "workload") && (
                             <>
                                 {/* ── 6 Kartu Metrik Repository Utama ── */}
@@ -318,15 +333,11 @@ export default function DosenDashboardPage() {
                                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition">
                                                 <Users className="h-4 w-4" />
                                             </span>
-                                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                                                Fakultas
-                                            </span>
+                                            
                                         </div>
                                         <p className="text-2xl font-black text-slate-900">{data.summary.totalDosen}</p>
                                         <p className="text-xs font-semibold text-slate-500 mt-0.5">Total Dosen</p>
-                                        <p className="text-[11px] text-teal-600 font-medium mt-1">
-                                            {data.summary.dosenAktifCount} dosen aktif
-                                        </p>
+                                        
                                     </div>
 
                                     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-blue-300 transition group">
@@ -334,15 +345,11 @@ export default function DosenDashboardPage() {
                                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
                                                 <GraduationCap className="h-4 w-4" />
                                             </span>
-                                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                                                Karya TA
-                                            </span>
+                                            
                                         </div>
                                         <p className="text-2xl font-black text-slate-900">{data.summary.totalTugasAkhir}</p>
                                         <p className="text-xs font-semibold text-slate-500 mt-0.5">Tugas Akhir</p>
-                                        <p className="text-[11px] text-blue-600 font-medium mt-1">
-                                            {data.summary.totalBimbinganSemua} slot bimbingan
-                                        </p>
+                                        
                                     </div>
 
                                     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-indigo-300 transition group">
@@ -350,15 +357,11 @@ export default function DosenDashboardPage() {
                                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition">
                                                 <Briefcase className="h-4 w-4" />
                                             </span>
-                                            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
-                                                Industri
-                                            </span>
+                                            
                                         </div>
                                         <p className="text-2xl font-black text-slate-900">{data.summary.totalLaporanPi}</p>
                                         <p className="text-xs font-semibold text-slate-500 mt-0.5">Laporan PI</p>
-                                        <p className="text-[11px] text-indigo-600 font-medium mt-1">
-                                            Praktik Industri
-                                        </p>
+                                       
                                     </div>
 
                                     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-pink-300 transition group">
@@ -366,15 +369,11 @@ export default function DosenDashboardPage() {
                                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition">
                                                 <FileText className="h-4 w-4" />
                                             </span>
-                                            <span className="text-[10px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md">
-                                                Lapangan
-                                            </span>
+                                            
                                         </div>
                                         <p className="text-2xl font-black text-slate-900">{data.summary.totalLaporanPlk}</p>
                                         <p className="text-xs font-semibold text-slate-500 mt-0.5">Laporan PLK</p>
-                                        <p className="text-[11px] text-pink-600 font-medium mt-1">
-                                            Pengalaman Kerja
-                                        </p>
+                                        
                                     </div>
 
                                     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs hover:border-amber-300 transition group">
@@ -382,15 +381,11 @@ export default function DosenDashboardPage() {
                                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition">
                                                 <BookOpen className="h-4 w-4" />
                                             </span>
-                                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
-                                                Riset
-                                            </span>
+                                            
                                         </div>
                                         <p className="text-2xl font-black text-slate-900">{data.summary.totalArtikelJurnal}</p>
                                         <p className="text-xs font-semibold text-slate-500 mt-0.5">Artikel Jurnal</p>
-                                        <p className="text-[11px] text-amber-600 font-medium mt-1">
-                                            Publikasi Ilmiah
-                                        </p>
+                                        
                                     </div>
                                 </div>
 
@@ -403,33 +398,28 @@ export default function DosenDashboardPage() {
                                                 <div className="flex items-center gap-2">
                                                     <span className="h-2.5 w-2.5 rounded-full bg-teal-500" />
                                                     <h3 className="text-base font-bold text-slate-900">
-                                                        Persebaran Bimbingan Dosen Teratas
+                                                        Persebaran Tugas seluruh dosen
                                                     </h3>
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600">
-                                                <span className="flex items-center gap-1.5">
-                                                    <span className="h-2.5 w-2.5 rounded-sm bg-teal-600" /> Bimb. 1
-                                                </span>
-                                                <span className="flex items-center gap-1.5">
-                                                    <span className="h-2.5 w-2.5 rounded-sm bg-blue-500" /> Bimb. 2
-                                                </span>
-                                                <span className="flex items-center gap-1.5">
-                                                    <span className="h-2.5 w-2.5 rounded-sm bg-purple-500" /> Penguji
-                                                </span>
+                                                    <p>
+                                                        Menampilkan urutan {chartPageIndex * Chart_items_per_page +1} - 
+                                                        {Math.min((chartPageIndex + 1) * Chart_items_per_page, chartDataFull.length)} 
+                                                        dari total {chartDataFull.length} Dosen
+                                                    </p>
                                             </div>
                                         </div>
 
                                         <div className="h-72 w-full">
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <BarChart
-                                                    data={data.topDosen.map((d) => ({
+                                                    data={currentChartData.map((d) => ({
                                                         name: d.name.length > 18 ? d.name.slice(0, 16) + "..." : d.name,
                                                         fullName: d.name,
                                                         "Bimbingan 1": d.pembimbingUtama,
                                                         "Bimbingan 2": d.pembimbingPendamping,
                                                         Penguji: d.penguji,
                                                         PI: d.pembimbingPi,
+                                                        PLK: d.pembimbingPlk,
                                                     }))}
                                                     margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
                                                 >
@@ -444,7 +434,9 @@ export default function DosenDashboardPage() {
                                                     <Tooltip content={<ChartTooltip />} />
                                                     <Bar dataKey="Bimbingan 1" stackId="a" fill="#0D9488" radius={[0, 0, 0, 0]} />
                                                     <Bar dataKey="Bimbingan 2" stackId="a" fill="#3B82F6" radius={[0, 0, 0, 0]} />
-                                                    <Bar dataKey="Penguji" stackId="a" fill="#A855F7" radius={[4, 4, 0, 0]} />
+                                                    <Bar dataKey="Penguji" stackId="a" fill="#A855F7" radius={[0, 0, 0, 0]} />
+                                                    <Bar dataKey="PI" stackId="a" fill="#6366F1" radius={[0, 0, 0, 0]} />
+                                                    <Bar dataKey="PLK" stackId="a" fill="#EC4899" radius={[4, 4, 0, 0]} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         </div>
@@ -664,6 +656,43 @@ export default function DosenDashboardPage() {
                         {/* ========================================================================= */}
                         {/* TAB 3 & 4: DIREKTORI DOSEN & REKAPITULASI                                */}
                         {/* ========================================================================= */}
+
+                        {!loading && data && (
+                            <>
+            
+                                    {/* Distribusi Program Studi */}
+                                    <div className=" rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="text-base font-bold text-slate-900 mb-1">
+                                                Distribusi Program Studi
+                                            </h3>
+                                            <p className="text-xs text-slate-500 mb-4">
+                                                Sebaran Tugas Akhir dan Jurnal per jenjang program studi:
+                                            </p>
+
+                                            <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                                {data.prodiList.map((p, idx) => (
+                                                    <div key={p.id} className="rounded-xl bg-slate-50 p-3 border border-slate-100">
+                                                        <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                                                            <span>{p.name} ({p.degree})</span>
+                                                            <span className="text-teal-700">{p.total} Karya</span>
+                                                        </div>
+                                                        <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500">
+                                                            <span>Tugas Akhir: {p.countTa}</span>
+                                                            <span>Jurnal: {p.countArtikel}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                    
+                                    </div>
+                                
+
+                                
+                            </>
+                        )}
                         
                     </div>
                 )}

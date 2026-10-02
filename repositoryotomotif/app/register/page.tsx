@@ -108,7 +108,7 @@ export default function RegisterPage() {
                     {/* Nama Lengkap */}
                     <div>
                         <label htmlFor="name" className="mb-1.5 block text-xs font-bold text-slate-700">
-                            Nama Lengkap 
+                            Nama Lengkap <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -133,7 +133,7 @@ export default function RegisterPage() {
                     {/* Email */}
                     <div>
                         <label htmlFor="email" className="mb-1.5 block text-xs font-bold text-slate-700">
-                            Email Mahasiswa
+                            Email Mahasiswa <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -149,7 +149,7 @@ export default function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition duration-150 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10"
-                                placeholder="nama@email.com"
+                                placeholder="nama@email.com / student.unp.ac.id"
                                 autoComplete="email"
                             />
                         </div>
@@ -159,7 +159,7 @@ export default function RegisterPage() {
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
                             <label htmlFor="password" className="block text-xs font-bold text-slate-700">
-                                Password 
+                                Password <span className="text-red-500">*</span>
                             </label>
                             {password.length > 0 && (
                                 <span className={`text-[11px] font-semibold transition-colors ${isPasswordLengthValid ? "text-emerald-600" : "text-amber-600"}`}>
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
                             <label htmlFor="confirmPassword" className="block text-xs font-bold text-slate-700">
-                                Konfirmasi Password
+                                Konfirmasi Password <span className="text-red-500">*</span>
                             </label>
                             {confirmPassword.length > 0 && (
                                 <span className={`text-[11px] font-semibold transition-colors ${isPasswordMatch ? "text-emerald-600" : "text-amber-600"}`}>
@@ -230,13 +230,12 @@ export default function RegisterPage() {
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className={`w-full rounded-xl border bg-slate-50/70 py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition duration-150 focus:bg-white focus:ring-4 ${
-                                    isPasswordMismatch 
-                                        ? "border-amber-300 focus:border-amber-500 focus:ring-amber-500/10" 
-                                        : isPasswordMatch 
+                                className={`w-full rounded-xl border bg-slate-50/70 py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition duration-150 focus:bg-white focus:ring-4 ${isPasswordMismatch
+                                    ? "border-amber-300 focus:border-amber-500 focus:ring-amber-500/10"
+                                    : isPasswordMatch
                                         ? "border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/10"
                                         : "border-slate-200 focus:border-blue-600 focus:ring-blue-600/10"
-                                }`}
+                                    }`}
                                 placeholder="Ulangi password di atas"
                                 autoComplete="new-password"
                             />
@@ -265,9 +264,9 @@ export default function RegisterPage() {
                     {error && (
                         <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50/90 px-3.5 py-2.5 text-red-800 animate-fadeIn">
                             <svg className="mt-0.5 shrink-0 text-red-600" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="8" x2="12" y2="12"/>
-                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
                             </svg>
                             <p className="text-xs font-semibold leading-relaxed">{error}</p>
                         </div>
@@ -282,7 +281,7 @@ export default function RegisterPage() {
                         {loading ? (
                             <span className="flex items-center gap-2">
                                 <svg className="animate-spin text-white" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                    <path d="M21 12a9 9 0 11-6.22-8.57"/>
+                                    <path d="M21 12a9 9 0 11-6.22-8.57" />
                                 </svg>
                                 <span>Memproses Pendaftaran...</span>
                             </span>
@@ -315,6 +314,13 @@ export default function RegisterPage() {
                         </svg>
                         Kembali ke Beranda
                     </Link>
+                    <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
+                            <rect x="3" y="11" width="18" height="11" rx="2" />
+                            <path d="M7 11V7a5 5 0 0110 0v4" />
+                        </svg>
+                        <span>Data terenkripsi & tersimpan aman di server UNP</span>
+                    </div>
                 </div>
             </div>
         </main>

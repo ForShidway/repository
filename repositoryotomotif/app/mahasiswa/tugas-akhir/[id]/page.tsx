@@ -1,252 +1,422 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState, use } from "react";
+import { useRouter, useParams } from "next/navigation";
+
+type Mahasiswa = {
+    id: number;
+    name: string;
+    nim: string;
+    urutan: number;
+};
 
 type Dosen = {
-  id: number;
-  name: string;
+    id: number;
+    name: string;
+};
+
+type Ruangan = {
+    id: number;
+    name: string;
 };
 
 type ProgramStudy = {
-  id: number;
-  name: string;
-  degree: string;
+    id: number;
+    name: string;
+    degree: string;
 };
 
-type SDG = {
-  id: number;
-  code: string;
-  title: string;
+type SDGs = {
+    id: number;
+    code: string;
+    title: string;
 };
 
-type Mahasiswa = {
-  id: number;
-  name: string;
-  nim: string;
-  urutan: number;
+type Keyword = {
+    id: number;
+    kata: string;
 };
 
-type TugasAkhir = {
-  id: number;
-  tahunMasuk: number;
-  judul: string;
-  jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN";
-  mataKuliahRelevan: string;
-  pembimbing: Dosen;
-  dosenPa: Dosen;
-  programStudy: ProgramStudy;
-  mahasiswa: Mahasiswa[];
-  sdgs: SDG[];
-  createdAt: string;
+type Penguji = {
+    id?: number;
+    peran?: string;
+    dosen?: {
+        nama?: string;
+        name?: string;
+    };
 };
 
-const SDG_COLORS: Record<number, string> = {
-  1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D',
-  5: '#FF3A21', 6: '#26BDE2', 7: '#FCC30B', 8: '#A21942',
-  9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
-  13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D',
-  17: '#19486A'
+type TugasAkhirDetail = {
+    id: number;
+    judul: string;
+    jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN";
+    abstract: string | null;
+    tahunMasuk: number;
+    mataKuliahRelevan: string;
+    fileName: string | null;
+    filePath: string | null;
+    fileSize: number | null;
+    fileType: string | null;
+    ruangan: Ruangan | null;
+    pembimbing: Dosen;
+    pembimbing2: Dosen | null;
+    dosenPa: Dosen | null;
+    programStudy: ProgramStudy | null;
+    sdgs: SDGs[];
+    mahasiswa: Mahasiswa[];
+    keywords: Keyword[];
+    penguji?: Penguji[];
 };
 
-export default function DetailTugasAkhirPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
+function formatFileSize(bytes: number | null) {
+    if (!bytes) return "";
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1) return `${mb.toFixed(1)} MB`;
+    const kb = bytes / 1024;
+    return `${kb.toFixed(0)} KB`;
+}
 
-  const [tugasAkhir, setTugasAkhir] = useState<TugasAkhir | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const sdgColors = [
+    "bg-red-500", "bg-amber-500", "bg-green-500", "bg-rose-500",
+    "bg-orange-500", "bg-cyan-500", "bg-yellow-500", "bg-pink-600",
+    "bg-orange-600", "bg-fuchsia-600", "bg-amber-600", "bg-lime-600",
+    "bg-emerald-600", "bg-sky-600", "bg-teal-600", "bg-blue-700",
+    "bg-indigo-800",
+];
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setError("");
-        const response = await fetch(`/api/tugas-akhirs/${id}`);
-        
-        if (!response.ok) {
-          throw new Error("Tugas Akhir tidak ditemukan");
+function sdgColor(code: string) {
+    const num = parseInt(code.replace(/\D/g, ""), 10) || 1;
+    return sdgColors[(num - 1) % sdgColors.length];
+}
+
+export default function DetailTugasAkhirMahasiswaPage({
+    params,
+}: {
+    params?: Promise<{ id: string }>;
+}) {
+    const router = useRouter();
+    const routeParams = useParams();
+    const resolvedParams = params ? use(params) : null;
+    const id = (resolvedParams?.id || routeParams?.id) as string;
+
+    const [data, setData] = useState<TugasAkhirDetail | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        async function fetchDetail() {
+            if (!id) return;
+            try {
+                setLoading(true);
+                const response = await fetch(`/api/tugas-akhirs/${id}`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Gagal mengambil data tugas akhir");
+                }
+
+                setData(result);
+            } catch (err) {
+                console.error(err);
+                setError(err instanceof Error ? err.message : "Gagal mengambil data");
+            } finally {
+                setLoading(false);
+            }
         }
+        fetchDetail();
+    }, [id]);
 
-        const data = await response.json();
-        setTugasAkhir(data);
-      } catch (error) {
-        console.error(error);
-        setError(
-          error instanceof Error ? error.message : "Gagal mengambil data"
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push("/mahasiswa/tugas-saya");
+        }
+    };
+
+    if (loading) {
+        return (
+            <main className="min-h-screen bg-gray-50 p-8">
+                <div className="mx-auto max-w-5xl">
+                    <p className="text-sm text-slate-500">Memuat data tugas akhir...</p>
+                </div>
+            </main>
         );
-      } finally {
-        setLoading(false);
-      }
     }
-    
-    if (id) {
-      fetchData();
+
+    if (error || !data) {
+        return (
+            <main className="min-h-screen bg-gray-50 p-8">
+                <div className="mx-auto max-w-5xl">
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                        <p className="text-sm text-red-600">{error || "Data tidak ditemukan"}</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        &larr; Kembali
+                    </button>
+                </div>
+            </main>
+        );
     }
-  }, [id]);
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-gray-50 p-8">
-        <div className="mx-auto max-w-4xl">
-          <p className="text-slate-600">Memuat detail Tugas Akhir....</p>
-        </div>
-      </main>
+    const dosenPembimbing = [data.pembimbing, data.pembimbing2].filter(
+        (d): d is Dosen => Boolean(d)
     );
-  }
 
-  if (error || !tugasAkhir) {
     return (
-      <main className="min-h-screen bg-[#F4F9F9] p-8">
-        <div className="mx-auto max-w-4xl">
-          <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 mb-6">
-            <p className="text-sm text-red-600">{error || "Tugas Akhir tidak ditemukan"}</p>
-          </div>
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50"
-          >
-            ← Kembali
-          </button>
-        </div>
-      </main>
+        <main className="min-h-screen bg-gray-50 p-8">
+            <div className="mx-auto max-w-5xl">
+                <div className="mb-4">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        &larr; Kembali
+                    </button>
+                </div>
+
+                <div className="mb-6 flex items-start justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Detail Tugas Akhir</h1>
+                        <p className="mt-2 text-gray-600">Informasi lengkap data Tugas Akhir</p>
+                    </div>
+                </div>
+
+                {/* Ringkasan */}
+                <div className="mb-6 grid grid-cols-1 gap-6 rounded-xl border bg-white p-6 shadow-sm md:grid-cols-2">
+                    <div className="flex gap-4">
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-9 5h12a2 2 0 002-2V7.5L14.5 3H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div className="min-w-0 space-y-4">
+                            <div>
+                                <p className="text-sm text-slate-500">Judul Tugas Akhir</p>
+                                <p className="mt-1 font-semibold text-slate-900">{data.judul}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-slate-500">Kategori</p>
+                                <p className={`mt-1 font-medium ${data.jenisPendidikan === "NON_PENDIDIKAN" ? "text-amber-700" : "text-emerald-700"}`}>
+                                    {data.jenisPendidikan === "NON_PENDIDIKAN" ? "Non Pendidikan" : "Pendidikan"}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-slate-500">Mata Kuliah Relevan</p>
+                                <p className="mt-1 text-slate-800">{data.mataKuliahRelevan}</p>
+                            </div>
+                            <div>
+                                <p className="mb-1 flex items-center gap-2 text-sm text-slate-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M15 9h.01M15 13h.01" />
+                                    </svg>
+                                    Ruangan
+                                </p>
+                                <p className="text-slate-800">{data.ruangan?.name || "Tidak ada ruangan terkait"}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 border-slate-100 md:border-l md:pl-6">
+                        <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-3a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
+                            </svg>
+                            Mahasiswa
+                        </h2>
+                        <div className="space-y-4">
+                            {data.mahasiswa.map((m) => (
+                                <div key={m.id}>
+                                    <p className="text-sm text-slate-500">Nama</p>
+                                    <p className="mb-2 font-medium text-slate-800">{m.name}</p>
+                                    <p className="text-sm text-slate-500">NIM</p>
+                                    <p className="font-medium text-slate-800">{m.nim}</p>
+                                </div>
+                            ))}
+                            <div>
+                                <p className="text-sm text-slate-500">Program Studi</p>
+                                <p className="mt-1 text-slate-800">
+                                    {data.programStudy ? `${data.programStudy.degree} ${data.programStudy.name}` : "-"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mahasiswa, Dosen, SDGs */}
+                <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="rounded-xl border bg-white p-5 shadow-sm">
+                        <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m-9-6v6a9 9 0 0018 0v-6" />
+                            </svg>
+                            Dosen Pembimbing
+                        </h2>
+                        <div className="space-y-4">
+                            {dosenPembimbing.map((dosen, index) => (
+                                <div key={dosen.id}>
+                                    <p className="text-sm text-slate-500">
+                                        Nama {dosenPembimbing.length > 1 ? `(Pembimbing ${index + 1})` : ""}
+                                    </p>
+                                    <p className="font-medium text-slate-800">{dosen.name}</p>
+                                </div>
+                            ))}
+                            <div>
+                                <p className="text-sm text-slate-500">Dosen PA</p>
+                                <p className="font-medium text-slate-800">{data.dosenPa?.name}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="rounded-xl border bg-white p-5 shadow-sm">
+                        <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-3a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
+                            </svg>
+                            Dosen Penguji
+                        </h2>
+                        <div className="space-y-4">
+                            {data.penguji && data.penguji.length > 0 ? (
+                                data.penguji.map((p, index) => (
+                                    <div key={p.id || index}>
+                                        <p className="text-sm text-slate-500">
+                                            Penguji {index + 1} {p.peran ? `(${p.peran})` : ""}
+                                        </p>
+                                        <p className="font-medium text-slate-800">
+                                            {p.dosen?.nama ?? p.dosen?.name ?? "-"}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-slate-500">Belum ada dosen penguji.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border bg-white p-5 shadow-sm">
+                        <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                                <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18" />
+                            </svg>
+                            SDGs Terkait
+                        </h2>
+                        <div className="space-y-3">
+                            {data.sdgs.length === 0 ? (
+                                <p className="text-sm text-slate-400">Belum ada SDGs terkait</p>
+                            ) : (
+                                data.sdgs.map((sdg) => (
+                                    <div key={sdg.id} className="flex items-start gap-3">
+                                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white ${sdgColor(sdg.code)}`}>
+                                            {sdg.code.replace(/\D/g, "")}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-slate-800">{sdg.code}</p>
+                                            <p className="text-xs text-slate-500">{sdg.title}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Kata Kunci */}
+                <div className="mb-6 rounded-xl border bg-white p-5 shadow-sm">
+                    <h2 className="mb-4 flex items-center gap-2 font-semibold text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5 text-blue-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M20.59 13.41L11 21l-9-9V3h9l9.59 9.41a2 2 0 010 2.83z" />
+                            <circle cx="7" cy="7" r="1" />
+                        </svg>
+                        Kata Kunci
+                    </h2>
+                    {data.keywords.length === 0 ? (
+                        <p className="text-sm text-slate-400">Belum ada kata kunci</p>
+                    ) : (
+                        <div className="flex flex-wrap gap-2">
+                            {data.keywords.map((kw) => (
+                                <span
+                                    key={kw.id}
+                                    className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
+                                >
+                                    {kw.kata}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {data.abstract && (
+                    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <h2 className="mb-3 flex items-center gap-2 font-bold text-slate-900">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+                            </svg>
+                            Abstrak
+                        </h2>
+                        <p className="whitespace-pre-line text-sm leading-7 text-slate-700">
+                            {data.abstract}
+                        </p>
+                    </div>
+                )}
+
+                {/* File Proposal (aksi) */}
+                {data.fileName && (
+                    <div className="rounded-xl border bg-white p-5 shadow-sm">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            {data.fileName && (
+                                <div>
+                                    <p className="mb-1 flex items-center gap-2 text-sm text-slate-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-9 5h12a2 2 0 002-2V7.5L14.5 3H6a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                        File Proposal
+                                    </p>
+                                    <div className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex h-8 w-8 items-center justify-center rounded bg-red-50 text-xs font-bold text-red-500">
+                                                PDF
+                                            </span>
+                                            <div>
+                                                <p className="text-sm font-medium text-slate-800">{data.fileName}</p>
+                                                <p className="text-xs text-slate-400">{formatFileSize(data.fileSize)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <div className="flex gap-3">
+                                {data.filePath && (
+                                    <a
+                                        href={data.filePath}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    >
+                                        Lihat File
+                                    </a>
+                                )}
+                                {data.filePath && (
+                                    <a
+                                        href={data.filePath}
+                                        download
+                                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                                    >
+                                        Unduh File
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </main>
     );
-  }
-
-  const tahun = new Date(tugasAkhir.createdAt).getFullYear();
-  const mahasiswaText = tugasAkhir.mahasiswa?.map((m) => `${m.name} (${m.nim})`).join(", ") || "-";
-  const nimText = tugasAkhir.mahasiswa?.map((m) => m.nim).join(", ") || "-";
-
-  return (
-    <main className="min-h-screen bg-gray-50 px-8 py-10">
-      <div className="mx-auto max-w-4xl">
-        
-        {/* Header */}
-        <section className="mb-8">
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50 mb-6"
-          >
-            ← Kembali
-          </button>
-          
-          <div className="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-blue-600">Repositori Otomotif</p>
-              <h1 className="mt-2 text-4xl font-bold text-slate-900">
-                {tugasAkhir.judul}
-              </h1>
-            </div>
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mt-6">
-            <span className="rounded-lg bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
-              {tugasAkhir.programStudy?.degree || 'Program'}
-            </span>
-            <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${tugasAkhir.jenisPendidikan === "NON_PENDIDIKAN" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
-              {tugasAkhir.jenisPendidikan === "NON_PENDIDIKAN" ? "Non Pendidikan" : "Pendidikan"}
-            </span>
-            {tugasAkhir.mataKuliahRelevan && (
-              <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">
-                {tugasAkhir.mataKuliahRelevan}
-              </span>
-            )}
-          </div>
-        </section>
-
-        {/* Main Content */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          
-          {/* Main Column */}
-          <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              
-              {/* Informasi Mahasiswa */}
-              <section className="mb-8 border-b border-slate-100 pb-8">
-                <h2 className="mb-4 text-lg font-bold text-slate-900">Informasi Mahasiswa</h2>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Nama Mahasiswa</p>
-                    <p className="mt-1 text-lg font-semibold text-slate-900">{mahasiswaText}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">NIM</p>
-                    <p className="mt-1 font-mono text-slate-700">{nimText}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Tahun Masuk</p>
-                    <p className="mt-1 text-slate-700">{tugasAkhir.tahunMasuk}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* Informasi Tugas Akhir */}
-              <section className="mb-8 border-b border-slate-100 pb-8">
-                <h2 className="mb-4 text-lg font-bold text-slate-900">Informasi Tugas Akhir</h2>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Judul</p>
-                    <p className="mt-2 text-slate-900 leading-relaxed">{tugasAkhir.judul}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Mata Kuliah Relevan</p>
-                    <p className="mt-1 text-slate-700">{tugasAkhir.mataKuliahRelevan || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Program Studi</p>
-                    <p className="mt-1 text-slate-700">{tugasAkhir.programStudy?.name || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Tahun</p>
-                    <p className="mt-1 text-slate-700">{tahun}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* SDGs */}
-              {tugasAkhir.sdgs && tugasAkhir.sdgs.length > 0 && (
-                <section className="mb-8 border-b border-slate-100 pb-8">
-                  <h2 className="mb-4 text-lg font-bold text-slate-900">Sustainable Development Goals (SDGs)</h2>
-                  <div className="flex flex-wrap gap-3">
-                    {tugasAkhir.sdgs.map(sdg => (
-                      <div
-                        key={sdg.id}
-                        className="rounded-lg px-4 py-3 text-white font-semibold text-center"
-                        style={{ backgroundColor: SDG_COLORS[parseInt(sdg.code)] || '#999' }}
-                      >
-                        <div className="text-2xl font-bold">{sdg.code}</div>
-                        <div className="text-xs mt-1">{sdg.title}</div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div>
-            <div className="sticky top-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              
-              <h3 className="mb-4 font-bold text-slate-900">Pembimbing & Penguji</h3>
-              
-              <div className="mb-6 space-y-2 border-b border-slate-100 pb-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Dosen Pembimbing</p>
-                <p className="font-semibold text-slate-900">{tugasAkhir.pembimbing?.name || '-'}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Dosen Penguji</p>
-                <p className="font-semibold text-slate-900">{tugasAkhir.dosenPa?.name || '-'}</p>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </main>
-  );
 }

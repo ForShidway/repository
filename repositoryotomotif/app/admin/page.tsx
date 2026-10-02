@@ -239,6 +239,7 @@ export default function AdminDashboard() {
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.message);
 
+                
                 // Map gabungan per-prodi into donut-ready distribusi
                 const prodiList: ProgramStudyStat[] = (result.labels ?? []).map(
                     (name: string, i: number) => ({
@@ -413,9 +414,6 @@ export default function AdminDashboard() {
                 {/* Header Admin */}
                 <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[11px] font-bold border border-blue-100">
-                            <Sparkles className="w-3 h-3 text-blue-600" /> Admin Executive Dashboard
-                        </span>
                         <h1 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
                             Beranda Administrator
                         </h1>
@@ -431,7 +429,7 @@ export default function AdminDashboard() {
                 </section>
 
                 {/* 8 Compact Summary Stat Cards */}
-                <section className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+                <section className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-4">
                     <StatCard
                         icon={<FileText className="h-4 h-4" />}
                         label="Tugas Akhir"
@@ -454,7 +452,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalMahasiswa}
                         description="Memiliki TA"
                         iconClass="bg-violet-50 text-violet-600"
-                        accent="border-l-4 border-violet-600"
+                        accent="border-l-4 border-emerald-600"
                     />
                     <StatCard
                         icon={<Building2 className="h-4 h-4" />}
@@ -486,7 +484,7 @@ export default function AdminDashboard() {
                         value={data.summary.totalLaporanPi}
                         description="Laporan PI"
                         iconClass="bg-teal-50 text-teal-600"
-                        accent="border-l-4 border-teal-600"
+                        accent="border-l-4 border-emerald-600"
                     />
                     <StatCard
                         icon={<Users className="h-4 h-4" />}
@@ -578,211 +576,188 @@ export default function AdminDashboard() {
                     </div>
                 </section>
 
-                {/* Table: Tugas Akhir Terbaru */}
-                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <div className="flex items-center justify-between border-b border-slate-100 p-4">
-                        <div>
-                            <h2 className="text-sm font-bold text-slate-900">Tugas Akhir Terbaru</h2>
-                            <p className="mt-0.5 text-[11px] text-slate-500">
-                                {data.tugasAkhirTerbaru.length} Tugas Akhir terbaru terdaftar
-                            </p>
-                        </div>
-                        <Link
-                            href="/admin/tugas-akhirs"
-                            className="inline-flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
-                        >
-                            Lihat Semua <ArrowRight className="w-3 h-3" />
-                        </Link>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                                    <th className="px-4 py-2.5 w-12">No.</th>
-                                    <th className="px-4 py-2.5">Judul Tugas Akhir</th>
-                                    <th className="px-4 py-2.5">Mahasiswa</th>
-                                    <th className="px-4 py-2.5">Tahun</th>
-                                    <th className="px-4 py-2.5">Program Studi</th>
-                                    <th className="px-4 py-2.5">Pembimbing</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-xs">
-                                {data.tugasAkhirTerbaru
-                                    .slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
-                                    .map((ta, index) => (
-                                        <tr key={ta.id} className="hover:bg-slate-50/80 transition-colors">
-                                            <td className="px-4 py-2.5 font-semibold text-slate-400">
-                                                {(page - 1) * ITEMS_PER_PAGE + index + 1}
-                                            </td>
-                                            <td className="max-w-[280px] px-4 py-2.5">
-                                                <p className="line-clamp-2 font-semibold text-slate-800 leading-snug">
-                                                    {ta.judul}
-                                                </p>
-                                            </td>
-                                            <td className="px-4 py-2.5 text-slate-700 font-medium">
-                                                {formatMahasiswa(ta.mahasiswa)}
-                                            </td>
-                                            <td className="px-4 py-2.5">
-                                                <span className="inline-flex rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
-                                                    {ta.tahunMasuk}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2.5">
-                                                {ta.programStudy ? (
-                                                    <div>
-                                                        <span className="inline-flex rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-100">
-                                                            {ta.programStudy.degree}
-                                                        </span>
-                                                        <p className="mt-0.5 text-[10px] font-medium text-slate-500">
-                                                            {ta.programStudy.name}
-                                                        </p>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 text-[10px]">-</span>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-2.5 text-slate-700 font-medium">
-                                                {ta.pembimbing?.name || "-"}
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {data.tugasAkhirTerbaru.length > ITEMS_PER_PAGE && (
-                        <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-xs">
-                            <p className="text-[11px] text-slate-500">
-                                Menampilkan Halaman <span className="font-bold text-slate-800">{page}</span> dari{" "}
-                                <span className="font-bold text-slate-800">
-                                    {Math.ceil(data.tugasAkhirTerbaru.length / ITEMS_PER_PAGE)}
-                                </span>
-                            </p>
-                            <div className="flex items-center gap-1">
-                                <button
-                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                    disabled={page === 1}
-                                    className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-                                >
-                                    <ChevronLeft className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        setPage((p) =>
-                                            Math.min(Math.ceil(data.tugasAkhirTerbaru.length / ITEMS_PER_PAGE), p + 1)
-                                        )
-                                    }
-                                    disabled={page === Math.ceil(data.tugasAkhirTerbaru.length / ITEMS_PER_PAGE)}
-                                    className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-                                >
-                                    <ChevronRight className="w-3.5 h-3.5" />
-                                </button>
+                <div className="flex flex-col lg:flex-row gap-4 w-full">
+                    <section className="flex-1 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div className="flex items-center justify-between border-b border-slate-100 p-4">
+                            <div>
+                                <h2 className="text-sm font-bold text-slate-900">Tugas Akhir Terbaru</h2>
+                                <p className="mt-0.5 text-[11px] text-slate-500">
+                                    {data.tugasAkhirTerbaru.length} Tugas Akhir terbaru terdaftar
+                                </p>
                             </div>
+                            <Link
+                                href="/admin/tugas-akhirs"
+                                className="inline-flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                            >
+                                Lihat Semua <ArrowRight className="w-3 h-3" />
+                            </Link>
                         </div>
-                    )}
-                </section>
 
-                {/* Table: Artikel Jurnal Terbaru */}
-                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <div className="flex items-center justify-between border-b border-slate-100 p-4">
-                        <div>
-                            <h2 className="text-sm font-bold text-slate-900">Artikel Jurnal Terbaru</h2>
-                            <p className="mt-0.5 text-[11px] text-slate-500">
-                                {data.artikelJurnalTerbaru.length} Artikel Jurnal terbaru terdaftar
-                            </p>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                        <th className="px-4 py-2.5 w-12">No.</th>
+                                        <th className="px-4 py-2.5">Judul Tugas Akhir</th>
+                                        <th className="px-4 py-2.5">Program Studi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 text-xs">
+                                    {data.tugasAkhirTerbaru
+                                        .slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+                                        .map((ta, index) => (
+                                            <tr key={ta.id} className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="px-4 py-2.5 font-semibold text-slate-400">
+                                                    {(page - 1) * ITEMS_PER_PAGE + index + 1}
+                                                </td>
+                                                <td className="max-w-[280px] px-4 py-2.5">
+                                                    <p className=" font-semibold text-slate-800 leading-snug text-justifiy">
+                                                        {ta.judul}
+                                                    </p>
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    {ta.programStudy ? (
+                                                        <div>
+                                                            <span className="inline-flex rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-100">
+                                                                {ta.programStudy.degree}
+                                                            </span>
+                                                            <p className="mt-0.5 text-[10px] font-medium text-slate-500">
+                                                                {ta.programStudy.name}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-400 text-[10px]">-</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
                         </div>
-                        <Link
-                            href="/admin/artikel-jurnal"
-                            className="inline-flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
-                        >
-                            Lihat Semua <ArrowRight className="w-3 h-3" />
-                        </Link>
-                    </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                                    <th className="px-4 py-2.5 w-12">No.</th>
-                                    <th className="px-4 py-2.5">Judul Artikel</th>
-                                    <th className="px-4 py-2.5">Penulis</th>
-                                    <th className="px-4 py-2.5">Tahun</th>
-                                    <th className="px-4 py-2.5">Program Studi</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-xs">
-                                {data.artikelJurnalTerbaru
-                                    .slice((articlePage - 1) * ITEMS_PER_PAGE, articlePage * ITEMS_PER_PAGE)
-                                    .map((aj, index) => (
-                                        <tr key={aj.id} className="hover:bg-slate-50/80 transition-colors">
-                                            <td className="px-4 py-2.5 font-semibold text-slate-400">
-                                                {(articlePage - 1) * ITEMS_PER_PAGE + index + 1}
-                                            </td>
-                                            <td className="max-w-[300px] px-4 py-2.5">
-                                                <p className="line-clamp-2 font-semibold text-slate-800 leading-snug">
-                                                    {aj.judul}
-                                                </p>
-                                            </td>
-                                            <td className="px-4 py-2.5 text-slate-700 font-medium">
-                                                {formatMahasiswa(aj.mahasiswa)}
-                                            </td>
-                                            <td className="px-4 py-2.5">
-                                                <span className="inline-flex rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
-                                                    {aj.tahun}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2.5">
-                                                {aj.programStudy ? (
-                                                    <div>
-                                                        <span className="inline-flex rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-100">
-                                                            {aj.programStudy.degree}
-                                                        </span>
-                                                        <p className="mt-0.5 text-[10px] font-medium text-slate-500">
-                                                            {aj.programStudy.name}
-                                                        </p>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 text-[10px]">-</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {data.artikelJurnalTerbaru.length > ITEMS_PER_PAGE && (
-                        <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-xs">
-                            <p className="text-[11px] text-slate-500">
-                                Menampilkan Halaman <span className="font-bold text-slate-800">{articlePage}</span> dari{" "}
-                                <span className="font-bold text-slate-800">
-                                    {Math.ceil(data.artikelJurnalTerbaru.length / ITEMS_PER_PAGE)}
-                                </span>
-                            </p>
-                            <div className="flex items-center gap-1">
-                                <button
-                                    onClick={() => setArticlePage((p) => Math.max(1, p - 1))}
-                                    disabled={articlePage === 1}
-                                    className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-                                >
-                                    <ChevronLeft className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                    onClick={() =>
-                                        setArticlePage((p) =>
-                                            Math.min(Math.ceil(data.artikelJurnalTerbaru.length / ITEMS_PER_PAGE), p + 1)
-                                        )
-                                    }
-                                    disabled={articlePage === Math.ceil(data.artikelJurnalTerbaru.length / ITEMS_PER_PAGE)}
-                                    className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-                                >
-                                    <ChevronRight className="w-3.5 h-3.5" />
-                                </button>
+                        {data.tugasAkhirTerbaru.length > ITEMS_PER_PAGE && (
+                            <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-xs">
+                                <p className="text-[11px] text-slate-500">
+                                    Menampilkan Halaman <span className="font-bold text-slate-800">{page}</span> dari{" "}
+                                    <span className="font-bold text-slate-800">
+                                        {Math.ceil(data.tugasAkhirTerbaru.length / ITEMS_PER_PAGE)}
+                                    </span>
+                                </p>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                        disabled={page === 1}
+                                        className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                                    >
+                                        <ChevronLeft className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={() =>
+                                            setPage((p) =>
+                                                Math.min(Math.ceil(data.tugasAkhirTerbaru.length / ITEMS_PER_PAGE), p + 1)
+                                            )
+                                        }
+                                        disabled={page === Math.ceil(data.tugasAkhirTerbaru.length / ITEMS_PER_PAGE)}
+                                        className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                                    >
+                                        <ChevronRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
                             </div>
+                        )}
+                    </section>
+
+                    <section className="flex-1 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div className="flex items-center justify-between border-b border-slate-100 p-4">
+                            <div>
+                                <h2 className="text-sm font-bold text-slate-900">Artikel Jurnal Terbaru</h2>
+                                <p className="mt-0.5 text-[11px] text-slate-500">
+                                    {data.artikelJurnalTerbaru.length} Artikel Jurnal terbaru terdaftar
+                                </p>
+                            </div>
+                            <Link
+                                href="/admin/artikel-jurnal"
+                                className="inline-flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                            >
+                                Lihat Semua <ArrowRight className="w-3 h-3" />
+                            </Link>
                         </div>
-                    )}
-                </section>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                        <th className="px-4 py-2.5 w-12">No.</th>
+                                        <th className="px-4 py-2.5">Judul Artikel</th>
+                                        <th className="px-4 py-2.5">Program Studi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 text-xs">
+                                    {data.artikelJurnalTerbaru
+                                        .slice((articlePage - 1) * ITEMS_PER_PAGE, articlePage * ITEMS_PER_PAGE)
+                                        .map((aj, index) => (
+                                            <tr key={aj.id} className="hover:bg-slate-50/80 transition-colors">
+                                                <td className="px-4 py-2.5 font-semibold text-slate-400">
+                                                    {(articlePage - 1) * ITEMS_PER_PAGE + index + 1}
+                                                </td>
+                                                <td className="max-w-[300px] px-4 py-2.5">
+                                                    <p className=" font-semibold text-slate-800 leading-snug text-justify">
+                                                        {aj.judul}
+                                                    </p>
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    {aj.programStudy ? (
+                                                        <div>
+                                                            <span className="inline-flex rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-100">
+                                                                {aj.programStudy.degree}
+                                                            </span>
+                                                            <p className="mt-0.5 text-[10px] font-medium text-slate-500">
+                                                                {aj.programStudy.name}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-400 text-[10px]">-</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {data.artikelJurnalTerbaru.length > ITEMS_PER_PAGE && (
+                            <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-xs">
+                                <p className="text-[11px] text-slate-500">
+                                    Menampilkan Halaman <span className="font-bold text-slate-800">{articlePage}</span> dari{" "}
+                                    <span className="font-bold text-slate-800">
+                                        {Math.ceil(data.artikelJurnalTerbaru.length / ITEMS_PER_PAGE)}
+                                    </span>
+                                </p>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={() => setArticlePage((p) => Math.max(1, p - 1))}
+                                        disabled={articlePage === 1}
+                                        className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                                    >
+                                        <ChevronLeft className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={() =>
+                                            setArticlePage((p) =>
+                                                Math.min(Math.ceil(data.artikelJurnalTerbaru.length / ITEMS_PER_PAGE), p + 1)
+                                            )
+                                        }
+                                        disabled={articlePage === Math.ceil(data.artikelJurnalTerbaru.length / ITEMS_PER_PAGE)}
+                                        className="flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                                    >
+                                        <ChevronRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </section>
+                </div>
+                
             </div>
         </main>
     );

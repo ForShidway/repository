@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 type TipePenulis = "MAHASISWA" | "DOSEN" | "LAINNYA";
 type Penulis = {
@@ -46,9 +46,18 @@ function namaPenulis(penulis: Penulis) {
 
 export default function ArtikelJurnalDetailPage() {
     const params = useParams<{ id: string }>();
+    const router = useRouter();
     const [data, setData] = useState<ArtikelJurnalDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push("/jelajahirepository");
+        }
+    };
 
     useEffect(() => {
         async function fetchDetail() {
@@ -72,12 +81,35 @@ export default function ArtikelJurnalDetailPage() {
     }
 
     if (error || !data) {
-        return <main className="min-h-screen bg-gray-50 p-8"><p className="text-sm text-red-500">{error ?? "Artikel jurnal tidak ditemukan"}</p></main>;
+        return (
+            <main className="min-h-screen bg-gray-50 p-8">
+                <div className="mx-auto max-w-6xl">
+                    <p className="text-sm text-red-500">{error ?? "Artikel jurnal tidak ditemukan"}</p>
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+            </main>
+        );
     }
 
     return (
         <main className="min-h-screen bg-gray-50 p-8">
-            <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="mx-auto max-w-6xl">
+                <div className="mb-6">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
                     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex flex-wrap gap-2">
@@ -126,6 +158,7 @@ export default function ArtikelJurnalDetailPage() {
                         </> : <p className="text-sm text-slate-400">Tidak ada berkas</p>}
                     </div>
                 </div>
+            </div>
             </div>
         </main>
     );

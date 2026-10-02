@@ -80,6 +80,14 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
         if (params.id) fetchDetail();
     }, [endpoint, label, params.id]);
 
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push("/jelajahirepository");
+        }
+    };
+
     if (loading) {
         return (
             <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
@@ -97,7 +105,7 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
             <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl rounded-2xl border border-red-200 bg-red-50 p-10 text-center">
                     <p className="font-semibold text-red-700">{error || `${label} tidak ditemukan`}</p>
-                    <button type="button" onClick={() => router.back()} className="mt-5 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50">
+                    <button type="button" onClick={handleBack} className="mt-5 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50">
                         Kembali
                     </button>
                 </div>
@@ -112,7 +120,7 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
     return (
         <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl space-y-5">
-                <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <button type="button" onClick={handleBack} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                     <span aria-hidden="true">←</span> Kembali
                 </button>
 

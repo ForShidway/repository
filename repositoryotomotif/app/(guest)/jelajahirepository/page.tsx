@@ -243,7 +243,7 @@ function KatalogTugasAkhirContent() {
   function resetFilters() {
     setKataKunci(''); setProdi(''); setTahun(''); setDosen(''); setSdgsFilter([]); setJenis('');
     setPage(1);
-    router.replace('/mahasiswa/tugas-akhir/katalog', { scroll: false });
+    router.replace('/jelajahirepository', { scroll: false });
   }
 
   if (loading) {

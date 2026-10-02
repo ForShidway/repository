@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 type Dosen = {
     id: number;
@@ -20,6 +20,8 @@ function formatBytes(bytes: number) {
 
 export default function LaporanPklForm() {
     const router = useRouter();
+    const params = useParams<{ programStudyId: string }>();
+    const programStudyId = params.programStudyId;
 
     const [name, setName] = useState("");
     const [nim, setNim] = useState("");
@@ -146,12 +148,29 @@ export default function LaporanPklForm() {
         }
     }
 
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push(`/mahasiswa/${programStudyId}`);
+        }
+    };
+
     return (
         <main className="min-h-screen bg-gray-50 p-8">
             <div className="mx-auto max-w-2xl">
+                <div className="mb-6">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Laporan PL
-                        I Baru</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Laporan PLI Baru</h1>
                     <p className="mt-2 text-gray-600">
                         Lengkapi data di bawah untuk mengunggah laporan PLI.
                     </p>
@@ -342,6 +361,13 @@ export default function LaporanPklForm() {
                         )}
 
                         <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+                            >
+                                Batal
+                            </button>
                             <button
                                 type="submit"
                                 disabled={!canSubmit}

@@ -26,15 +26,15 @@ export default function AdminLayout({
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // Set CSS variable for sidebar width (used by legacy .site-header rules)
+    // Set CSS variable for sidebar width
     useEffect(() => {
         document.documentElement.style.setProperty(
             "--sidebar-width",
-            collapsed ? "72px" : "272px"
+            collapsed ? "76px" : "268px"
         );
     }, [collapsed]);
 
-    const mainMargin = collapsed ? "md:ml-[72px]" : "md:ml-[272px]";
+    const mainMargin = collapsed ? "md:ml-[76px]" : "md:ml-[268px]";
 
     return (
         <div className="admin-layout min-h-screen bg-slate-100">

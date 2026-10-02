@@ -131,13 +131,13 @@ export default function TugasSayaMahasiswaPage() {
   const getDetailHref = (item: RepositoryItem): string | null => {
     switch (item.jenis) {
       case "TUGAS AKHIR":
-        return `/tugas-akhirs/${item.sourceId}`;
+        return `/mahasiswa/tugas-akhir/${item.sourceId}`;
       case "ARTIKEL JURNAL":
-        return `/artikel-jurnal/${item.sourceId}`;
+        return `/mahasiswa/artikel-jurnal/${item.sourceId}`;
       case "LAPORAN PI":
-        return `/laporan-pi/${item.sourceId}`;
+        return `/mahasiswa/laporan-pi/${item.sourceId}`;
       case "LAPORAN PLK":
-        return `/laporan-plk/${item.sourceId}`;
+        return `/mahasiswa/laporan-plk/${item.sourceId}`;
       default:
         return null;
     }
