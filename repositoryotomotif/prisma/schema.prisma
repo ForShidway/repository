@@ -63,24 +63,14 @@ model ProgramStudy {
   @@unique([name, degree])
 }
 
-model Ruangan{
-  id Int @id @default(autoincrement())
-  name String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tugasAkhir TugasAkhir[]
-}
-
 model TugasAkhir {
   id Int @id @default(autoincrement())
   tahunMasuk Int
   judul String @db.Text
   jenisPendidikan JenisPendidikan @default(PENDIDIKAN)
   abstract String?  @db.Text
-  mataKuliahRelevan String?
+ 
 
-  ruanganId Int?
   pembimbingId Int
   pembimbing2Id Int?
   dosenPaId Int?
@@ -91,7 +81,6 @@ model TugasAkhir {
   fileSize Int?
   fileType String?
 
-  ruangan Ruangan? @relation(fields: [ruanganId], references: [id])
   pembimbing Dosen @relation("PembimbingTA", fields: [pembimbingId], references: [id])
   pembimbing2 Dosen? @relation("Pembimbing2TA", fields: [pembimbing2Id], references: [id])
   dosenPa Dosen? @relation("DosenPA", fields: [dosenPaId], references: [id])

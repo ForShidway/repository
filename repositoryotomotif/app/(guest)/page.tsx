@@ -13,10 +13,7 @@ type SDGs = {
     code: string;
     title: string;
 };
-type Ruangan = {
-    id: number;
-    name: string;
-};
+
 type Mahasiswa = {
     id: number;
     name: string;
@@ -28,8 +25,6 @@ type TugasAkhir = {
     id: number;
     tahunMasuk: number;
     judul: string;
-    mataKuliahRelevan: string;
-    ruangan: Ruangan;
     pembimbing: Dosen;
     dosenPa: Dosen;
     mahasiswa: Mahasiswa[];
@@ -39,7 +34,6 @@ type HomeData = {
     statistics: {
         totalTugasAkhir: number;
         totalDosen: number;
-        totalRuangan: number;
         totalSDGs: number;
     };
     periodeTersedia: string;
@@ -69,7 +63,7 @@ const features = [
         iconBg: "bg-blue-50",
         iconColor: "text-blue-800",
         title: "Filter Lengkap",
-        desc: "Filter berdasarkan program studi, tahun, SDGs, dosen pembimbing, dan ruangan.",
+        desc: "Filter berdasarkan program studi, tahun, SDGs, dosen pembimbing.",
         icon: (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />

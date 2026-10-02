@@ -15,8 +15,6 @@ type TugasAkhir = {
     tahunMasuk: number,
     judul: string,
     jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN",
-    mataKuliahRelevan:string,
-    ruangan: {id: number, name:string}
     pembimbing: {id: number, name: string}
     dosenPa: {id: number, name:string}
     mahasiswa: Mahasiswa[];

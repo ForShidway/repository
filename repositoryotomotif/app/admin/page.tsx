@@ -29,7 +29,6 @@ import SdgRadarChart from "@/components/admin/SdgRadarChart";
 type Summary = {
     totalTugasAkhir: number;
     totalDosen: number;
-    totalRuangan: number;
     totalSDGs: number;
     totalUser: number;
     totalProgramStudy: number;
@@ -455,14 +454,6 @@ export default function AdminDashboard() {
                         accent="border-l-4 border-emerald-600"
                     />
                     <StatCard
-                        icon={<Building2 className="h-4 h-4" />}
-                        label="Ruangan"
-                        value={data.summary.totalRuangan}
-                        description="Ruangan Terdaftar"
-                        iconClass="bg-amber-50 text-amber-600"
-                        accent="border-l-4 border-amber-600"
-                    />
-                    <StatCard
                         icon={<Globe2 className="h-4 h-4" />}
                         label="SDGs"
                         value={data.summary.totalSDGs}
@@ -496,7 +487,6 @@ export default function AdminDashboard() {
                     />
                 </section>
 
-                {/* Dashboard Combined Bar Analytics Component (With Recharts) */}
                 <StatistikDashboard
                     programStudyOptions={data.distribusiProgramStudy.map((ps) => ({
                         id: ps.id,

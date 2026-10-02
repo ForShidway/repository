@@ -105,7 +105,6 @@ export async function GET(
                 { tahunMasuk : "desc"}, { createdAt: "desc" }
             ], include: {
                 programStudy: true,
-                ruangan: true,
                 sdgs: true,
                 mahasiswa: {
                     orderBy: {

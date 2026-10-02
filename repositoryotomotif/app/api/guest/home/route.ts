@@ -6,7 +6,6 @@ export async function GET() {
         const [
             totalTugasAkhir,
             totalDosen,
-            totalRuangan,
             totalSDGs,
             tugasAkhirTerbaru,
             tugasAkhirYearRange,
@@ -16,7 +15,6 @@ export async function GET() {
         ] = await Promise.all([
             prisma.tugasAkhir.count(),
             prisma.dosen.count(),
-            prisma.ruangan.count(),
             prisma.sDGs.count(),
             prisma.tugasAkhir.findMany({
                 take: 6,
@@ -24,7 +22,6 @@ export async function GET() {
                     createdAt: "desc"
                 },
                 include: {
-                    ruangan: true,
                     pembimbing: true,
                     dosenPa: true,
                     sdgs: true,
@@ -66,7 +63,7 @@ export async function GET() {
         const endYear = years.length ? Math.max(...years) : new Date().getFullYear();
 
         return NextResponse.json({
-            statistics: { totalTugasAkhir, totalDosen, totalRuangan, totalSDGs },
+            statistics: { totalTugasAkhir, totalDosen, totalSDGs },
             periodeTersedia: `${startYear} - ${endYear}`,
             tugasAkhirTerbaru,
         });

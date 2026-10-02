@@ -16,11 +16,6 @@ type Dosen = {
     name: string;
 };
 
-type Ruangan = {
-    id: number;
-    name: string;
-};
-
 type ProgramStudy = {
     id: number;
     name: string;
@@ -53,12 +48,10 @@ type TugasAkhirDetail = {
     jenisPendidikan: "PENDIDIKAN" | "NON_PENDIDIKAN";
     abstract: string | null;
     tahunMasuk: number;
-    mataKuliahRelevan: string;
     fileName: string | null;
     filePath: string | null;
     fileSize: number | null;
     fileType: string | null;
-    ruangan: Ruangan | null;
     pembimbing: Dosen;
     pembimbing2: Dosen | null;
     dosenPa: Dosen | null;
@@ -112,7 +105,6 @@ export default function DetailTugasAkhirPage({
                 if (!response.ok) {
                     throw new Error(result.message || "Gagal mengambil data tugas akhir");
                 }
-
                 setData(result);
             } catch (err) {
                 console.error(err);
@@ -205,17 +197,6 @@ export default function DetailTugasAkhirPage({
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-slate-500">Mata Kuliah Relevan</p>
-                                <p className="mt-1 text-slate-800">{data.mataKuliahRelevan}</p>
-                            </div>
-                            <div>
-                            <p className="mb-1 flex items-center gap-2 text-sm text-slate-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M15 9h.01M15 13h.01" />
-                                </svg>
-                                Ruangan
-                            </p>
-                            <p className="text-slate-800">{data.ruangan?.name || "Tidak ada ruangan terkait"}</p>
                         </div>
                         </div>
                     </div>

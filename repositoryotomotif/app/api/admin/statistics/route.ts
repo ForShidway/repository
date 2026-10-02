@@ -10,7 +10,6 @@ export async function GET() {
         const [
             totalTugasAkhir,
             totalDosen,
-            totalRuangan,
             totalSDGs,
             totalUser,
             totalProgramStudy,
@@ -20,7 +19,6 @@ export async function GET() {
         ] = await Promise.all([
             prisma.tugasAkhir.count(),
             prisma.dosen.count(),
-            prisma.ruangan.count(),
             prisma.sDGs.count({
                 where: {
                     isActive: true,
@@ -234,7 +232,6 @@ export async function GET() {
             summary: {
                 totalTugasAkhir,
                 totalDosen,
-                totalRuangan,
                 totalSDGs,
                 totalUser,
                 totalProgramStudy,

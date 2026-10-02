@@ -27,7 +27,6 @@ export async function GET(
             where: {
                 id : tugasAkhirId
             }, include : {
-                ruangan: true,
                 pembimbing: true,
                 pembimbing2: true,
                 dosenPa: true,

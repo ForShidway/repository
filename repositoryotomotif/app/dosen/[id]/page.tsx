@@ -58,10 +58,6 @@ type TugasAkhir = {
     tahunMasuk: number;
     mahasiswa: Mahasiswa[];
     programStudy: ProgramStudy | null;
-    ruangan?: {
-        id: number;
-        name: string;
-    } | null;
     sdgs: SDGs[];
 };
 
@@ -891,11 +887,6 @@ export default function StatistikDosenPage() {
                                             <p className="font-semibold text-slate-800 leading-snug line-clamp-2 text-xs">
                                                 {ta.judul}
                                             </p>
-                                            {ta.ruangan && (
-                                                <span className="mt-0.5 inline-flex items-center text-[10px] text-slate-400 font-medium">
-                                                    Ruang: {ta.ruangan.name}
-                                                </span>
-                                            )}
                                         </td>
                                         <td className="px-4 py-2.5">
                                             {ta.mahasiswa && ta.mahasiswa.length > 0 ? (

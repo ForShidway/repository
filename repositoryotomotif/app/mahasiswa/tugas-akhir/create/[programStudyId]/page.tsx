@@ -14,10 +14,6 @@ type Dosen = {
     name: string;
 }
 
-type Ruangan = {
-    id:number;
-    name:string;
-}
 
 type ProgramStudy = {
     id: number;
@@ -47,9 +43,7 @@ export default function CreateTugasAkhirPage({
     const [tahunMasuk, setTahunMasuk] = useState("");
     const [judul, setJudul] = useState("");
     const [jenisPendidikan, setJenisPendidikan] = useState<"PENDIDIKAN" | "NON_PENDIDIKAN">("PENDIDIKAN");
-    const [mataKuliahRelevan, setMataKuliahRelevan] = useState("");
 
-    const [ruanganId, setRuanganId] = useState("");
     const [pembimbingId, setPembimbingId] = useState("");
     const [pembimbing2Id, setPembimbing2Id] = useState("")
     const [dosenPaId, setDosenPaId] = useState("")
@@ -60,7 +54,6 @@ export default function CreateTugasAkhirPage({
     const [keywords, setKeywords] = useState<string[]>([]);
 
     const [abstract, setAbstract] = useState("");
-    const [ruangans, setRuangans] = useState<Ruangan[]>([]);
     const [dosens, setDosens] = useState<Dosen[]>([]);
     const [programStudy, setProgramStudy] = useState<ProgramStudy | null> (null);
     const [sdgs, setSdgs] = useState<SDGs[]>([]);
@@ -82,22 +75,15 @@ export default function CreateTugasAkhirPage({
     useEffect(() => {
         async function fetchData() {
             try{
-                const [ ruanganResponse, dosenResponse, sdgsResponse, programStudyResponse ] = await Promise.all([
-                    fetch("/api/ruangans"),
+                const [ dosenResponse, sdgsResponse, programStudyResponse ] = await Promise.all([
                     fetch("/api/dosens"),
                     fetch("/api/sdgs"),
                     fetch(`/api/program-studies/${programStudyId}`)
                 ]);
 
-                const ruanganData = await ruanganResponse.json();
                 const dosenData = await dosenResponse.json();
                 const sdgsData = await sdgsResponse.json();
                 const programStudyData = await programStudyResponse.json();
-                if (!ruanganResponse.ok) {
-                    throw new Error (
-                        ruanganData.message || "Gagal mengambil data ruangan"
-                    )
-                }
 
                 if(!dosenResponse.ok) {
                     throw new Error (
@@ -116,7 +102,6 @@ export default function CreateTugasAkhirPage({
                     )
                 }
 
-                setRuangans(ruanganData);
                 setDosens(dosenData);
                 setSdgs(sdgsData);
                 setProgramStudy(programStudyData)
@@ -167,12 +152,6 @@ export default function CreateTugasAkhirPage({
                 formData.append("abstract", abstract.trim());
             }
             
-            if (mataKuliahRelevan.trim()) {
-                formData.append("mataKuliahRelevan", mataKuliahRelevan.trim());
-            }
-            if (ruanganId) {
-                formData.append("ruanganId", ruanganId);
-            }
             formData.append("pembimbingId", pembimbingId);
             if(pembimbing2Id) {
                 formData.append("pembimbing2Id", pembimbing2Id)
@@ -424,36 +403,7 @@ export default function CreateTugasAkhirPage({
                                 placeholder="Tuliskan ringkasan singkat penelitian Tugas Akhir..."
                             />
                         </div>
-
-                        <div>
-                            <label htmlFor="ruangan" className="mb-2 block text-sm font-medium">
-                                Tempat Pelaksanaan TA
-                            </label>
-                            <select id="ruangan" value={ruanganId}  onChange={(e) => setRuanganId( e.target.value ) } className="w-full rounded-lg border px-4 py-3" >
-                                <option value="">
-                                    -- Pilih Ruangan --
-                                </option>
-                                {ruangans.map(
-                                    (ruangan) => (
-                                        <option key={ruangan.id} value={ruangan.id} >
-                                            {ruangan.name}
-                                        </option>
-                                    )
-                                )}
-                            </select>
-                        </div>
                         
-                        <div>
-                            <label htmlFor="mataKuliahRelevan" className="mb-2 block text-sm font-medium">
-                                Mata Kuliah yang Relevan
-                            </label>
-                            <input  id="mataKuliahRelevan" type="text" value={ mataKuliahRelevan }
-                                onChange={(e) => setMataKuliahRelevan( e.target.value ) }
-                                className="w-full rounded-lg border px-4 py-3"
-                                placeholder="Contoh: Pemrograman Web"
-                            />
-                        </div>
-
                         <div>
                             <label htmlFor="keywordInput" className="mb-2 block text-sm font-medium text-gray-700">
                                 Kata Kunci <span className="font-normal text-slate-400">(maksimal 5)</span>

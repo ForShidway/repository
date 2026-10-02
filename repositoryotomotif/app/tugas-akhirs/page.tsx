@@ -12,10 +12,7 @@ type Dosen = {
     id:number;
     name: string;
 }
-type Ruangan = {
-    id:number;
-    name:string;
-}
+
 type Mahasiswa = {
     id: number;
     name: string;
@@ -27,8 +24,6 @@ type TugasAkhir = {
     id: number;
     tahunMasuk: number;
     judul: string;
-    mataKuliahRelevan: string;
-    ruangan: Ruangan;
     pembimbing: Dosen;
     dosenPa: Dosen;
     mahasiswa: Mahasiswa[];

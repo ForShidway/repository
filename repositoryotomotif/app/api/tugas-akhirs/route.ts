@@ -11,7 +11,6 @@ export async function GET(){
             orderBy: {
                 createdAt : "desc",
             }, include : {
-                ruangan: true,
                 pembimbing:  true,
                 pembimbing2:  true,
                 dosenPa: true,
@@ -128,10 +127,6 @@ export async function POST(request: Request) {
         const judul = formData.get("judul")?.toString().trim();
         const jenisPendidikanRaw = formData.get("jenisPendidikan")?.toString().trim();
         const jenisPendidikan = jenisPendidikanRaw === "NON_PENDIDIKAN" ? "NON_PENDIDIKAN" : "PENDIDIKAN";
-        const mataKuliahRelevanRaw = formData.get("mataKuliahRelevan")?.toString().trim();
-        const mataKuliahRelevan = mataKuliahRelevanRaw ? mataKuliahRelevanRaw : null;
-        const ruanganIdRaw = formData.get("ruanganId");
-        const ruanganId = ruanganIdRaw ? Number(ruanganIdRaw) : null;
         const pembimbingId = Number(formData.get("pembimbingId"));
         const pembimbingId2 = formData.get("pembimbing2Id");
         const pembimbing2Id = pembimbingId2 ? Number(pembimbingId2) : null ;
@@ -258,19 +253,6 @@ export async function POST(request: Request) {
                 { message : "Nim tersebut telah terdaftar"},
                 { status : 409 }
             )
-        }
-
-        if (ruanganId) {
-            const ruangan = await prisma.ruangan.findUnique({
-                where: { id: ruanganId }
-            })
-
-            if (!ruangan) {
-                return NextResponse.json(
-                    { message: "Ruangan tidak ditemukan" },
-                    { status: 404 }
-                )
-            }
         }
 
         const pembimbing = await prisma.dosen.findUnique({
@@ -404,7 +386,7 @@ export async function POST(request: Request) {
         
         const tugasAkhir = await prisma.tugasAkhir.create ({
             data: {
-                tahunMasuk, judul, jenisPendidikan, abstract, mataKuliahRelevan, ruanganId, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
+                tahunMasuk, judul, jenisPendidikan, abstract, pembimbingId, pembimbing2Id, dosenPaId, ProgramStudyId : programStudyId,
                 fileName: file?.name ?? null,
                 filePath,
                 fileSize: file?.size ?? null,
@@ -428,7 +410,6 @@ export async function POST(request: Request) {
                     })),
                 },
             }, include : {
-                ruangan: true,
                 pembimbing: true,
                 pembimbing2: true,
                 dosenPa: true,
