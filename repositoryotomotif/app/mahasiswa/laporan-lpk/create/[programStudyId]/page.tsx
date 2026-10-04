@@ -34,10 +34,17 @@ export default function LaporanPLKForm() {
     const [tanggalMulai, setTanggalMulai] = useState("");
     const [tanggalSelesai, setTanggalSelesai] = useState("");
 
+    // File Laporan PLK
     const [file, setFile] = useState<File | null>(null);
     const [fileError, setFileError] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // File Laporan Aktivitas
+    const [fileAktivitas, setFileAktivitas] = useState<File | null>(null);
+    const [fileAktivitasError, setFileAktivitasError] = useState<string | null>(null);
+    const [isDraggingAktivitas, setIsDraggingAktivitas] = useState(false);
+    const fileAktivitasInputRef = useRef<HTMLInputElement>(null);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -76,6 +83,26 @@ export default function LaporanPLKForm() {
         setFile(candidate);
     }
 
+    function validateAndSetFileAktivitas(candidate: File | null) {
+        if (!candidate) {
+            setFileAktivitas(null);
+            setFileAktivitasError(null);
+            return;
+        }
+        if (candidate.size > MAX_FILE_SIZE) {
+            setFileAktivitasError("Maksimal ukuran file adalah 100 MB");
+            setFileAktivitas(null);
+            return;
+        }
+        if (!ALLOWED_FILE_TYPES.includes(candidate.type)) {
+            setFileAktivitasError(`File hanya boleh ${ALLOWED_FILE_LABEL}`);
+            setFileAktivitas(null);
+            return;
+        }
+        setFileAktivitasError(null);
+        setFileAktivitas(candidate);
+    }
+
     const canSubmit =
         name.trim() &&
         nim.trim() &&
@@ -87,6 +114,8 @@ export default function LaporanPLKForm() {
         tanggalSelesai &&
         file &&
         !fileError &&
+        fileAktivitas &&
+        !fileAktivitasError &&
         !loading;
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -94,12 +123,12 @@ export default function LaporanPLKForm() {
         setError("");
 
         if (!canSubmit) {
-            setError("Semua data harus diisi, termasuk file laporan");
+            setError("Semua data harus diisi, termasuk kedua file laporan");
             return;
         }
 
         if (tanggalSelesai < tanggalMulai) {
-            setError("Bulan selesai tidak boleh sebelum bulan mulai");
+            setError("Tanggal selesai tidak boleh sebelum tanggal mulai");
             return;
         }
 
@@ -116,6 +145,7 @@ export default function LaporanPLKForm() {
             formData.append("tanggalMulai", tanggalMulai);
             formData.append("tanggalSelesai", tanggalSelesai);
             if (file) formData.append("file", file);
+            if (fileAktivitas) formData.append("fileAktivitas", fileAktivitas);
 
             const response = await fetch("/api/laporanPlk", {
                 method: "POST",
@@ -138,7 +168,9 @@ export default function LaporanPLKForm() {
             setTanggalMulai("");
             setTanggalSelesai("");
             setFile(null);
+            setFileAktivitas(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
+            if (fileAktivitasInputRef.current) fileAktivitasInputRef.current.value = "";
             router.refresh();
         } catch (err) {
             console.error(err);
@@ -270,7 +302,7 @@ export default function LaporanPLKForm() {
                                 </label>
                                 <input
                                     id="tanggalMulai"
-                                    type="month"
+                                    type="date"
                                     value={tanggalMulai}
                                     onChange={(e) => setTanggalMulai(e.target.value)}
                                     className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
@@ -282,7 +314,7 @@ export default function LaporanPLKForm() {
                                 </label>
                                 <input
                                     id="tanggalSelesai"
-                                    type="month"
+                                    type="date"
                                     value={tanggalSelesai}
                                     onChange={(e) => setTanggalSelesai(e.target.value)}
                                     className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
@@ -290,10 +322,10 @@ export default function LaporanPLKForm() {
                             </div>
                         </div>
 
-                        {/* BERKAS */}
+                        {/* BERKAS LAPORAN PLK */}
                         <div>
                             <label htmlFor="file" className="mb-2 block text-sm font-medium text-gray-700">
-                                Berkas Laporan <span className="font-normal text-slate-400">({ALLOWED_FILE_LABEL}, maksimal 100 MB)</span>
+                                Berkas Laporan PLK <span className="font-normal text-slate-400">({ALLOWED_FILE_LABEL}, maksimal 100 MB)</span>
                             </label>
 
                             <div
@@ -341,11 +373,70 @@ export default function LaporanPLKForm() {
                                         </button>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-slate-500">Klik atau seret berkas ke sini</p>
+                                    <p className="text-sm text-slate-500">Klik atau seret berkas Laporan PLK ke sini</p>
                                 )}
                             </div>
                             {fileError && (
                                 <p className="mt-1.5 text-xs text-red-500">{fileError}</p>
+                            )}
+                        </div>
+
+                        {/* BERKAS LAPORAN AKTIVITAS */}
+                        <div>
+                            <label htmlFor="fileAktivitas" className="mb-2 block text-sm font-medium text-gray-700">
+                                Berkas Laporan Aktivitas <span className="font-normal text-slate-400">({ALLOWED_FILE_LABEL}, maksimal 100 MB)</span>
+                            </label>
+
+                            <div
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setIsDraggingAktivitas(true);
+                                }}
+                                onDragLeave={() => setIsDraggingAktivitas(false)}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setIsDraggingAktivitas(false);
+                                    validateAndSetFileAktivitas(e.dataTransfer.files?.[0] ?? null);
+                                }}
+                                onClick={() => fileAktivitasInputRef.current?.click()}
+                                className={`cursor-pointer rounded-lg border-2 border-dashed px-6 py-8 text-center transition ${
+                                    isDraggingAktivitas
+                                        ? "border-blue-400 bg-blue-50"
+                                        : fileAktivitasError
+                                          ? "border-red-300 bg-red-50"
+                                          : "border-slate-200 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40"
+                                }`}
+                            >
+                                <input
+                                    ref={fileAktivitasInputRef}
+                                    id="fileAktivitas"
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => validateAndSetFileAktivitas(e.target.files?.[0] ?? null)}
+                                    className="hidden"
+                                />
+                                {fileAktivitas ? (
+                                    <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+                                        <span className="font-semibold text-slate-800">{fileAktivitas.name}</span>
+                                        <span className="text-slate-400">{formatBytes(fileAktivitas.size)}</span>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                validateAndSetFileAktivitas(null);
+                                                if (fileAktivitasInputRef.current) fileAktivitasInputRef.current.value = "";
+                                            }}
+                                            className="font-semibold text-red-500 hover:text-red-700"
+                                        >
+                                            Hapus
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-slate-500">Klik atau seret berkas Laporan Aktivitas ke sini</p>
+                                )}
+                            </div>
+                            {fileAktivitasError && (
+                                <p className="mt-1.5 text-xs text-red-500">{fileAktivitasError}</p>
                             )}
                         </div>
 

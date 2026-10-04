@@ -182,7 +182,7 @@ export async function GET(request: Request) {
         rows = items.map((item, index) => ({
             no: String(index + 1), mahasiswa: item.mahasiswa.map((value) => value.name).join(", "), nim: item.mahasiswa.map((value) => value.nim).join(", "),
             judul: item.judul, jenisPendidikan: item.jenisPendidikan === "NON_PENDIDIKAN" ? "Non Pendidikan" : "Pendidikan", tahunMasuk: String(item.tahunMasuk),
-            programStudy: item.programStudy ? `${item.programStudy.degree} ${item.programStudy.name}` : "-", pembimbing1: item.pembimbing.name, pembimbing2: text(item.pembimbing2?.name), dosenPa: text(item.dosenPa?.name),  filePath: fileLink(item.filePath, baseUrl),
+            programStudy: item.programStudy ? `${item.programStudy.degree} ${item.programStudy.name}` : "-", pembimbing1: item.pembimbing.name, pembimbing2: text(item.pembimbing2?.name), dosenPa: text(item.dosenPa?.name),  fileName: text(item.fileName) ,filePath: fileLink(item.filePath, baseUrl),
         }));
     } else if (type === "artikel-jurnal") {
         const items = await prisma.artikelJurnal.findMany({

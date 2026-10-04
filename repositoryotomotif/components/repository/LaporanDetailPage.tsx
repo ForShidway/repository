@@ -18,15 +18,22 @@ type LaporanDetail = {
     filePath: string | null;
     fileSize: number | null;
     fileType: string | null;
+    fileNameAktivitas: string | null;
+    filePathAktivitas: string | null;
+    fileSizeAktivitas: number | null;
+    fileTypeAktivitas: string | null;
     dosenPembimbing: { id: number; name: string };
 };
 
-function formatDate(value: string) {
+function formatDate(value: string | null | undefined) {
+    if (!value) return "-";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "-";
     return new Intl.DateTimeFormat("id-ID", {
-        day: "2-digit",
+        day: "numeric",
         month: "long",
         year: "numeric",
-    }).format(new Date(value));
+    }).format(d);
 }
 
 function formatFileSize(value: number | null) {
@@ -49,6 +56,50 @@ function DetailItem({ label, value }: { label: string; value: string }) {
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</p>
             <p className="mt-1.5 break-words text-sm font-semibold leading-relaxed text-slate-800">{value || "-"}</p>
         </div>
+    );
+}
+
+function FileCard({
+    label,
+    fileName,
+    filePath,
+    fileSize,
+    fileType,
+    accentClasses,
+}: {
+    label: string;
+    fileName: string | null;
+    filePath: string | null;
+    fileSize: number | null;
+    fileType: string | null;
+    accentClasses: { icon: string };
+}) {
+    return (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${accentClasses.icon}`}>
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M8 13h8M8 17h6" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p className="text-sm font-bold text-slate-900">{label}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">{fileName || "Belum ada file"} {filePath ? `· ${formatFileSize(fileSize)}` : ""}</p>
+                    </div>
+                </div>
+                {filePath ? (
+                    <div className="flex flex-wrap gap-2">
+                        <a href={filePath} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
+                            Lihat {fileTypeLabel(fileType)}
+                        </a>
+                        <a href={filePath} download={fileName || true} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                            <span aria-hidden="true">↓</span> Unduh File
+                        </a>
+                    </div>
+                ) : <span className="text-sm text-slate-400">File belum tersedia</span>}
+            </div>
+        </section>
     );
 }
 
@@ -150,31 +201,27 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
                     </div>
                 </section>
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${accentClasses.icon}`}>
-                                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M8 13h8M8 17h6" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold text-slate-900">Dokumen Laporan</p>
-                                <p className="mt-0.5 text-xs text-slate-500">{data.fileName || "Belum ada file"} {data.filePath ? `· ${formatFileSize(data.fileSize)}` : ""}</p>
-                            </div>
-                        </div>
-                        {data.filePath ? (
-                            <div className="flex flex-wrap gap-2">
-                                <a href={data.filePath} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
-                                    Lihat {fileTypeLabel(data.fileType)}
-                                </a>
-                                <a href={data.filePath} download={data.fileName || true} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
-                                    <span aria-hidden="true">↓</span> Unduh File
-                                </a>
-                            </div>
-                        ) : <span className="text-sm text-slate-400">File belum tersedia</span>}
-                    </div>
-                </section>
+                {/* Dokumen Laporan (utama) */}
+                <FileCard
+                    label={isPi ? "Dokumen Laporan" : "Dokumen Laporan PLK"}
+                    fileName={data.fileName}
+                    filePath={data.filePath}
+                    fileSize={data.fileSize}
+                    fileType={data.fileType}
+                    accentClasses={accentClasses}
+                />
+
+                {/* Dokumen Laporan Aktivitas (hanya PLK) */}
+                {!isPi && (
+                    <FileCard
+                        label="Dokumen Laporan Aktivitas"
+                        fileName={data.fileNameAktivitas}
+                        filePath={data.filePathAktivitas}
+                        fileSize={data.fileSizeAktivitas}
+                        fileType={data.fileTypeAktivitas}
+                        accentClasses={accentClasses}
+                    />
+                )}
             </div>
         </main>
     );

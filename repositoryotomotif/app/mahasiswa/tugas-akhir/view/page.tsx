@@ -32,7 +32,6 @@ type TugasAkhir = {
   id: number;
   tahunMasuk: number;
   judul: string;
-  mataKuliahRelevan: string;
   pembimbing: Dosen;
   programStudy: ProgramStudy;
   mahasiswa: Mahasiswa[];
@@ -165,9 +164,6 @@ export default function DaftarTugasAkhirPage() {
                   <div className="mb-4 flex items-center gap-2">
                     <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ background: '#EEF2FB', color: '#1E4FBA' }}>
                       {ta.programStudy?.degree || 'Program'}
-                    </span>
-                    <span className="rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ background: '#FFF4EC', color: '#E8630A' }}>
-                      {ta.mataKuliahRelevan || 'Umum'}
                     </span>
                   </div>
                   

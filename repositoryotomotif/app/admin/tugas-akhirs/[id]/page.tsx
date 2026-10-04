@@ -248,10 +248,6 @@ export default function DetailTugasAkhirPage({
                                     <p className="font-medium text-slate-800">{dosen.name}</p>
                                 </div>
                             ))}
-                            <div>
-                                <p className="text-sm text-slate-500">Dosen PA</p>
-                                <p className="font-medium text-slate-800">{data.dosenPa?.name}</p>
-                            </div>
                         </div>
                     </div>
                     

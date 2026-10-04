@@ -17,6 +17,7 @@ type ArtikelJurnalDetail = {
     tahun: number;
     judul: string;
     abstract: string;
+    linkDoi: string | null;
     fileName: string | null;
     filePath: string | null;
     fileSize: number | null;
@@ -38,6 +39,12 @@ function formatFileType(fileType: string | null) {
     if (fileType.includes("wordprocessingml")) return "DOCX";
     if (fileType.includes("msword")) return "DOC";
     return fileType.split("/").pop()?.toUpperCase() ?? "";
+}
+
+function toDoiLink(doi: string) {
+    const trimedDoi = doi.trim();
+    if (/^https?:\/\//i.test(trimedDoi)) return trimedDoi;
+            return `https://doi.org/${trimedDoi}`;
 }
 
 function namaPenulis(penulis: Penulis) {
@@ -125,6 +132,12 @@ export default function ArtikelJurnalDetailPage() {
                         {data.keywords.length > 0 && <>
                             <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wide text-slate-400">Kata Kunci</p>
                             <div className="flex flex-wrap gap-2">{data.keywords.map((keyword) => <span key={keyword.id} className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600">{keyword.kata}</span>)}</div>
+                        </>}
+                        {data.linkDoi && <>
+                            <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wide text-slate-400">Link DOI</p>
+                            <a href={toDoiLink(data.linkDoi)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
+                                {toDoiLink(data.linkDoi)}
+                            </a>
                         </>}
                     </div>
                 </div>

@@ -130,6 +130,7 @@ export async function POST(request: Request) {
 
         const judul = formData.get("judul")?.toString().trim() ?? "";
         const abstract = formData.get("abstract")?.toString().trim() ?? "";
+        const linkDoi = formData.get("linkDoi")?.toString().trim() ?? "";
         const tahunRaw = formData.get("tahun")?.toString().trim() ?? "";
         const tahun = Number(tahunRaw);
         const programStudyIdRaw = formData.get("programStudyId")?.toString().trim() ?? "";
@@ -297,6 +298,7 @@ export async function POST(request: Request) {
                 tahun,
                 judul,
                 abstract,
+                linkDoi: linkDoi || null,
                 ProgramStudyId: programStudyId,
                 sdgs: {
                     connect: sdgsId.map((id) => ({

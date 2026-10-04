@@ -45,8 +45,15 @@ export async function POST(request: Request) {
             );
         }
 
-        const tanggalMulai = new Date(`${tanggalMulaiRaw}-01`);
-        const tanggalSelesai = new Date(`${tanggalSelesaiRaw}-01`);
+        const parseDate = (val: string) => {
+            if (/^\d{4}-\d{2}$/.test(val)) {
+                return new Date(`${val}-01T00:00:00.000Z`);
+            }
+            return new Date(val);
+        };
+
+        const tanggalMulai = parseDate(tanggalMulaiRaw);
+        const tanggalSelesai = parseDate(tanggalSelesaiRaw);
 
         if (Number.isNaN(tanggalMulai.getTime()) || Number.isNaN(tanggalSelesai.getTime())) {
             return NextResponse.json(

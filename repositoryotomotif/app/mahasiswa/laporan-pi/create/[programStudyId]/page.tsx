@@ -99,7 +99,7 @@ export default function LaporanPklForm() {
         }
 
         if (tanggalSelesai < tanggalMulai) {
-            setError("Bulan selesai tidak boleh sebelum bulan mulai");
+            setError("Tanggal selesai tidak boleh sebelum tanggal mulai");
             return;
         }
 
@@ -270,7 +270,7 @@ export default function LaporanPklForm() {
                                 </label>
                                 <input
                                     id="tanggalMulai"
-                                    type="month"
+                                    type="date"
                                     value={tanggalMulai}
                                     onChange={(e) => setTanggalMulai(e.target.value)}
                                     className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
@@ -282,7 +282,7 @@ export default function LaporanPklForm() {
                                 </label>
                                 <input
                                     id="tanggalSelesai"
-                                    type="month"
+                                    type="date"
                                     value={tanggalSelesai}
                                     onChange={(e) => setTanggalSelesai(e.target.value)}
                                     className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"

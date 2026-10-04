@@ -156,6 +156,7 @@ model ArtikelJurnal {
   tahun Int
   judul String @db.Text
   abstract String @db.Text
+  linkDoi String? @db.Text
   
   ProgramStudyId Int?
   programStudy ProgramStudy? @relation(fields: [ProgramStudyId], references: [id])
@@ -250,6 +251,11 @@ model LaporanPLK {
   filePath String
   fileSize Int
   fileType String
+
+  fileNameAktivitas String?
+  filePathAktivitas String?
+  fileSizeAktivitas Int?
+  fileTypeAktivitas String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

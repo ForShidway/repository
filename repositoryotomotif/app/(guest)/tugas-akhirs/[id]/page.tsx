@@ -54,7 +54,6 @@ type TugasAkhirDetail = {
     fileType: string | null;
     pembimbing: Dosen;
     pembimbing2: Dosen | null;
-    dosenPa: Dosen | null;
     programStudy: ProgramStudy | null;
     sdgs: SDGs[];
     mahasiswa: Mahasiswa[];
@@ -247,10 +246,6 @@ export default function DetailTugasAkhirPage({
                                     <p className="font-medium text-slate-800">{dosen.name}</p>
                                 </div>
                             ))}
-                            <div>
-                                <p className="text-sm text-slate-500">Dosen PA</p>
-                                <p className="font-medium text-slate-800">{data.dosenPa?.name}</p>
-                            </div>
                         </div>
                     </div>
                     

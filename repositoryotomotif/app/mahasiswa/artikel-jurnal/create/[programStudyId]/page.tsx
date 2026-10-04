@@ -71,6 +71,7 @@ export default function ArtikelJurnalForm() {
     const [tahun, setTahun] = useState(String(CURRENT_YEAR));
     const [judul, setJudul] = useState("");
     const [abstract, setAbstract] = useState("");
+    const [linkDoi, setLinkDoi] = useState("");
 
     const [keywordInput, setKeywordInput] = useState("");
     const [keywords, setKeywords] = useState<string[]>([]);
@@ -167,6 +168,8 @@ export default function ArtikelJurnalForm() {
 
   const abstractWordCount = useMemo(() => countWords(abstract), [abstract]);
   const abstractOverLimit = abstractWordCount > MAX_ABSTRACT_WORDS;
+  const DOI_PATTERN = /^https?:\/\/(dx\.)?doi\.org\/.+$/i;
+  const linkDoiInvalid = linkDoi.trim() !== "" && !DOI_PATTERN.test(linkDoi.trim());
 
   function addKeyword() {
     const parts = keywordInput
@@ -228,6 +231,7 @@ export default function ArtikelJurnalForm() {
     setTahun(String(CURRENT_YEAR));
     setJudul("");
     setAbstract("");
+    setLinkDoi("");
     setKeywords([]);
     setKeywordInput("");
     setKeywordError(null);
@@ -252,6 +256,7 @@ export default function ArtikelJurnalForm() {
     selectedSDGs.length > 0 &&
     programStudy &&
     !fileError &&
+    !linkDoiInvalid &&
     submit.status !== "submitting";
 
   async function handleSubmit(e: React.FormEvent) {
@@ -631,6 +636,25 @@ export default function ArtikelJurnalForm() {
                                     </p>
                                 )}
                             </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="linkDoi" className="mb-2 block text-sm font-medium text-gray-700">
+                                Link DOI
+                            </label>
+                            <input
+                                type="url"
+                                id="linkDoi"
+                                value={linkDoi}
+                                onChange={(e) => setLinkDoi(e.target.value)}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                placeholder="https://doi.org/..."
+                            />
+                            {linkDoiInvalid && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    Format link DOI tidak valid
+                                </p>
+                            )}
                         </div>
 
                         {/* BERKAS */}
