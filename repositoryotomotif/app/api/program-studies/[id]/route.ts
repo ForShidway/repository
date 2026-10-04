@@ -68,6 +68,9 @@ export async function PUT(request: Request, context: RouteContext) {
         const name = body.name?.trim();
         const degree = body.degree?.trim();
         const description = body.description?.trim() || null;
+        const category = degree === "S1" 
+            ? (body.category === "NON_KEPENDIDIKAN" ? "NON_KEPENDIDIKAN" : "KEPENDIDIKAN")
+            : null;
 
         if (!name || !degree) {
             return NextResponse.json (
@@ -81,8 +84,6 @@ export async function PUT(request: Request, context: RouteContext) {
                 id: programStudyId,
             }
         });
-        
-        
         
         if (!existingProgramStudy) {
             return NextResponse.json(
@@ -113,7 +114,7 @@ export async function PUT(request: Request, context: RouteContext) {
                 id: programStudyId,
             },
             data: {
-                name, degree, description,
+                name, degree, description, category,
             }
         });
 

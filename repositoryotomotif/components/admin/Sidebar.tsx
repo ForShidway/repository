@@ -64,6 +64,7 @@ const menuGroups: MenuGroup[] = [
             { label: "Artikel Jurnal", href: "/admin/artikel-jurnals", icon: BookOpen },
             { label: "Laporan PI", href: "/admin/laporan-pi", icon: Briefcase },
             { label: "Laporan PLK", href: "/admin/laporan-plk", icon: GraduationCap },
+            { label: "Laporan KP", href: "/admin/laporan-kp", icon: Briefcase },
             { label: "Dosen", href: "/admin/dosens", icon: Users },
             { label: "Program Studi", href: "/admin/program-studies", icon: Library },
             { label: "SDGs", href: "/admin/sdgs", icon: Globe },

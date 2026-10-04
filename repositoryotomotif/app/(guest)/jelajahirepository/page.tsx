@@ -31,7 +31,7 @@ type Mahasiswa = {
 type RepositoryItem = {
   id: string;
   sourceId: number;
-  jenis: "TUGAS AKHIR" | "ARTIKEL JURNAL" | "LAPORAN PI" | "LAPORAN PLK";
+  jenis: "TUGAS AKHIR" | "ARTIKEL JURNAL" | "LAPORAN PI" | "LAPORAN PLK" | "LAPORAN KP";
   tahun: number;
   judul: string;
   pembimbing: Dosen | null;
@@ -181,6 +181,8 @@ function KatalogTugasAkhirContent() {
         return `/laporan-pi/${item.sourceId}`;
       case "LAPORAN PLK":
         return `/laporan-plk/${item.sourceId}`;
+      case "LAPORAN KP":
+        return `/laporan-kp/${item.sourceId}`;
       default:
         return null;
     }
@@ -377,6 +379,7 @@ function KatalogTugasAkhirContent() {
                     <option value="ARTIKEL JURNAL">Artikel Jurnal</option>
                     <option value="LAPORAN PI">Laporan PI</option>
                     <option value="LAPORAN PLK">Laporan PLK</option>
+                    <option value="LAPORAN KP">Laporan Kerja Praktek</option>
                   </select>
                 </div>
 

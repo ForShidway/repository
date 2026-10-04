@@ -33,6 +33,9 @@ export async function POST(request: Request) {
         const name = body.name?.trim();
         const degree =  body.degree?.trim();
         const description = body.description?.trim() || null;
+        const category = degree === "S1" 
+            ? (body.category === "NON_KEPENDIDIKAN" ? "NON_KEPENDIDIKAN" : "KEPENDIDIKAN")
+            : null;
 
         if (!name || !degree) {
             return NextResponse.json(
@@ -60,7 +63,7 @@ export async function POST(request: Request) {
         }
 
         const programStudy = await prisma.programStudy.create({
-            data: {name, degree, description}
+            data: { name, degree, description, category }
         });
 
         return NextResponse.json(programStudy, {

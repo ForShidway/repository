@@ -45,6 +45,7 @@ model Dosen {
   pengujiTa PengujiTugasAkhir[]
   pembimbingPi LaporanPi[] @relation("PembimbingPI")
   pembimbingPlk LaporanPLK[] @relation("PembimbingPLK")
+  pembimbingKp LaporanKerjaPraktek[] @relation("PembimbingKP")
   penulisArtikel PenulisArtikelJurnal[] @relation("PenulisArtikel")
 
 }
@@ -53,6 +54,7 @@ model ProgramStudy {
   id Int @id @default(autoincrement())
   name String 
   degree String
+  category String? @default("KEPENDIDIKAN")
   description String? @db.Text
   isActive Boolean @default(true)
   createdAt DateTime @default(now())
@@ -243,6 +245,34 @@ model LaporanPLK {
   
   dosenPembimbingId Int
   dosenPembimbing Dosen @relation("PembimbingPLK", fields:[dosenPembimbingId], references: [id])
+
+  tanggalMulai DateTime
+  tanggalSelesai DateTime
+
+  fileName String
+  filePath String
+  fileSize Int
+  fileType String
+
+  fileNameAktivitas String?
+  filePathAktivitas String?
+  fileSizeAktivitas Int?
+  fileTypeAktivitas String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LaporanKerjaPraktek {
+  id Int @id @default(autoincrement())
+  name String
+  nim String
+  judul String @db.Text
+  namaInstansi String
+  alamat String @db.Text
+  
+  dosenPembimbingId Int
+  dosenPembimbing Dosen @relation("PembimbingKP", fields:[dosenPembimbingId], references: [id])
 
   tanggalMulai DateTime
   tanggalSelesai DateTime

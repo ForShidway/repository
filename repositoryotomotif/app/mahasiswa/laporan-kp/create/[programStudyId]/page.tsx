@@ -1,0 +1,482 @@
+"use client";
+
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+
+type Dosen = {
+    id: number;
+    name: string;
+};
+
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+const ALLOWED_FILE_LABEL = "PDF, DOC, atau DOCX";
+
+function formatBytes(bytes: number) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export default function LaporanKPForm() {
+    const router = useRouter();
+    const params = useParams<{ programStudyId: string }>();
+    const programStudyId = params.programStudyId;
+
+    const [name, setName] = useState("");
+    const [nim, setNim] = useState("");
+    const [judul, setJudul] = useState("");
+    const [namaInstansi, setNamaInstansi] = useState("");
+    const [alamat, setAlamat] = useState("");
+    const [dosenPembimbingId, setDosenPembimbingId] = useState("");
+    const [dosens, setDosens] = useState<Dosen[]>([]);
+
+    const [tanggalMulai, setTanggalMulai] = useState("");
+    const [tanggalSelesai, setTanggalSelesai] = useState("");
+
+    // File Laporan KP
+    const [file, setFile] = useState<File | null>(null);
+    const [fileError, setFileError] = useState<string | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // File Laporan Aktivitas
+    const [fileAktivitas, setFileAktivitas] = useState<File | null>(null);
+    const [fileAktivitasError, setFileAktivitasError] = useState<string | null>(null);
+    const [isDraggingAktivitas, setIsDraggingAktivitas] = useState(false);
+    const fileAktivitasInputRef = useRef<HTMLInputElement>(null);
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+
+    useEffect(() => {
+        async function fetchDosens() {
+            try {
+                const res = await fetch("/api/dosens");
+                const data = await res.json();
+                if (res.ok) setDosens(data);
+            } catch (err) {
+                console.error("Gagal mengambil data dosen", err);
+            }
+        }
+        fetchDosens();
+    }, []);
+
+    function validateAndSetFile(candidate: File | null) {
+        if (!candidate) {
+            setFile(null);
+            setFileError(null);
+            return;
+        }
+        if (candidate.size > MAX_FILE_SIZE) {
+            setFileError("Maksimal ukuran file adalah 100 MB");
+            setFile(null);
+            return;
+        }
+        if (!ALLOWED_FILE_TYPES.includes(candidate.type)) {
+            setFileError(`File hanya boleh ${ALLOWED_FILE_LABEL}`);
+            setFile(null);
+            return;
+        }
+        setFileError(null);
+        setFile(candidate);
+    }
+
+    function validateAndSetFileAktivitas(candidate: File | null) {
+        if (!candidate) {
+            setFileAktivitas(null);
+            setFileAktivitasError(null);
+            return;
+        }
+        if (candidate.size > MAX_FILE_SIZE) {
+            setFileAktivitasError("Maksimal ukuran file adalah 100 MB");
+            setFileAktivitas(null);
+            return;
+        }
+        if (!ALLOWED_FILE_TYPES.includes(candidate.type)) {
+            setFileAktivitasError(`File hanya boleh ${ALLOWED_FILE_LABEL}`);
+            setFileAktivitas(null);
+            return;
+        }
+        setFileAktivitasError(null);
+        setFileAktivitas(candidate);
+    }
+
+    const canSubmit =
+        name.trim() &&
+        nim.trim() &&
+        judul.trim() &&
+        namaInstansi.trim() &&
+        alamat.trim() &&
+        dosenPembimbingId &&
+        tanggalMulai &&
+        tanggalSelesai &&
+        file &&
+        !fileError &&
+        fileAktivitas &&
+        !fileAktivitasError &&
+        !loading;
+
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        setError("");
+
+        if (!canSubmit) {
+            setError("Semua data harus diisi, termasuk kedua file laporan");
+            return;
+        }
+
+        if (tanggalSelesai < tanggalMulai) {
+            setError("Tanggal selesai tidak boleh sebelum tanggal mulai");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const formData = new FormData();
+            formData.append("name", name.trim());
+            formData.append("nim", nim.trim());
+            formData.append("judul", judul.trim());
+            formData.append("namaInstansi", namaInstansi.trim());
+            formData.append("alamat", alamat.trim());
+            formData.append("dosenPembimbingId", dosenPembimbingId);
+            formData.append("tanggalMulai", tanggalMulai);
+            formData.append("tanggalSelesai", tanggalSelesai);
+            if (file) formData.append("file", file);
+            if (fileAktivitas) formData.append("fileAktivitas", fileAktivitas);
+
+            const response = await fetch("/api/laporanKp", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Gagal mengirim laporan Kerja Praktek");
+            }
+
+            setSuccess(true);
+            setName("");
+            setNim("");
+            setJudul("");
+            setNamaInstansi("");
+            setAlamat("");
+            setDosenPembimbingId("");
+            setTanggalMulai("");
+            setTanggalSelesai("");
+            setFile(null);
+            setFileAktivitas(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            if (fileAktivitasInputRef.current) fileAktivitasInputRef.current.value = "";
+            router.refresh();
+        } catch (err) {
+            console.error(err);
+            setError(err instanceof Error ? err.message : "Terjadi kesalahan");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleBack = () => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+            router.back();
+        } else {
+            router.push(`/mahasiswa/${programStudyId}`);
+        }
+    };
+
+    return (
+        <main className="min-h-screen bg-gray-50 p-8">
+            <div className="mx-auto max-w-2xl">
+                <div className="mb-6">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-blue-600"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Laporan Kerja Praktek Baru</h1>
+                    <p className="mt-2 text-gray-600">
+                        Lengkapi data di bawah untuk mengunggah laporan Kerja Praktek (KP).
+                    </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+
+                        {/* NAMA + NIM */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
+                                    Nama Mahasiswa
+                                </label>
+                                <input
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Contoh: Budi Santoso"
+                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="nim" className="mb-2 block text-sm font-medium text-gray-700">
+                                    NIM
+                                </label>
+                                <input
+                                    id="nim"
+                                    value={nim}
+                                    onChange={(e) => setNim(e.target.value)}
+                                    placeholder="Contoh: 23123456"
+                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="judul" className="mb-2 block text-sm font-medium text-gray-700">
+                                Judul Laporan
+                            </label>
+                            <textarea
+                                id="judul"
+                                value={judul}
+                                onChange={(e) => setJudul(e.target.value)}
+                                rows={3}
+                                placeholder="Laporan Kerja Praktek di PT..."
+                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                        </div>
+
+                        {/* NAMA INSTANSI */}
+                        <div>
+                            <label htmlFor="namaInstansi" className="mb-2 block text-sm font-medium text-gray-700">
+                                Nama Instansi
+                            </label>
+                            <input
+                                id="namaInstansi"
+                                value={namaInstansi}
+                                onChange={(e) => setNamaInstansi(e.target.value)}
+                                placeholder="Contoh: PT Astra Otoparts Tbk"
+                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="alamat" className="mb-2 block text-sm font-medium text-gray-700">
+                                Alamat Instansi
+                            </label>
+                            <textarea
+                                id="alamat"
+                                value={alamat}
+                                onChange={(e) => setAlamat(e.target.value)}
+                                rows={3}
+                                placeholder="Contoh: Jl. Industri No. 10, Bandung"
+                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                        </div>
+
+                        {/* DOSEN PEMBIMBING */}
+                        <div>
+                            <label htmlFor="dosenPembimbing" className="mb-2 block text-sm font-medium text-gray-700">
+                                Dosen Pembimbing
+                            </label>
+                            <select
+                                id="dosenPembimbing"
+                                value={dosenPembimbingId}
+                                onChange={(e) => setDosenPembimbingId(e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            >
+                                <option value="">-- Pilih Dosen Pembimbing --</option>
+                                {dosens.map((dosen) => (
+                                    <option key={dosen.id} value={dosen.id}>
+                                        {dosen.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* PERIODE MAGANG */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="tanggalMulai" className="mb-2 block text-sm font-medium text-gray-700">
+                                    Mulai Magang
+                                </label>
+                                <input
+                                    id="tanggalMulai"
+                                    type="date"
+                                    value={tanggalMulai}
+                                    onChange={(e) => setTanggalMulai(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="tanggalSelesai" className="mb-2 block text-sm font-medium text-gray-700">
+                                    Selesai Magang
+                                </label>
+                                <input
+                                    id="tanggalSelesai"
+                                    type="date"
+                                    value={tanggalSelesai}
+                                    onChange={(e) => setTanggalSelesai(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                />
+                            </div>
+                        </div>
+
+                        {/* BERKAS LAPORAN KP */}
+                        <div>
+                            <label htmlFor="file" className="mb-2 block text-sm font-medium text-gray-700">
+                                Berkas Laporan KP <span className="font-normal text-slate-400">({ALLOWED_FILE_LABEL}, maksimal 100 MB)</span>
+                            </label>
+
+                            <div
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setIsDragging(true);
+                                }}
+                                onDragLeave={() => setIsDragging(false)}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setIsDragging(false);
+                                    validateAndSetFile(e.dataTransfer.files?.[0] ?? null);
+                                }}
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`cursor-pointer rounded-lg border-2 border-dashed px-6 py-8 text-center transition ${
+                                    isDragging
+                                        ? "border-blue-400 bg-blue-50"
+                                        : fileError
+                                          ? "border-red-300 bg-red-50"
+                                          : "border-slate-200 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40"
+                                }`}
+                            >
+                                <input
+                                    ref={fileInputRef}
+                                    id="file"
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => validateAndSetFile(e.target.files?.[0] ?? null)}
+                                    className="hidden"
+                                />
+                                {file ? (
+                                    <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+                                        <span className="font-semibold text-slate-800">{file.name}</span>
+                                        <span className="text-slate-400">{formatBytes(file.size)}</span>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                validateAndSetFile(null);
+                                                if (fileInputRef.current) fileInputRef.current.value = "";
+                                            }}
+                                            className="font-semibold text-red-500 hover:text-red-700"
+                                        >
+                                            Hapus
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-slate-500">Klik atau seret berkas Laporan KP ke sini</p>
+                                )}
+                            </div>
+                            {fileError && (
+                                <p className="mt-1.5 text-xs text-red-500">{fileError}</p>
+                            )}
+                        </div>
+
+                        {/* BERKAS LAPORAN AKTIVITAS */}
+                        <div>
+                            <label htmlFor="fileAktivitas" className="mb-2 block text-sm font-medium text-gray-700">
+                                Berkas Laporan Aktivitas <span className="font-normal text-slate-400">({ALLOWED_FILE_LABEL}, maksimal 100 MB)</span>
+                            </label>
+
+                            <div
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setIsDraggingAktivitas(true);
+                                }}
+                                onDragLeave={() => setIsDraggingAktivitas(false)}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setIsDraggingAktivitas(false);
+                                    validateAndSetFileAktivitas(e.dataTransfer.files?.[0] ?? null);
+                                }}
+                                onClick={() => fileAktivitasInputRef.current?.click()}
+                                className={`cursor-pointer rounded-lg border-2 border-dashed px-6 py-8 text-center transition ${
+                                    isDraggingAktivitas
+                                        ? "border-blue-400 bg-blue-50"
+                                        : fileAktivitasError
+                                          ? "border-red-300 bg-red-50"
+                                          : "border-slate-200 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40"
+                                }`}
+                            >
+                                <input
+                                    ref={fileAktivitasInputRef}
+                                    id="fileAktivitas"
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => validateAndSetFileAktivitas(e.target.files?.[0] ?? null)}
+                                    className="hidden"
+                                />
+                                {fileAktivitas ? (
+                                    <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+                                        <span className="font-semibold text-slate-800">{fileAktivitas.name}</span>
+                                        <span className="text-slate-400">{formatBytes(fileAktivitas.size)}</span>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                validateAndSetFileAktivitas(null);
+                                                if (fileAktivitasInputRef.current) fileAktivitasInputRef.current.value = "";
+                                            }}
+                                            className="font-semibold text-red-500 hover:text-red-700"
+                                        >
+                                            Hapus
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-slate-500">Klik atau seret berkas Laporan Aktivitas ke sini</p>
+                                )}
+                            </div>
+                            {fileAktivitasError && (
+                                <p className="mt-1.5 text-xs text-red-500">{fileAktivitasError}</p>
+                            )}
+                        </div>
+
+                        {error && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                                <p className="text-sm text-red-600">{error}</p>
+                            </div>
+                        )}
+                        {success && (
+                            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
+                                <p className="text-sm text-emerald-700">Laporan Kerja Praktek berhasil dikirim.</p>
+                            </div>
+                        )}
+
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-50"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={!canSubmit}
+                                className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {loading ? "Mengirim..." : "Kirim Laporan"}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    );
+}

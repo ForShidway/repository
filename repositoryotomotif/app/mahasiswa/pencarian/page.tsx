@@ -49,7 +49,7 @@ type Mahasiswa = {
 type RepositoryItem = {
   id: string;
   sourceId: number;
-  jenis: "TUGAS AKHIR" | "ARTIKEL JURNAL" | "LAPORAN PI" | "LAPORAN PLK";
+  jenis: "TUGAS AKHIR" | "ARTIKEL JURNAL" | "LAPORAN PI" | "LAPORAN PLK" | "LAPORAN KP";
   tahun: number;
   judul: string;
   pembimbing: Dosen | null;
@@ -154,6 +154,8 @@ function PencarianMahasiswaContent() {
         return `/mahasiswa/laporan-pi/${item.sourceId}`;
       case "LAPORAN PLK":
         return `/mahasiswa/laporan-plk/${item.sourceId}`;
+      case "LAPORAN KP":
+        return `/mahasiswa/laporan-kp/${item.sourceId}`;
       default:
         return null;
     }
@@ -220,6 +222,12 @@ function PencarianMahasiswaContent() {
           label: "Laporan PLK",
           color: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-900/50",
           icon: School,
+        };
+      case "LAPORAN KP":
+        return {
+          label: "Laporan KP",
+          color: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/50 dark:text-orange-400 dark:border-orange-900/50",
+          icon: Briefcase,
         };
       default:
         return {
@@ -341,6 +349,7 @@ function PencarianMahasiswaContent() {
                   <option value="ARTIKEL JURNAL">Artikel Jurnal</option>
                   <option value="LAPORAN PI">Laporan PI</option>
                   <option value="LAPORAN PLK">Laporan PLK</option>
+                  <option value="LAPORAN KP">Laporan Kerja Praktek</option>
                 </select>
               </div>
 

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     try {
-        const [tugasAkhir, artikelJurnal, laporanPi, laporanPlk] = await Promise.all([
+        const [tugasAkhir, artikelJurnal, laporanPi, laporanPlk, laporanKp] = await Promise.all([
             prisma.tugasAkhir.findMany({
                 orderBy: { createdAt: "desc" },
                 include: {
@@ -26,6 +26,10 @@ export async function GET() {
                 include: { dosenPembimbing: true },
             }),
             prisma.laporanPLK.findMany({
+                orderBy: { createdAt: "desc" },
+                include: { dosenPembimbing: true },
+            }),
+            prisma.laporanKerjaPraktek.findMany({
                 orderBy: { createdAt: "desc" },
                 include: { dosenPembimbing: true },
             }),
@@ -89,6 +93,25 @@ export async function GET() {
                 sourceId: item.id,
                 jenis: "LAPORAN PLK" as const,
                 judul: item.judul || `Laporan PLK - ${item.name}`,
+                tahun: item.tanggalMulai ? new Date(item.tanggalMulai).getFullYear() : new Date().getFullYear(),
+                programStudy: null,
+                mahasiswa: [{
+                    id: item.id,
+                    name: item.name,
+                    nim: item.nim,
+                    urutan: 1,
+                }],
+                pembimbing: item.dosenPembimbing,
+                sdgs: [],
+                fileName: item.fileName,
+                filePath: item.filePath,
+                createdAt: item.createdAt,
+            })),
+            ...laporanKp.map((item) => ({
+                id: `laporan-kp-${item.id}`,
+                sourceId: item.id,
+                jenis: "LAPORAN KP" as const,
+                judul: item.judul || `Laporan KP - ${item.name}`,
                 tahun: item.tanggalMulai ? new Date(item.tanggalMulai).getFullYear() : new Date().getFullYear(),
                 programStudy: null,
                 mahasiswa: [{

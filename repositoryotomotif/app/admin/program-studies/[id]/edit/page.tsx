@@ -11,6 +11,7 @@ export default function EditProgramStudyPage() {
 
     const [name, setName] = useState("");
     const [degree, setDegree] = useState("");
+    const [category, setCategory] = useState<"KEPENDIDIKAN" | "NON_KEPENDIDIKAN">("KEPENDIDIKAN");
     const [description, setDescription] =
         useState("");
 
@@ -36,6 +37,7 @@ export default function EditProgramStudyPage() {
 
                 setName(data.name);
                 setDegree(data.degree);
+                setCategory(data.category === "NON_KEPENDIDIKAN" ? "NON_KEPENDIDIKAN" : "KEPENDIDIKAN");
                 setDescription(
                     data.description || ""
                 );
@@ -86,6 +88,7 @@ export default function EditProgramStudyPage() {
                     body: JSON.stringify({
                         name: name.trim(),
                         degree: degree.trim(),
+                        category: degree === "S1" ? category : null,
                         description:
                             description.trim() ||
                             null,
@@ -199,6 +202,47 @@ export default function EditProgramStudyPage() {
                                 </option>
                             </select>
                         </div>
+
+                        {degree === "S1" && (
+                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                                <p className="mb-3 text-sm font-semibold text-blue-800">
+                                    Kategori Program Studi S1
+                                </p>
+                                <p className="mb-3 text-xs text-blue-600">
+                                    Pilihan ini menentukan jenis laporan yang tersedia untuk mahasiswa pada program studi ini.
+                                </p>
+                                <div className="flex flex-col gap-3">
+                                    <label className={`flex cursor-pointer items-start gap-3 rounded-lg border-2 bg-white p-3 transition ${category === "KEPENDIDIKAN" ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200 hover:border-blue-300"}`}>
+                                        <input
+                                            type="radio"
+                                            name="category"
+                                            value="KEPENDIDIKAN"
+                                            checked={category === "KEPENDIDIKAN"}
+                                            onChange={() => setCategory("KEPENDIDIKAN")}
+                                            className="mt-0.5 accent-blue-600"
+                                        />
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-800">Kependidikan</p>
+                                            <p className="mt-0.5 text-xs text-gray-500">Mahasiswa akan memiliki akses Tugas Akhir, Artikel Jurnal, Laporan PI, dan <strong>Laporan PLK</strong>.</p>
+                                        </div>
+                                    </label>
+                                    <label className={`flex cursor-pointer items-start gap-3 rounded-lg border-2 bg-white p-3 transition ${category === "NON_KEPENDIDIKAN" ? "border-orange-500 ring-2 ring-orange-200" : "border-gray-200 hover:border-orange-300"}`}>
+                                        <input
+                                            type="radio"
+                                            name="category"
+                                            value="NON_KEPENDIDIKAN"
+                                            checked={category === "NON_KEPENDIDIKAN"}
+                                            onChange={() => setCategory("NON_KEPENDIDIKAN")}
+                                            className="mt-0.5 accent-orange-600"
+                                        />
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-800">Non-Kependidikan</p>
+                                            <p className="mt-0.5 text-xs text-gray-500">Mahasiswa akan memiliki akses Tugas Akhir, Artikel Jurnal, Laporan PI, dan <strong>Laporan Kerja Praktek (KP)</strong>.</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
 
                         <div>
                             <label

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-type ExportType = "tugas-akhir" | "artikel-jurnal" | "laporan-pi" | "laporan-plk";
+type ExportType = "tugas-akhir" | "artikel-jurnal" | "laporan-pi" | "laporan-plk" | "laporan-kp";
 type ExportRow = Record<string, string>;
 
 type Column = {
@@ -67,6 +67,24 @@ const EXPORTS: Record<ExportType, { filename: string; sheetName: string; title: 
         filename: "data-laporan-plk.xls",
         sheetName: "Laporan PLK",
         title: "Daftar Laporan PLK Mahasiswa",
+        columns: [
+            { label: "No", key: "no" },
+            { label: "Nama Mahasiswa", key: "name" },
+            { label: "NIM", key: "nim" },
+            { label: "Judul", key: "judul" },
+            { label: "Nama Instansi", key: "namaInstansi" },
+            { label: "Alamat", key: "alamat" },
+            { label: "Dosen Pembimbing", key: "dosenPembimbing" },
+            { label: "Tanggal Mulai", key: "tanggalMulai" },
+            { label: "Tanggal Selesai", key: "tanggalSelesai" },
+            { label: "Nama File", key: "fileName" },
+            { label: "Link File", key: "filePath" },
+        ],
+    },
+    "laporan-kp": {
+        filename: "data-laporan-kp.xls",
+        sheetName: "Laporan KP",
+        title: "Daftar Laporan Kerja Praktek Mahasiswa",
         columns: [
             { label: "No", key: "no" },
             { label: "Nama Mahasiswa", key: "name" },
@@ -193,20 +211,24 @@ export async function GET(request: Request) {
             no: String(index + 1), penulis: item.penulis.map((value) => value.nama).join(", "), nim: item.penulis.filter((value) => value.nim).map((value) => value.nim as string).join(", "), judul: item.judul, tahun: String(item.tahun),
             programStudy: item.programStudy ? `${item.programStudy.degree} ${item.programStudy.name}` : "-", fileName: text(item.fileName), filePath: fileLink(item.filePath, baseUrl),
         }));
+    } else if (type === "laporan-pi") {
+        const items = await prisma.laporanPi.findMany({ orderBy: { createdAt: "desc" }, include: { dosenPembimbing: true } });
+        rows = items.map((item, index) => ({
+            no: String(index + 1), name: item.name, nim: item.nim, judul: item.judul, namaInstansi: item.namaInstansi, alamat: item.alamat,
+            dosenPembimbing: item.dosenPembimbing.name, tanggalMulai: formatDate(item.tanggalMulai), tanggalSelesai: formatDate(item.tanggalSelesai), fileName: text(item.fileName), filePath: fileLink(item.filePath, baseUrl),
+        }));
+    } else if (type === "laporan-plk") {
+        const items = await prisma.laporanPLK.findMany({ orderBy: { createdAt: "desc" }, include: { dosenPembimbing: true } });
+        rows = items.map((item, index) => ({
+            no: String(index + 1), name: item.name, nim: item.nim, judul: item.judul, namaInstansi: item.namaInstansi, alamat: item.alamat,
+            dosenPembimbing: item.dosenPembimbing.name, tanggalMulai: formatDate(item.tanggalMulai), tanggalSelesai: formatDate(item.tanggalSelesai), fileName: text(item.fileName), filePath: fileLink(item.filePath, baseUrl),
+        }));
     } else {
-        if (type === "laporan-pi") {
-            const items = await prisma.laporanPi.findMany({ orderBy: { createdAt: "desc" }, include: { dosenPembimbing: true } });
-            rows = items.map((item, index) => ({
-                no: String(index + 1), name: item.name, nim: item.nim, judul: item.judul, namaInstansi: item.namaInstansi, alamat: item.alamat,
-                dosenPembimbing: item.dosenPembimbing.name, tanggalMulai: formatDate(item.tanggalMulai), tanggalSelesai: formatDate(item.tanggalSelesai), fileName: text(item.fileName), filePath: fileLink(item.filePath, baseUrl),
-            }));
-        } else {
-            const items = await prisma.laporanPLK.findMany({ orderBy: { createdAt: "desc" }, include: { dosenPembimbing: true } });
-            rows = items.map((item, index) => ({
-                no: String(index + 1), name: item.name, nim: item.nim, judul: item.judul, namaInstansi: item.namaInstansi, alamat: item.alamat,
-                dosenPembimbing: item.dosenPembimbing.name, tanggalMulai: formatDate(item.tanggalMulai), tanggalSelesai: formatDate(item.tanggalSelesai), fileName: text(item.fileName), filePath: fileLink(item.filePath, baseUrl),
-            }));
-        }
+        const items = await prisma.laporanKerjaPraktek.findMany({ orderBy: { createdAt: "desc" }, include: { dosenPembimbing: true } });
+        rows = items.map((item, index) => ({
+            no: String(index + 1), name: item.name, nim: item.nim, judul: item.judul, namaInstansi: item.namaInstansi, alamat: item.alamat,
+            dosenPembimbing: item.dosenPembimbing.name, tanggalMulai: formatDate(item.tanggalMulai), tanggalSelesai: formatDate(item.tanggalSelesai), fileName: text(item.fileName), filePath: fileLink(item.filePath, baseUrl),
+        }));
     }
 
     const workbook = renderWorkbook(EXPORTS[type], rows);

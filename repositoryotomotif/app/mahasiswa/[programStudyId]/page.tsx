@@ -19,6 +19,7 @@ type ProgramStudy = {
   id: number;
   name: string;
   degree: string;
+  category: string | null;
   description: string | null;
 };
 
@@ -79,6 +80,17 @@ const ALL_FOLDER_CATEGORIES: FolderCategory[] = [
     badge: "bg-violet-50 text-violet-700 ring-1 ring-violet-200/80",
     Icon: School,
   },
+  {
+    id: "laporan-kerja-praktek",
+    label: "Laporan Kerja Praktek",
+    description: "Upload laporan Kerja Praktek (KP).",
+    iconBg: "bg-gradient-to-br from-orange-500 to-rose-600 text-white shadow-orange-500/25",
+    gradient: "from-orange-500 to-rose-600",
+    borderHover: "hover:border-orange-400 hover:shadow-orange-500/10",
+    glowBg: "from-orange-500/10 to-rose-500/5",
+    badge: "bg-orange-50 text-orange-700 ring-1 ring-orange-200/80",
+    Icon: Briefcase,
+  },
 ];
 
 export default function MahasiswaProgramStudyFolderPage() {
@@ -130,6 +142,9 @@ export default function MahasiswaProgramStudyFolderPage() {
       case "laporan-pelatihan-kependidikan":
         router.push(`/mahasiswa/laporan-lpk/create/${programStudyId}`);
         break;
+      case "laporan-kerja-praktek":
+        router.push(`/mahasiswa/laporan-kp/create/${programStudyId}`);
+        break;
       case "tugas-akhir":
       default:
         router.push(
@@ -158,11 +173,25 @@ export default function MahasiswaProgramStudyFolderPage() {
   }
 
   const isD3 = programStudy?.degree?.toUpperCase() === "D3";
-  const folderCategories = isD3
-    ? ALL_FOLDER_CATEGORIES.filter(
-        (c) => c.id === "tugas-akhir" || c.id === "laporan-pelatihan-industri"
-      )
-    : ALL_FOLDER_CATEGORIES;
+  const isS1NonKep = programStudy?.degree?.toUpperCase() === "S1" && programStudy?.category === "NON_KEPENDIDIKAN";
+
+  let folderCategories: FolderCategory[];
+  if (isD3) {
+    // D3: hanya Tugas Akhir dan Laporan PI
+    folderCategories = ALL_FOLDER_CATEGORIES.filter(
+      (c) => c.id === "tugas-akhir" || c.id === "laporan-pelatihan-industri"
+    );
+  } else if (isS1NonKep) {
+    // S1 Non-Kependidikan: Tugas Akhir, Artikel Jurnal, Laporan PI, Laporan Kerja Praktek
+    folderCategories = ALL_FOLDER_CATEGORIES.filter(
+      (c) => c.id !== "laporan-pelatihan-kependidikan"
+    );
+  } else {
+    // Default (S1 Kependidikan, D4, S2, dst): semua kecuali Laporan Kerja Praktek
+    folderCategories = ALL_FOLDER_CATEGORIES.filter(
+      (c) => c.id !== "laporan-kerja-praktek"
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] pb-16 pt-8 px-4 sm:px-6 lg:px-8">

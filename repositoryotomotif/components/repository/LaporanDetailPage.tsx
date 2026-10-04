@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-type LaporanType = "PI" | "PLK";
+type LaporanType = "PI" | "PLK" | "KP";
 
 type LaporanDetail = {
     id: number;
@@ -111,8 +111,9 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
     const [error, setError] = useState("");
 
     const isPi = type === "PI";
-    const label = isPi ? "Laporan PI" : "Laporan PLK";
-    const endpoint = isPi ? "/api/laporanPi" : "/api/laporanPlk";
+    const isKp = type === "KP";
+    const label = isPi ? "Laporan PI" : isKp ? "Laporan Kerja Praktek" : "Laporan PLK";
+    const endpoint = isPi ? "/api/laporanPi" : isKp ? "/api/laporanKp" : "/api/laporanPlk";
 
     useEffect(() => {
         async function fetchDetail() {
@@ -166,7 +167,9 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
 
     const accentClasses = isPi
         ? { badge: "bg-amber-100 text-amber-800", icon: "bg-amber-50 text-amber-700", border: "border-amber-200" }
-        : { badge: "bg-orange-100 text-orange-800", icon: "bg-orange-50 text-orange-700", border: "border-orange-200" };
+        : isKp
+        ? { badge: "bg-orange-100 text-orange-800", icon: "bg-orange-50 text-orange-700", border: "border-orange-200" }
+        : { badge: "bg-purple-100 text-purple-800", icon: "bg-purple-50 text-purple-700", border: "border-purple-200" };
 
     return (
         <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
@@ -203,7 +206,7 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
 
                 {/* Dokumen Laporan (utama) */}
                 <FileCard
-                    label={isPi ? "Dokumen Laporan" : "Dokumen Laporan PLK"}
+                    label={isPi ? "Dokumen Laporan PI" : isKp ? "Dokumen Laporan KP" : "Dokumen Laporan PLK"}
                     fileName={data.fileName}
                     filePath={data.filePath}
                     fileSize={data.fileSize}
@@ -211,7 +214,7 @@ export default function LaporanDetailPage({ type }: { type: LaporanType }) {
                     accentClasses={accentClasses}
                 />
 
-                {/* Dokumen Laporan Aktivitas (hanya PLK) */}
+                {/* Dokumen Laporan Aktivitas (hanya PLK dan KP) */}
                 {!isPi && (
                     <FileCard
                         label="Dokumen Laporan Aktivitas"
